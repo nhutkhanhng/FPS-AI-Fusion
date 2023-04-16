@@ -1,0 +1,71 @@
+using Fusion;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace TPSBR
+{
+    // The AsteroidSpawner does not execute any behaviour on the clients.
+    // Therefore all of its parameters can remained local and not networked.
+    // Using the SimulationBehaviour attribute, it can be ensured this script exclusively runs on the Server / Host
+    [SimulationBehaviour(Stages = SimulationStages.Forward, Modes = SimulationModes.Server | SimulationModes.Host)]
+    public class AISpawner : ContextBehaviour
+    {
+        [SerializeField] private bool _disableSpawner = false;
+        [SerializeField] protected NetworkBehaviour enemyTemplate;
+        [SerializeField] protected NetworkBehaviour PTemplate;
+        // The TickTimer controls the time lapse between spawns.
+        [Networked] private TickTimer _spawnDelay { get; set; }
+
+        public override void Spawned()
+        {
+            Debug.LogError("Enemies Spaner is Spawned");
+            _spawnDelay = TickTimer.CreateFromSeconds(Runner, 5f);
+            base.Spawned();
+        }
+        public List<NetworkBehaviour> AllEnemies = new List<NetworkBehaviour>();
+        private GameplayMode _currentGameMode;
+
+        protected int countSpawned = 0;
+
+
+
+        public void InitGameMode(GameplayMode gameMode) => this._currentGameMode = gameMode;
+        public override void FixedUpdateNetwork()
+        {
+            if (_disableSpawner || !Object.HasStateAuthority || _currentGameMode == null)
+                return;
+
+            if (countSpawned <= 2 && _spawnDelay.Expired(Runner))
+            {
+                countSpawned++;
+                if (countSpawned == 1)
+                    SpawnEnemies(enemyTemplate);
+                else
+                    SpawnEnemies(PTemplate);
+
+                _spawnDelay = TickTimer.CreateFromSeconds(Runner, 3f);
+            }
+        }
+        private void SpawnEnemies(NetworkBehaviour template)
+        {
+            var spawnPoint = _currentGameMode.GetRandomSpawnPoint(100f);
+
+            var spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            var spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
+
+            var rotation = Quaternion.identity;
+
+            enemyTemplate.transform.localRotation = Quaternion.identity;
+            PTemplate.transform.localRotation = Quaternion.identity;
+
+            var enemy = Runner.Spawn(template, spawnPoint.position, rotation, PlayerRef.None, onBeforeSpawned: _OnBeforeSpawned);
+            AllEnemies.Add(enemy);
+        }
+
+        private void _OnBeforeSpawned(NetworkRunner runner, NetworkObject obj)
+        {
+
+        }
+    }
+}

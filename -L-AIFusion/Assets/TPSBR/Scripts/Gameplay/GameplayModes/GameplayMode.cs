@@ -385,14 +385,14 @@ namespace TPSBR
 
 		protected virtual void OnActivate() { }
 
-		protected virtual void TrySpawnAgent(Player player)
+		protected virtual NetworkBehaviour TrySpawnAgent(Player player)
 		{
 			Transform spawnPoint = GetRandomSpawnPoint(100.0f);
 
 			var spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
 			var spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
 
-			SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
+			return SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
 		}
 
 		protected virtual void AgentDeath(ref PlayerStatistics victimStatistics, ref PlayerStatistics killerStatistics)

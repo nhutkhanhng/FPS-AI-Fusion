@@ -190,7 +190,7 @@ namespace TPSBR
 			}
 		}
 
-		protected override void TrySpawnAgent(Player player)
+		protected override NetworkBehaviour TrySpawnAgent(Player player)
 		{
 			var statistics = player.Statistics;
 
@@ -199,7 +199,7 @@ namespace TPSBR
 				var playerRef = player.Object.InputAuthority;
 
 				if (_airplaneAgents.ContainsKey(playerRef) == true)
-					return;
+					return null;
 
 				var agent = Runner.Spawn(_airplaneAgentPrefab, inputAuthority: playerRef);
 				Runner.SetPlayerAlwaysInterested(playerRef, agent.Object, true);
@@ -211,7 +211,10 @@ namespace TPSBR
 				statistics.IsAlive = true;
 
 				player.UpdateStatistics(statistics);
-			}
+
+                return agent;
+
+            }
 			else
 			{
 				// Too late, player is automatically eliminated
@@ -221,6 +224,7 @@ namespace TPSBR
 				player.UpdateStatistics(statistics);
 
 				SetSpectatorTargetToBestPlayer(player);
+                return null;
 			}
 		}
 

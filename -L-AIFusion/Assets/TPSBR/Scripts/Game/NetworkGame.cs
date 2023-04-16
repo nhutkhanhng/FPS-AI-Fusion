@@ -41,6 +41,9 @@ namespace TPSBR
 		[SerializeField]
 		private ShrinkingArea _shrinkingArea;
 
+        [SerializeField] AISpawner AISpawner;
+
+        [SerializeField]
 		[Networked(OnChanged = nameof(OnSeedChanged), OnChangedTargets = OnChangedTargets.All)]
 		private int _levelGeneratorSeed { get; set; }
 
@@ -62,7 +65,10 @@ namespace TPSBR
 			{
 				var prefab = _modePrefabs.Find(t => t.Type == gameplayType);
 				_gameplayMode = Runner.Spawn(prefab);
-			}
+
+
+                AISpawner.InitGameMode(_gameplayMode);
+            }
 
 			_localPlayer = Runner.LocalPlayer;
 
