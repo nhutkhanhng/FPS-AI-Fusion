@@ -7,18 +7,9 @@ namespace CoverShooter
     /// Each character inside the level must have this component as the AI only regards objects with Actor as characters.
     /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class Actor : mNetworkTransform, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
+    public class Actor : CharacterAdapter, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
     {
         #region Properties
-
-        /// <summary>
-        /// Is the object alive.
-        /// </summary>
-        public bool IsAlive
-        {
-            get { return _isAlive; }
-        }
-
         /// <summary>
         /// Does the character have a weapon in their hands.
         /// </summary>
@@ -69,6 +60,21 @@ namespace CoverShooter
                 else
                     return transform.position + Vector3.up * _height;
             }
+        }
+
+        private void OnEnable()
+        {
+            Actors.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            Actors.Unregister(this);
+        }
+
+        private void OnDestroy()
+        {
+            Actors.Unregister(this);
         }
 
         /// <summary>
@@ -172,12 +178,6 @@ namespace CoverShooter
         #region Public fields
 
         /// <summary>
-        /// Team number used by the AI.
-        /// </summary>
-        [Tooltip("Team number used by the AI.")]
-        public int Side = 0;
-
-        /// <summary>
         /// Is the actor aggresive. Value used by the AI. Owning AI usually overwrites the value if present.
         /// </summary>
         [Tooltip("Is the actor aggresive. Value used by the AI. Owning AI usually overwrites the value if present.")]
@@ -187,7 +187,6 @@ namespace CoverShooter
 
         #region Private fields
 
-        private bool _isAlive = true;
         private Cover _cover;
         private bool _hasStandingHeight;
         private float _standingHeight;
@@ -358,22 +357,6 @@ namespace CoverShooter
 
             _height = _collider.bounds.extents.y * 2;
         }
-
-        private void OnEnable()
-        {
-            Actors.Register(this);
-        }
-
-        private void OnDisable()
-        {
-            Actors.Unregister(this);
-        }
-
-        private void OnDestroy()
-        {
-            Actors.Unregister(this);
-        }
-
         #endregion
 
         #region Public methods
@@ -383,7 +366,7 @@ namespace CoverShooter
         /// </summary>
         public float GetViewDistance(float viewDistance, bool isAlerted)
         {
-            return Util.GetViewDistance(viewDistance, _darkZones, _lightZones, _motor.IsCrouching ? _grassZones : null, isAlerted);
+            return Util.GetViewDistance(viewDistance, _darkZones, _lightZones, (_motor == null ? false : _motor.IsCrouching) ? _grassZones : null, isAlerted);
         }
 
         #endregion
@@ -423,6 +406,8 @@ namespace CoverShooter
                 _list.Add(actor);
 
             _map[actor.gameObject] = actor;
+
+            Debug.LogError(_list.Count);
         }
 
         public static void Unregister(Actor actor)

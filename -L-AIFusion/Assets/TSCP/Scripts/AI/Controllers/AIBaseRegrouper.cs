@@ -85,7 +85,7 @@ namespace CoverShooter
             _friends.Clear();
             _takenPositions.Clear();
 
-            var count = Physics.OverlapSphereNonAlloc(_actor.transform.position, CallDistance, Util.Colliders, Layers.Character, QueryTriggerInteraction.Ignore);
+            var count = Util.GetPhysicsScene().OverlapSphere(_actor.transform.position, CallDistance, Util.Colliders, Layers.Character, QueryTriggerInteraction.Ignore);
             var limit = Limit;
 
             for (int i = 0; i < count; i++)

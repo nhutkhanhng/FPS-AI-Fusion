@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CoverShooter
 {
@@ -3211,10 +3212,10 @@ namespace CoverShooter
                 _isMoving = _currentMovement.IsMoving;
 
                 if (_getHitWait > 0)
-                    _getHitWait -= kINetworkTimer.deltaTime;
+                    _getHitWait -= GetDeltaTime();
 
-                if (_weaponGrabTimer > float.Epsilon) _weaponGrabTimer -= kINetworkTimer.deltaTime;
-                if (_postFireAimWait > float.Epsilon) _postFireAimWait -= kINetworkTimer.deltaTime;
+                if (_weaponGrabTimer > float.Epsilon) _weaponGrabTimer -= GetDeltaTime();
+                if (_postFireAimWait > float.Epsilon) _postFireAimWait -= GetDeltaTime();
 
                 var weapon = EquippedWeapon;
 
@@ -3236,30 +3237,30 @@ namespace CoverShooter
                         InputAimWhenLeavingCover();
                 }
 
-                _coverUpdateTimer += kINetworkTimer.deltaTime;
+                _coverUpdateTimer += GetDeltaTime();
                 _isCrouching = _wantsToCrouch && (!_cover.In || _cover.IsTall);
 
                 if (_useSprintingAnimation)
                 {
                     if (_sprintAnimationOffDelay > 0)
-                        _sprintAnimationOffDelay -= kINetworkTimer.deltaTime;
+                        _sprintAnimationOffDelay -= GetDeltaTime();
                     else
                         _useSprintingAnimation = false;
                 }
 
                 if (_cover.In)
-                    _coverTime += kINetworkTimer.deltaTime;
+                    _coverTime += GetDeltaTime();
                 else
                     _coverTime = 0;
 
                 if (_postPumpDelay > float.Epsilon)
-                    _postPumpDelay -= kINetworkTimer.deltaTime;
+                    _postPumpDelay -= GetDeltaTime();
 
                 if (_willPerformPump && !_isPumping)
                 {
                     if (_pumpWait > float.Epsilon)
                     {
-                        _pumpWait -= kINetworkTimer.deltaTime;
+                        _pumpWait -= GetDeltaTime();
 
                         if (_pumpWait <= float.Epsilon)
                             performPump();
@@ -3270,7 +3271,7 @@ namespace CoverShooter
 
                 if (IsAlive && !_isClimbing)
                 {
-                    var force = new Vector3(0, Gravity, 0) * kINetworkTimer.deltaTime;
+                    var force = new Vector3(0, Gravity, 0) * GetDeltaTime();
 
                     if (!_isGrounded && _isRolling)
                         _body.velocity -= force;
@@ -3367,21 +3368,21 @@ namespace CoverShooter
                 if (Mathf.Abs(_movementInput) > float.Epsilon)
                     _noMovementTimer = 0;
                 else if (_noMovementTimer < 1)
-                    _noMovementTimer += kINetworkTimer.deltaTime;
+                    _noMovementTimer += GetDeltaTime();
 
                 if (!_isGrounded)
                 {
                     _groundTimer = 0;
 
                     if (_nogroundTimer < 1)
-                        _nogroundTimer += kINetworkTimer.deltaTime;
+                        _nogroundTimer += GetDeltaTime();
                 }
                 else
                 {
                     _nogroundTimer = 0;
 
                     if (_groundTimer < 1)
-                        _groundTimer += kINetworkTimer.deltaTime;
+                        _groundTimer += GetDeltaTime();
                 }
 
                 if (_lastNotifiedCover != _cover.Main)
@@ -3423,7 +3424,7 @@ namespace CoverShooter
             _keepUsingWeapon = false;
 
             if (IsAiming)
-                _aimTimer += kINetworkTimer.deltaTime;
+                _aimTimer += GetDeltaTime();
             else
                 _aimTimer = 0;
 
@@ -3461,7 +3462,7 @@ namespace CoverShooter
             // Recoil recover
             if (gun != null)
             {
-                var rate = gun.Recoil.RecoveryRate * RecoilRecovery * kINetworkTimer.deltaTime;
+                var rate = gun.Recoil.RecoveryRate * RecoilRecovery * GetDeltaTime();
 
                 if (_verticalRecoil > 0)
                 {
@@ -3501,7 +3502,7 @@ namespace CoverShooter
 
             if (_inputMovement.IsMoving)
             {
-                _inputMovementTimer += kINetworkTimer.deltaTime;
+                _inputMovementTimer += GetDeltaTime();
 
                 if (!_wasCountingInputMovement)
                 {
@@ -3526,7 +3527,7 @@ namespace CoverShooter
             }
             else
             {
-                _inputMovementTimer += kINetworkTimer.deltaTime;
+                _inputMovementTimer += GetDeltaTime();
                 _inputMovement = _lastMovingInputMovement;
             }
 
@@ -3606,7 +3607,7 @@ namespace CoverShooter
 
                     if (_cover.Main.IsFrontField(_horizontalAngle, 180))
                     {
-                        _isAimingThroughCoverPlane = Physics.RaycastNonAlloc(origin, horizontalDirection, Util.Hits, _capsule.radius * 4, Layers.Geometry, QueryTriggerInteraction.Ignore) > 0;
+                        _isAimingThroughCoverPlane = GetPhysicsScene().Raycast(origin, horizontalDirection, Util.Hits, _capsule.radius * 4, Layers.Geometry, QueryTriggerInteraction.Ignore) > 0;
 
                         if (_isAimingThroughCoverPlane)
                         {
@@ -4302,7 +4303,7 @@ namespace CoverShooter
             if (_cover.In)
                 stickToCover();
 
-            var animatorMovement = _animator.deltaPosition / kINetworkTimer.deltaTime;
+            var animatorMovement = _animator.deltaPosition / GetDeltaTime();
             var animatorSpeed = animatorMovement.magnitude;
 
             if (!IsAlive)
@@ -4337,7 +4338,7 @@ namespace CoverShooter
                 if (_isClimbingAVault)
                 {
                     if (_normalizedClimbTime >= 0.5f && y < 0)
-                        animatorMovement.y = _body.velocity.y - Gravity * kINetworkTimer.deltaTime;
+                        animatorMovement.y = _body.velocity.y - Gravity * GetDeltaTime();
                     else
                         animatorMovement.y = y * VaultSettings.VerticalScale;
                 }
@@ -4363,7 +4364,7 @@ namespace CoverShooter
 
                 if (_isRolling && _isGrounded)
                 {
-                    animatorMovement.y = _body.velocity.y - Gravity * kINetworkTimer.deltaTime;
+                    animatorMovement.y = _body.velocity.y - Gravity * GetDeltaTime();
 
                     if (_potentialCover == null)
                         animatorMovement -= transform.right * Vector3.Dot(transform.right, animatorMovement);
@@ -4391,7 +4392,7 @@ namespace CoverShooter
             }
             else if (_isGettingHit)
             {
-                _body.velocity = _animator.deltaPosition / kINetworkTimer.deltaTime;
+                _body.velocity = _animator.deltaPosition / GetDeltaTime();
                 transform.rotation = _animator.deltaRotation * transform.rotation;
             }
             else if (_isPerformingCustomAction || _useMeleeRootMotion)
@@ -4478,7 +4479,7 @@ namespace CoverShooter
                 var targetAngle = transform.eulerAngles.y + _horizontalAngleDiff;
                 var fullDelta = Mathf.DeltaAngle(_currentAnimatedAngle, targetAngle);
 
-                _stepCursor += kINetworkTimer.deltaTime / _stepDuration;
+                _stepCursor += GetDeltaTime() / _stepDuration;
 
                 float sign;
 
@@ -4597,7 +4598,7 @@ namespace CoverShooter
                 // We want to update the speed information for smooth transitions.
                 updateWalk();
 
-                _climbTime += kINetworkTimer.deltaTime;
+                _climbTime += GetDeltaTime();
 
                 var oldClimbOffset = _climbOffset;
                 _climbOffset = Util.Lerp(_climbOffset, Vector3.zero, 100);
@@ -4641,7 +4642,7 @@ namespace CoverShooter
                 var origin = transform.position;
 
                 var perfect = cover.ClosestPointTo(origin + Vector3.up * 0.2f, -_capsule.radius, _capsule.radius * 0.8f - cover.Depth * 0.5f);
-                var count = Physics.RaycastNonAlloc(perfect - cover.Forward * _capsule.radius, cover.Forward, Util.Hits, _capsule.radius * 2, Layers.Geometry, QueryTriggerInteraction.Ignore);
+                var count = GetPhysicsScene().Raycast(perfect - cover.Forward * _capsule.radius, cover.Forward, Util.Hits, _capsule.radius * 2, Layers.Geometry, QueryTriggerInteraction.Ignore);
 
                 for (int i = 0; i < count; i++)
                 {
@@ -5339,7 +5340,7 @@ namespace CoverShooter
             Vector3 movement;
 
             if (_directionChangeDelay > float.Epsilon)
-                _directionChangeDelay -= kINetworkTimer.deltaTime;
+                _directionChangeDelay -= GetDeltaTime();
 
             _currentMovement = _inputMovement;
 
@@ -5732,9 +5733,9 @@ namespace CoverShooter
 
         private void updateVertical()
         {
-            if (_jumpTimer < 999) _jumpTimer += kINetworkTimer.deltaTime;
-            if (_ignoreFallTimer > 0) _ignoreFallTimer -= kINetworkTimer.deltaTime;
-            if (_ignoreJumpTimer > 0) _ignoreJumpTimer -= kINetworkTimer.deltaTime;
+            if (_jumpTimer < 999) _jumpTimer += GetDeltaTime();
+            if (_ignoreFallTimer > 0) _ignoreFallTimer -= GetDeltaTime();
+            if (_ignoreJumpTimer > 0) _ignoreJumpTimer -= GetDeltaTime();
 
             updateGround();
 
@@ -5743,7 +5744,7 @@ namespace CoverShooter
 
             if (_isGrounded)
             {
-                if (_nextJumpTimer > -float.Epsilon) _nextJumpTimer -= kINetworkTimer.deltaTime;
+                if (_nextJumpTimer > -float.Epsilon) _nextJumpTimer -= GetDeltaTime();
 
                 if (!_cover.In && !_isClimbing && !_isJumping && _nextJumpTimer < float.Epsilon && _wantsToJump)
                     _isIntendingToJump = true;
@@ -5812,7 +5813,7 @@ namespace CoverShooter
                     if (distance > 0.01f)
                     {
                         offset /= distance;
-                        transform.position += offset * Mathf.Clamp(kINetworkTimer.deltaTime * 3, 0, distance);
+                        transform.position += offset * Mathf.Clamp(GetDeltaTime() * 3, 0, distance);
                     }
                 }
             }
@@ -6075,22 +6076,22 @@ namespace CoverShooter
 
                 if (_coverOffset.magnitude > float.Epsilon)
                 {
-                    _animator.SetFloat("SmoothRotation", 0, 0.05f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("Rotation", 0, 0.05f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
+                    _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
                 }
                 else if (_wantsToRotateSmoothly)
                 {
                     if (_isGrounded && _movementInput < 0.5f && !_isClimbing && !_isFalling)
-                        _animator.SetFloat("SmoothRotation", _currentStep, 0.05f, kINetworkTimer.deltaTime);
+                        _animator.SetFloat("SmoothRotation", _currentStep, 0.05f, GetDeltaTime());
                     else
-                        _animator.SetFloat("SmoothRotation", 0, 0.05f, kINetworkTimer.deltaTime);
+                        _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
 
-                    _animator.SetFloat("Rotation", 0, 0.05f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
                 }
                 else
                 {
-                    _animator.SetFloat("SmoothRotation", 0, 0.05f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("Rotation", _currentStep, 0.05f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
+                    _animator.SetFloat("Rotation", _currentStep, 0.05f, GetDeltaTime());
                 }
 
                 var movement = _localMovement;
@@ -6117,19 +6118,19 @@ namespace CoverShooter
                 else if (movementSpeed >= 1 - float.Epsilon && !_useSprintingAnimation)
                     movementSpeed = 1;
 
-                _animator.SetFloat("ArmLift", _wantsToLiftArms ? 1 : 0, 0.14f, kINetworkTimer.deltaTime);
+                _animator.SetFloat("ArmLift", _wantsToLiftArms ? 1 : 0, 0.14f, GetDeltaTime());
 
                 if (_movementInput > 0.5f)
                 {
-                    _animator.SetFloat("MovementSpeed", movementSpeed * _movementInput, AccelerationDamp * 0.1f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("MovementX", movement.x, AccelerationDamp * 0.02f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("MovementZ", movement.z, AccelerationDamp * 0.02f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("MovementSpeed", movementSpeed * _movementInput, AccelerationDamp * 0.1f, GetDeltaTime());
+                    _animator.SetFloat("MovementX", movement.x, AccelerationDamp * 0.02f, GetDeltaTime());
+                    _animator.SetFloat("MovementZ", movement.z, AccelerationDamp * 0.02f, GetDeltaTime());
                 }
                 else
                 {
-                    _animator.SetFloat("MovementSpeed", 0, DeccelerationDamp * 0.1f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("MovementX", movement.x, DeccelerationDamp * 0.02f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("MovementZ", movement.z, DeccelerationDamp * 0.02f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("MovementSpeed", 0, DeccelerationDamp * 0.1f, GetDeltaTime());
+                    _animator.SetFloat("MovementX", movement.x, DeccelerationDamp * 0.02f, GetDeltaTime());
+                    _animator.SetFloat("MovementZ", movement.z, DeccelerationDamp * 0.02f, GetDeltaTime());
                 }
 
                 _animator.SetBool("IsFalling", _isFalling && !_isJumping);
@@ -6158,22 +6159,22 @@ namespace CoverShooter
                 float gunVariant;
                 getWeaponProperties(out bodyValue, out toolValue, out gunVariant);
 
-                _animator.SetFloat("BodyValue", bodyValue, 0.1f, kINetworkTimer.deltaTime);
+                _animator.SetFloat("BodyValue", bodyValue, 0.1f, GetDeltaTime());
 
-                _animator.SetFloat("BodyValue0", bodyValue == 0 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("BodyValue1", bodyValue == 1 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("BodyValue2", bodyValue == 2 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("BodyValue3", bodyValue == 3 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("BodyValue4", bodyValue == 4 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("BodyValue5", bodyValue == 5 ? 1 : 0, 0.1f, kINetworkTimer.deltaTime);
+                _animator.SetFloat("BodyValue0", bodyValue == 0 ? 1 : 0, 0.1f, GetDeltaTime());
+                _animator.SetFloat("BodyValue1", bodyValue == 1 ? 1 : 0, 0.1f, GetDeltaTime());
+                _animator.SetFloat("BodyValue2", bodyValue == 2 ? 1 : 0, 0.1f, GetDeltaTime());
+                _animator.SetFloat("BodyValue3", bodyValue == 3 ? 1 : 0, 0.1f, GetDeltaTime());
+                _animator.SetFloat("BodyValue4", bodyValue == 4 ? 1 : 0, 0.1f, GetDeltaTime());
+                _animator.SetFloat("BodyValue5", bodyValue == 5 ? 1 : 0, 0.1f, GetDeltaTime());
 
-                _animator.SetFloat("GunVariant", gunVariant, 0.1f, kINetworkTimer.deltaTime);
-                _animator.SetFloat("Tool", toolValue, 0.1f, kINetworkTimer.deltaTime);
+                _animator.SetFloat("GunVariant", gunVariant, 0.1f, GetDeltaTime());
+                _animator.SetFloat("Tool", toolValue, 0.1f, GetDeltaTime());
 
                 if (IsAiming || (_cover.In && _wantsToLiftArms))
-                    _animator.SetFloat("IdleToAim", 1, 0.05f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("IdleToAim", 1, 0.05f, GetDeltaTime());
                 else
-                    _animator.SetFloat("IdleToAim", 0, 0.05f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("IdleToAim", 0, 0.05f, GetDeltaTime());
 
                 var gun = EquippedWeapon.Gun;
 
@@ -6219,8 +6220,8 @@ namespace CoverShooter
 
                 if (_cover.In)
                 {
-                    _animator.SetFloat("CoverDirection", (_ik.HasSwitchedHands ? -1 : 1) * _cover.Direction, 0.2f, kINetworkTimer.deltaTime);
-                    _animator.SetFloat("CoverHeight", (_cover.IsTall && !_isCrouching) ? 1.0f : 0.0f, 0.1f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("CoverDirection", (_ik.HasSwitchedHands ? -1 : 1) * _cover.Direction, 0.2f, GetDeltaTime());
+                    _animator.SetFloat("CoverHeight", (_cover.IsTall && !_isCrouching) ? 1.0f : 0.0f, 0.1f, GetDeltaTime());
 
                     var angle = _isThrowing ? _throwAngle : _horizontalAngle;
 
@@ -6238,9 +6239,9 @@ namespace CoverShooter
                 _animator.SetBool("IsVault", _isClimbingAVault);
 
                 if (IsAiming && IsInLowCover)
-                    _animator.SetFloat("CrouchToStand", ((!_cover.IsTall || _isCrouching) && !_isAimingThroughCoverPlane) ? 0 : outOfCoverStand, 0.1f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("CrouchToStand", ((!_cover.IsTall || _isCrouching) && !_isAimingThroughCoverPlane) ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
                 else
-                    _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : outOfCoverStand, 0.1f, kINetworkTimer.deltaTime);
+                    _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
 
                 _animator.SetBool("HasGrenade", _isGrenadeTakenOut);
             }
@@ -6304,7 +6305,7 @@ namespace CoverShooter
         private bool findGround(float threshold)
         {
             var offset = 0.2f;
-            var count = Physics.RaycastNonAlloc(transform.position + Vector3.up * offset, Vector3.down, Util.Hits, threshold + offset, Layers.Geometry);
+            var count = GetPhysicsScene().Raycast(transform.position + Vector3.up * offset, Vector3.down, Util.Hits, threshold + offset, Layers.Geometry);
 
             for (int i = 0; i < count; i++)
             {
@@ -6318,6 +6319,22 @@ namespace CoverShooter
             return false;
         }
 
+        private PhysicsScene GetPhysicsScene()
+        {
+            if (Runner)
+                return Runner.GetPhysicsScene();
+
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (activeScene.IsValid() == true)
+            {
+                PhysicsScene physicsScene = activeScene.GetPhysicsScene();
+                if (physicsScene.IsValid() == true)
+                    return physicsScene;
+            }
+
+            return Physics.defaultPhysicsScene;
+        }
+
         private void findGroundAndSlope(float threshold)
         {
             _isOnSlope = false;
@@ -6326,7 +6343,7 @@ namespace CoverShooter
             var offset = 0.4f;
             var highest = 0f;
             var start = transform.position + Vector3.up * offset;
-            var count = Physics.RaycastNonAlloc(start, Vector3.down, Util.Hits, threshold + offset, Layers.Geometry);
+            var count = GetPhysicsScene().Raycast(start, Vector3.down, Util.Hits, threshold + offset, Layers.Geometry);
 
             const float slopeThreshold = 20f;
 
@@ -6366,7 +6383,7 @@ namespace CoverShooter
 
                 if (maxShift > float.Epsilon)
                 {
-                    var shift = kINetworkTimer.deltaTime * 0.5f;
+                    var shift = GetDeltaTime() * 0.5f;
 
                     if (shift > maxShift)
                         shift = maxShift;
@@ -6378,7 +6395,7 @@ namespace CoverShooter
 
         private float getGoundHeight()
         {
-            var count = Physics.RaycastNonAlloc(transform.position + (Vector3.up * (0.1f)), Vector3.down, Util.Hits, Layers.Geometry);
+            var count = GetPhysicsScene().Raycast(transform.position + (Vector3.up * (0.1f)), Vector3.down, Util.Hits, Layers.Geometry);
 
             for (int i = 0; i < count; i++)
             {
@@ -6394,7 +6411,7 @@ namespace CoverShooter
         private bool findEdge(out Vector3 position, float threshold)
         {
             var bottom = transform.TransformPoint(_capsule.center - new Vector3(0, _capsule.height * 0.5f + _capsule.radius, 0));
-            var count = Physics.OverlapSphereNonAlloc(bottom, _capsule.radius + threshold, Util.Colliders, Layers.Geometry);
+            var count = GetPhysicsScene().OverlapSphere(bottom, _capsule.radius + threshold, Util.Colliders, Layers.Geometry, QueryTriggerInteraction.UseGlobal);
 
             for (int i = 0; i < count; i++)
                 if (Util.Colliders[i].gameObject != gameObject)

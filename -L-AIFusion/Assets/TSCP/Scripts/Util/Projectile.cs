@@ -1,11 +1,23 @@
-﻿using UnityEngine;
+﻿
+using Fusion;
+using UnityEngine;
+public abstract class ProjtileAdapt : TPSBR.KinematicProjectile
+{
+    public float GetDeltaTime()
+    {
+        if (Runner != null)
+            return Runner.DeltaTime;
+
+        return Time.deltaTime;
+    }
+}
 
 namespace CoverShooter
 {
     /// <summary>
     /// An object that flies a distance and then destroys itself.
     /// </summary>
-    public class Projectile : MonoBehaviour
+    public class Projectile : NetworkTransform
     {
         /// <summary>
         /// Speed of the projectile in meters per second.
@@ -27,22 +39,35 @@ namespace CoverShooter
 
         private float _path = 0;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             _path = 0;
         }
-
-        private void Update()
+        public float GetDeltaTime()
         {
-            transform.position += Direction * Speed * kINetworkTimer.deltaTime;
-            _path += Speed * kINetworkTimer.deltaTime;
+            if (Runner != null)
+                return Runner.DeltaTime;
+
+            return Time.deltaTime;
+        }
+        public override void FixedUpdateNetwork()
+        {
+            transform.position += Direction * Speed * GetDeltaTime();
+            _path += Speed * GetDeltaTime();
 
             if (_path >= Distance)
             {
                 if (Target != null)
                     Target.SendMessage("OnHit", Hit, SendMessageOptions.DontRequireReceiver);
 
-                GameObject.Destroy(gameObject);
+                if (Runner != null)
+                {
+                    Despawned(Runner, false);
+                    Runner.Despawn(Object, true);
+                }
+                else
+                    GameObject.Destroy(gameObject);
             }
         }
     }

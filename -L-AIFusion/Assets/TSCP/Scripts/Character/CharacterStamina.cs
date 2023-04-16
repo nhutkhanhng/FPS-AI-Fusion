@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using UnityEngine;
 
 namespace CoverShooter
 {
@@ -6,7 +7,7 @@ namespace CoverShooter
     /// Maintains character health.
     /// </summary>
     [RequireComponent(typeof(CharacterMotor))]
-    public class CharacterStamina : MonoBehaviour, ICharacterWalkListener, ICharacterHealthListener
+    public class CharacterStamina : mNetworkTransform, ICharacterWalkListener, ICharacterHealthListener
     {
         /// <summary>
         /// Current health of the character.

@@ -341,7 +341,7 @@ namespace CoverShooter
             {
                 if (_avoidingTimer > float.Epsilon)
                 {
-                    _avoidingTimer -= kINetworkTimer.deltaTime;
+                    _avoidingTimer -= GetDeltaTime();
                     move(_avoidDirection, 1, false);
                 }
                 else
@@ -393,7 +393,7 @@ namespace CoverShooter
                         if (canMoveInDirection(_direction))
                             move(_direction, _speed, true);
 
-                        _inDirectionLeft -= kINetworkTimer.deltaTime;
+                        _inDirectionLeft -= GetDeltaTime();
 
                         if (_inDirectionLeft <= float.Epsilon)
                             _mode = Mode.none;
@@ -547,7 +547,7 @@ namespace CoverShooter
                     if (_futureCircleDirection != 0)
                     {
                         if (_circleWait > float.Epsilon)
-                            _circleWait -= kINetworkTimer.deltaTime;
+                            _circleWait -= GetDeltaTime();
 
                         if (_circleWait < float.Epsilon)
                         {

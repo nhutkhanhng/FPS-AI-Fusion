@@ -728,7 +728,7 @@ namespace CoverShooter
                 minDistance -= 0.5f;
 
             isFriend = false;
-            var count = Physics.RaycastNonAlloc(origin, direction, _hits, Distance);
+            var count = Util.GetPhysicsScene().Raycast(origin, direction, _hits, Distance);
 
             for (int i = 0; i < count; i++)
             {

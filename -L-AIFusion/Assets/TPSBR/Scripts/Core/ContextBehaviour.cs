@@ -21,4 +21,11 @@ namespace TPSBR
     {
 		public SceneContext Context { get; set; }
     }
+
+
+    public abstract class ChatacterMix : CharacterAdapter, IContextBehaviour
+    {
+        public SceneContext Context { get; set; }
+    }
+
 }

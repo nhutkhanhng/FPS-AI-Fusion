@@ -4879,6 +4879,8 @@ GameObject:
   - component: {fileID: 1995551543325358703}
   - component: {fileID: 3308056109482708667}
   - component: {fileID: 6942872777585290701}
+  - component: {fileID: 896739025279222427}
+  - component: {fileID: 7259203548458920123}
   m_Layer: 8
   m_Name: AgentBase
   m_TagString: Untagged
@@ -4944,6 +4946,7 @@ MonoBehaviour:
   - {fileID: 9214389469141760512}
   - {fileID: 3308056109482708667}
   - {fileID: 6942872777585290701}
+  - {fileID: 7259203548458920123}
   SimulationBehaviours:
   - {fileID: 57946675724828624}
   - {fileID: 8051080283524710738}
@@ -4991,6 +4994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   _LeftSide:
     _value: 0
   _jumpPower: 4
@@ -5028,6 +5032,7 @@ MonoBehaviour:
       m_Bits: 2305
     RenderBehavior: 1
     Features: -1
+    SuppressConvexMeshColliders: 0
     SpawnColliderOnProxy: 1
     AllowClientTeleports: 0
     TeleportThreshold: 1
@@ -5158,6 +5163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Config: 1
   BroadRadius: 2
   Offset: {x: 0, y: 1, z: 0}
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -5339,6 +5345,35 @@ MonoBehaviour:
   _fullThrustPitch: 1.5
   _idleThrustVolume: 0.5
   _fullThrustVolume: 1
+--- !u!136 &896739025279222427
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.1
+  m_Height: 1.2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.6, z: 0}
+--- !u!114 &7259203548458920123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7625200539080901463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2db8d34ed836104da5fc4956d3702e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 1
+  IsAggressive: 1
 --- !u!1 &8107021845495828554
 GameObject:
   m_ObjectHideFlags: 0

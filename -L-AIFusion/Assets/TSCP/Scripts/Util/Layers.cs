@@ -13,7 +13,7 @@
         /// <summary>
         /// Layer for the cover markers.
         /// </summary>
-        public static int Cover = 1 << 8;
+        public static int Cover = 1 << 16;
 
         /// <summary>
         /// Layer for objects to be hidden when using scope (usually the player renderer).
@@ -23,7 +23,7 @@
         /// <summary>
         /// Layer for all human characters.
         /// </summary>
-        public static int Character = 1 << 10;
+        public static int Character = 1 << 8;
 
         /// <summary>
         /// Layer for zones.

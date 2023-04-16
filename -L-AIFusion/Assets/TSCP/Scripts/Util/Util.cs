@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CoverShooter
 {
@@ -35,7 +36,7 @@ namespace CoverShooter
 
         public static float GetViewDistance(Vector3 position, float viewDistance, bool isAlerted)
         {
-            var count = Physics.OverlapSphereNonAlloc(position, 1, Colliders, Layers.Zones, QueryTriggerInteraction.Collide);
+            var count = GetPhysicsScene().OverlapSphere(position, 1, Colliders, Layers.Zones, QueryTriggerInteraction.Collide);
 
             _dark.Clear();
             _light.Clear();
@@ -137,7 +138,7 @@ namespace CoverShooter
 
         public static bool IsFree(GameObject gameObject, Vector3 origin, Vector3 direction, float distance, bool coverMeansFree, bool actorMeansFree)
         {
-            var count = Physics.RaycastNonAlloc(origin,
+            var count = GetPhysicsScene().Raycast(origin,
                                                 direction,
                                                 Hits,
                                                 distance);
@@ -159,10 +160,22 @@ namespace CoverShooter
             return isFree;
         }
 
+        public static PhysicsScene GetPhysicsScene()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (activeScene.IsValid() == true)
+            {
+                PhysicsScene physicsScene = activeScene.GetPhysicsScene();
+                if (physicsScene.IsValid() == true)
+                    return physicsScene;
+            }
+
+            return Physics.defaultPhysicsScene;
+        }
         public static bool GetClosestCover(Vector3 position, float radius, ref Cover resultCover, ref Vector3 resultPosition)
         {
             var minDistance = 0f;
-            var count = Physics.OverlapSphereNonAlloc(position, radius, Colliders, Layers.Cover, QueryTriggerInteraction.Collide);
+            var count = GetPhysicsScene().OverlapSphere(position, radius, Colliders, Layers.Cover, QueryTriggerInteraction.Collide);
 
             resultCover = null;
 
@@ -194,7 +207,7 @@ namespace CoverShooter
 
             RaycastHit closestHit = new RaycastHit();
 
-            var count = Physics.RaycastNonAlloc(origin, vector, Hits);
+            var count = GetPhysicsScene().Raycast(origin, vector, Hits);
 
             for (int i = 0; i < count; i++)
             {
@@ -216,7 +229,7 @@ namespace CoverShooter
             var vector = (target - origin).normalized;
             var maxDistance = Vector3.Distance(origin, target);
             var closestHit = target;
-            var count = Physics.RaycastNonAlloc(origin, vector, Hits);
+            var count = GetPhysicsScene().Raycast(origin, vector, Hits);
 
             for (int i = 0; i < count; i++)
             {
@@ -239,7 +252,7 @@ namespace CoverShooter
             var vector = (target - origin).normalized;
             var maxDistance = Vector3.Distance(origin, target);
             var closestHit = target;
-            var count = Physics.RaycastNonAlloc(origin, vector, Hits);
+            var count = GetPhysicsScene().Raycast(origin, vector, Hits);
 
             normal = Vector3.zero;
 
@@ -269,7 +282,7 @@ namespace CoverShooter
             var vector = (target - origin).normalized;
             var maxDistance = Vector3.Distance(origin, target);
             var closestHit = target;
-            var count = Physics.RaycastNonAlloc(origin, vector, Hits, maxDistance, Layers.Geometry, QueryTriggerInteraction.Ignore);
+            var count = GetPhysicsScene().Raycast(origin, vector, Hits, maxDistance, Layers.Geometry, QueryTriggerInteraction.Ignore);
 
             for (int i = 0; i < count; i++)
             {
@@ -291,7 +304,7 @@ namespace CoverShooter
             var vector = (target - origin).normalized;
             var maxDistance = Vector3.Distance(origin, target);
             var closestHit = target;
-            var count = Physics.RaycastNonAlloc(origin, vector, Hits);
+            var count = GetPhysicsScene().Raycast(origin, vector, Hits);
 
             for (int i = 0; i < count; i++)
             {

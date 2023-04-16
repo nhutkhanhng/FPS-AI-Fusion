@@ -1629,6 +1629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   IsAlive: 1
   Speed: 1
   MoveMultiplier: 1
@@ -1771,6 +1772,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Threshold: 0.2
 --- !u!114 &868761327086247019
 MonoBehaviour:
@@ -1785,6 +1787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Health: 200
   MaxHealth: 200
   Regeneration: 0.5
@@ -1847,6 +1850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   InventoryUsage: 0
   InventoryIndex: 0
   AutoFindType: 0
@@ -1894,6 +1898,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   AvoidDistance: 4
   AllySpacing: 1.2
   StandDuration: 1
@@ -1955,6 +1960,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   RollTriggerDistance: 2
   CircleDelay: 2
   ObstructionRadius: 1.5
@@ -1973,6 +1979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   MaxLowCoverThreatAngle: 80
   MaxTallCoverThreatAngle: 40
   MaxDefenseAngle: 85
@@ -1993,6 +2000,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   VerifyHeight: 0.7
   FieldOfView: 90
   WalkDistance: 8
@@ -2011,6 +2019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Distance: 12
   UpdateDelay: 0.2
   DebugFriends: 0
@@ -2027,6 +2036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Distance: 20
   ObstacleIgnoreDistance: 15
   FieldOfView: 160
@@ -2045,6 +2055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Speed: 6
   SlowSpeed: 2
   MinScanDuration: 3.5
@@ -2084,6 +2095,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Step: 0
   Hurt: 15
   Death: 15
@@ -2103,6 +2115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   VerifyDistance: 10
   VerifyHeight: 0.3
   VerifyRadius: 1
@@ -2609,6 +2622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Type: 1
   Name: Rifle
   Zoom: 0
@@ -3737,6 +3751,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  Side: 0
   Type: 0
   Name: Pistol
   Zoom: 0

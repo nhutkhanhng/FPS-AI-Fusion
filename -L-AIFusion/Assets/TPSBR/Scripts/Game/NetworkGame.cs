@@ -57,10 +57,16 @@ namespace TPSBR
 		private bool                          _levelGenerated;
 		private bool                          _isActive;
 
+        public Player GetLocalPlayer()
+        {
+            return _pendingPlayers[Runner.LocalPlayer];
+        }
 		// PUBLIC METHODS
 
 		public void Initialize(EGameplayType gameplayType)
 		{
+            Physics.autoSimulation = true;
+
 			if (Object.HasStateAuthority == true)
 			{
 				var prefab = _modePrefabs.Find(t => t.Type == gameplayType);
@@ -322,8 +328,8 @@ namespace TPSBR
 			var player = Runner.Spawn(_playerPrefab, inputAuthority: playerRef);
 
 			Runner.SetPlayerAlwaysInterested(playerRef, player.Object, true);
-
-			_pendingPlayers[playerRef] = player;
+            
+            _pendingPlayers[playerRef] = player;
 
 #if UNITY_EDITOR
 			player.gameObject.name = $"Player Unknown (Pending)";

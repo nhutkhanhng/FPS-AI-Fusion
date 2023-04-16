@@ -5,7 +5,8 @@ namespace TPSBR
 {
 	using System.Collections;
 	using System.Collections.Generic;
-	using UnityEngine;
+    using System.Linq;
+    using UnityEngine;
 
 	public struct KillData : INetworkStruct
 	{
@@ -96,6 +97,9 @@ namespace TPSBR
 		private DefaultPlayerComparer    _playerComparer        = new DefaultPlayerComparer();
 		private float                    _backfillTimerS;
 
+        protected Dictionary<Player, Agent> _allAgentInGame = new Dictionary<Player, Agent>();
+        public Agent GetAgent(Player player) => _allAgentInGame[player];
+        public Agent[] GetAgents() => _allAgentInGame.Values.ToArray();
 		// PUBLIC METHODS
 
 		public void Activate()
@@ -387,13 +391,16 @@ namespace TPSBR
 
 		protected virtual NetworkBehaviour TrySpawnAgent(Player player)
 		{
-			Transform spawnPoint = GetRandomSpawnPoint(100.0f);
+			Transform spawnPoint = GetRandomSpawnPoint(1f);
 
 			var spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
 			var spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
 
-			return SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
-		}
+			var _agent =  SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
+            _allAgentInGame.TryAdd(player, _agent);
+            Debug.LogError(_agent);
+            return _agent;
+        }
 
 		protected virtual void AgentDeath(ref PlayerStatistics victimStatistics, ref PlayerStatistics killerStatistics)
 		{

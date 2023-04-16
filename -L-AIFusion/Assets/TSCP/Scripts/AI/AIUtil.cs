@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 namespace CoverShooter
 {
@@ -8,6 +9,19 @@ namespace CoverShooter
     /// </summary>
     public static class AIUtil
     {
+        public static PhysicsScene GetPhysicsScene()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (activeScene.IsValid() == true)
+            {
+                PhysicsScene physicsScene = activeScene.GetPhysicsScene();
+                if (physicsScene.IsValid() == true)
+                    return physicsScene;
+            }
+
+            return Physics.defaultPhysicsScene;
+        }
+
         /// <summary>
         /// Actor array filled by some of the methods.
         /// </summary>
@@ -37,7 +51,7 @@ namespace CoverShooter
         public static int FindActors(Vector3 position, float radius, bool ignoreDead, Actor ignore = null)
         {
             int count = 0;
-            var physicsCount = Physics.OverlapSphereNonAlloc(position, radius, _colliders, Layers.Character);
+            var physicsCount = GetPhysicsScene().OverlapSphere(position, radius, _colliders, Layers.Character, QueryTriggerInteraction.UseGlobal);
 
             for (int i = 0; i < physicsCount; i++)
             {
@@ -82,7 +96,7 @@ namespace CoverShooter
             Actor result = null;
             float minDist = 0;
 
-            var physicsCount = Physics.OverlapSphereNonAlloc(position, radius, _colliders, Layers.Character);
+            var physicsCount = GetPhysicsScene().OverlapSphere(position, radius, _colliders, Layers.Character, QueryTriggerInteraction.UseGlobal);
 
             for (int i = 0; i < physicsCount; i++)
             {

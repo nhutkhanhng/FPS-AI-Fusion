@@ -563,6 +563,14 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8136512086002264079, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136512086002264079, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
+      propertyPath: NetworkedBehaviours.Array.data[1]
+      value: 
+      objectReference: {fileID: 8889212205540581364}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f938544efb06df40b044953cf2402f2, type: 3}
 --- !u!1 &1301534751993122031 stripped
@@ -587,6 +595,7 @@ MonoBehaviour:
   enemyTemplate: {fileID: 6039596180723873719, guid: b791bf2f091958f4b9adc2199040f8da, type: 3}
   PTemplate: {fileID: 2932369536713455639, guid: 0b1d2f43c5d12b446a9fcb6aec8420d5, type: 3}
   AllEnemies: []
+  networkGame: {fileID: 6612427242272952745}
 --- !u!114 &2715061937427427295 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6606485482797002304, guid: 3f938544efb06df40b044953cf2402f2, type: 3}

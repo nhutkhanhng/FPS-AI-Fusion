@@ -7,8 +7,8 @@ namespace TPSBR
 	using UnityEngine.Profiling;
 
 	[OrderBefore(typeof(HitboxManager))]
-	public sealed class Agent : ContextBehaviour
-	{
+	public sealed class Agent : ChatacterMix
+    {
 		// PUBLIC METHODS
 
 		public bool        IsLocal    => Object != null && Object.HasInputAuthority == true;

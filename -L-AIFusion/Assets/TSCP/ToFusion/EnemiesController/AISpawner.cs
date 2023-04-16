@@ -24,6 +24,8 @@ namespace TPSBR
             base.Spawned();
         }
         public List<NetworkBehaviour> AllEnemies = new List<NetworkBehaviour>();
+
+        [SerializeField] NetworkGame networkGame;
         private GameplayMode _currentGameMode;
 
         protected int countSpawned = 0;
@@ -36,7 +38,7 @@ namespace TPSBR
             if (_disableSpawner || !Object.HasStateAuthority || _currentGameMode == null)
                 return;
 
-            if (countSpawned <= 2 && _spawnDelay.Expired(Runner))
+            if (countSpawned <= 0 && _spawnDelay.Expired(Runner))
             {
                 countSpawned++;
                 if (countSpawned == 1)
@@ -49,9 +51,13 @@ namespace TPSBR
         }
         private void SpawnEnemies(NetworkBehaviour template)
         {
-            var spawnPoint = _currentGameMode.GetRandomSpawnPoint(100f);
+            // var spawnPoint = _currentGameMode.GetRandomSpawnPoint(1f);
+            var spawnPoint = _currentGameMode.GetAgents()[0].transform;
 
-            var spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            var deltaPosition = UnityEngine.Random.insideUnitSphere * 5f;
+            deltaPosition.y = 0;
+
+            var spawnPosition = spawnPoint != null ? spawnPoint.position + deltaPosition : Vector3.zero;
             var spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
 
             var rotation = Quaternion.identity;

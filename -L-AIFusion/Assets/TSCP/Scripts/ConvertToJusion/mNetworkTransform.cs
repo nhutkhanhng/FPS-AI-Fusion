@@ -3,13 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class mNetworkTransform : NetworkBehaviour, kINetworkUpdate
+public class mNetworkTransform : CharacterAdapter, kINetworkUpdate
 {
     //public override void FixedUpdateNetwork()
     //{
-        
-    //}
 
+    //}
+    protected float GetDeltaTime()
+    {
+        if (Runner == null)
+            return Time.deltaTime;
+
+        return Runner.DeltaTime;
+    }
     public virtual void kRender()
     {
         

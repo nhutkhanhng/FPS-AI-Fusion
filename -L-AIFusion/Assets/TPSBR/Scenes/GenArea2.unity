@@ -462,14 +462,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1074556404691249552, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1074556404691249552, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
-      value: 
-      objectReference: {fileID: 640476332}
     - target: {fileID: 6612427242272952745, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
       propertyPath: _shrinkingArea
       value: 
@@ -528,17 +520,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
---- !u!114 &640476332 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8889212205540581364, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
-  m_PrefabInstance: {fileID: 640476331}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb17e3e60bfe186469ade2816ab34492, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &701041036 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5872025486481888424, guid: c91e068e99c0df240b4477d2d2f9e96b, type: 3}

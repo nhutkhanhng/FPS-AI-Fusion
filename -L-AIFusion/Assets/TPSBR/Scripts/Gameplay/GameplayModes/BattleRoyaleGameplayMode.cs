@@ -210,7 +210,7 @@ namespace TPSBR
 
 				statistics.IsAlive = true;
 
-				player.UpdateStatistics(statistics);
+                player.UpdateStatistics(statistics);
 
                 return agent;
 

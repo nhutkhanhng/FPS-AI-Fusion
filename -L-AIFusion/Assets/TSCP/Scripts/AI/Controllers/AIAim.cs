@@ -373,7 +373,7 @@ namespace CoverShooter
                 case BodyMode.walk: aimBodyTo(transform.position + _walkDirection * 8, (_isTurningSlowly ? SlowSpeed : Speed) * 2); break;
 
                 case BodyMode.scan:
-                    _scanLeft -= kINetworkTimer.deltaTime;
+                    _scanLeft -= GetDeltaTime();
 
                     if (_scanLeft < float.Epsilon)
                         findNewScanDirection();
@@ -401,7 +401,7 @@ namespace CoverShooter
                     else
                         _currentAim = target;
 
-                    _sweepDelta += _sweepDirection * kINetworkTimer.deltaTime / _sweepDuration;
+                    _sweepDelta += _sweepDirection * GetDeltaTime() / _sweepDuration;
 
                     if (_sweepDelta >= 1 && _sweepDirection > 0) _sweepDirection = -1;
                     else if (_sweepDelta <= -1 && _sweepDirection < 0) _sweepDirection = 1;
@@ -413,7 +413,7 @@ namespace CoverShooter
             aimMotorAt(_currentAim);
 
             if (_aimDelay >= 0)
-                _aimDelay -= kINetworkTimer.deltaTime;
+                _aimDelay -= GetDeltaTime();
         }
 
         #endregion
@@ -522,7 +522,7 @@ namespace CoverShooter
                 var currentVerticalAngle = Util.VerticalAngle(currentVector);
                 var targetVerticalAngle = Util.VerticalAngle(targetVector);
 
-                var move = speed * kINetworkTimer.deltaTime * 60;
+                var move = speed * GetDeltaTime() * 60;
                 var horizontalDelta = Mathf.DeltaAngle(currentHorizontalAngle, targetHorizontalAngle);
                 var verticalDelta = Mathf.DeltaAngle(currentVerticalAngle, targetVerticalAngle);
 

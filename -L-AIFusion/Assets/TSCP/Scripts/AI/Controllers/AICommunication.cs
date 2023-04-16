@@ -62,7 +62,7 @@ namespace CoverShooter
             if (!_actor.IsAlive)
                 return;
 
-            _wait -= kINetworkTimer.deltaTime;
+            _wait -= GetDeltaTime();
 
             if (DebugFriends)
                 foreach (var friend in _friends)
@@ -105,7 +105,7 @@ namespace CoverShooter
                 }
             }
 
-            var count = Physics.OverlapSphereNonAlloc(_actor.transform.position, Distance, Util.Colliders, Layers.Character, QueryTriggerInteraction.Ignore);
+            var count = Util.GetPhysicsScene().OverlapSphere(_actor.transform.position, Distance, Util.Colliders, Layers.Character, QueryTriggerInteraction.Ignore);
 
             for (int i = 0; i < count; i++)
             {

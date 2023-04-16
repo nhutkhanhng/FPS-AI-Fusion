@@ -10,7 +10,7 @@ namespace CoverShooter
     [RequireComponent(typeof(CharacterMotor))]
     [OrderBefore(typeof(NetworkTransform))]
     [RequireComponent(typeof(Actor))]
-    public class ThirdPersonController : NetworkTransform
+    public class ThirdPersonController : mNetworkTransform
     {
         /// <summary>
         /// Is the character using zoom.
@@ -507,7 +507,7 @@ namespace CoverShooter
                         if (AimWhenWalking && MovementInput.IsMoving)
                             _aimSustain = AimSustain;
                         else
-                            _aimSustain -= kINetworkTimer.deltaTime;
+                            _aimSustain -= GetDeltaTime();
 
                         checkZoom();
                         checkEquipment();
@@ -787,7 +787,7 @@ namespace CoverShooter
                     else
                     {
                         if (_noAimSustain < NoAimSustain)
-                            _noAimSustain += kINetworkTimer.deltaTime;
+                            _noAimSustain += GetDeltaTime();
                         else
                             return true;
                     }
@@ -843,7 +843,7 @@ namespace CoverShooter
             if (_motor.IsGrounded)
             {
                 if (_postLandWait >= 0)
-                    _postLandWait -= kINetworkTimer.deltaTime;
+                    _postLandWait -= GetDeltaTime();
             }
             else
                 _postLandWait = PostLandAimDelay;
@@ -888,15 +888,15 @@ namespace CoverShooter
             {
                 if ((MovementInput.IsSlowedDown || MovementInput.Magnitude > 0.6f) && MovementInput.Magnitude < 1.1f && MovementInput.IsMoving && !_motor.IsClimbingOrVaulting)
                 {
-                    _armLiftTimer += kINetworkTimer.deltaTime;
+                    _armLiftTimer += GetDeltaTime();
                     _armLiftRetain = 0.1f;
                 }
                 else
                 {
                     if (_armLiftRetain > float.Epsilon)
-                        _armLiftRetain -= kINetworkTimer.deltaTime;
+                        _armLiftRetain -= GetDeltaTime();
                     else
-                        _armLiftTimer = Mathf.Clamp01(_armLiftTimer - kINetworkTimer.deltaTime);
+                        _armLiftTimer = Mathf.Clamp01(_armLiftTimer - GetDeltaTime());
                 }
             }
 
@@ -1076,7 +1076,7 @@ namespace CoverShooter
                 _motor.InputCrouchNearCover();
 
             if (_motor.PotentialCover != null)
-                _coverDelayWait += kINetworkTimer.deltaTime;
+                _coverDelayWait += GetDeltaTime();
             else
                 _coverDelayWait = 0;
         }

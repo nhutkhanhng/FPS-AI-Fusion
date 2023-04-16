@@ -220,7 +220,7 @@ namespace CoverShooter
             }
 
             var colliders = Physics.OverlapSphere(transform.position, ExplosionRadius);
-            var count = Physics.OverlapSphereNonAlloc(transform.position, ExplosionRadius, Util.Colliders);
+            var count = Util.GetPhysicsScene().OverlapSphere(transform.position, ExplosionRadius, Util.Colliders, 1 << 32, QueryTriggerInteraction.UseGlobal);
 
             for (int i = 0; i < count; i++)
             {

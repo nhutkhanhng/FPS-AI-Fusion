@@ -758,7 +758,7 @@ namespace CoverShooter
             var distance = vector.magnitude;
             var direction = vector / distance;
 
-            var count = Physics.RaycastNonAlloc(start,
+            var count = Util.GetPhysicsScene().Raycast(start,
                                                 direction,
                                                 Util.Hits,
                                                 distance,
