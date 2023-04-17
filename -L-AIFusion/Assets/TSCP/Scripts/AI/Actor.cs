@@ -15,7 +15,7 @@ namespace CoverShooter
         /// </summary>
         public bool IsArmed
         {
-            get { return _motor != null && _motor.EquippedWeapon.Gun != null; }
+            get { return _motor != null && _motor.IsGun; }
         }
 
         /// <summary>

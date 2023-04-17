@@ -23,41 +23,41 @@ namespace TPSBR
 		public AgentVFX    Effects    => _agentVFX;
 
 		[Networked]
-		public NetworkBool LeftSide { get; private set; }
+		public NetworkBool LeftSide { get; protected set; }
 
-		// PRIVATE MEMBERS
+		// protected MEMBERS
 
 		[SerializeField]
-		private float _jumpPower;
+		protected float _jumpPower;
 		[SerializeField]
-		private float _topCameraAngleLimit;
+		protected float _topCameraAngleLimit;
 		[SerializeField]
-		private float _bottomCameraAngleLimit;
+		protected float _bottomCameraAngleLimit;
 		[SerializeField]
-		private KCCProcessor _fastMovementProcessor;
+		protected KCCProcessor _fastMovementProcessor;
 		[SerializeField]
-		private GameObject _visualRoot;
+		protected GameObject _visualRoot;
 
 		[Header("Fall Damage")]
 		[SerializeField]
-		private float _minFallDamage = 5f;
+		protected float _minFallDamage = 5f;
 		[SerializeField]
-		private float _maxFallDamage = 200f;
+		protected float _maxFallDamage = 200f;
 		[SerializeField]
-		private float _maxFallDamageVelocity = 20f;
+		protected float _maxFallDamageVelocity = 20f;
 		[SerializeField]
-		private float _minFallDamageVelocity = 5f;
+		protected float _minFallDamageVelocity = 5f;
 
-		private AgentInput     _agentInput;
-		private Character      _character;
+		protected AgentInput     _agentInput;
+		protected Character      _character;
 		protected Weapons        _weapons;
-		private Jetpack        _jetpack;
-		private AgentSenses    _senses;
-		private Health         _health;
-		private AgentVFX       _agentVFX;
-		private NetworkCulling _networkCulling;
-		private Quaternion     _cachedLookRotation;
-		private Quaternion     _cachedPitchRotation;
+		protected Jetpack        _jetpack;
+		protected AgentSenses    _senses;
+		protected Health         _health;
+		protected AgentVFX       _agentVFX;
+		protected NetworkCulling _networkCulling;
+		protected Quaternion     _cachedLookRotation;
+		protected Quaternion     _cachedPitchRotation;
 
 		// NetworkBehaviour INTERFACE
 
@@ -182,7 +182,7 @@ namespace TPSBR
 
 		// MONOBEHAVIOUR
 
-		private void Awake()
+		protected void Awake()
 		{
 			_agentInput     = GetComponent<AgentInput>();
 			_character      = GetComponent<Character>();
@@ -199,9 +199,9 @@ namespace TPSBR
 			_networkCulling.Updated += OnCullingUpdated;
 		}
 
-		// PRIVATE METHODS
+		// protected METHODS
 
-		private void OnEarlyFixedUpdate()
+		protected void OnEarlyFixedUpdate()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -217,7 +217,7 @@ namespace TPSBR
 			Profiler.EndSample();
 		}
 
-		private void OnLateFixedUpdate()
+		protected void OnLateFixedUpdate()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -242,7 +242,7 @@ namespace TPSBR
 			}
 		}
 
-		private void OnEarlyRender()
+		protected void OnEarlyRender()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -253,7 +253,7 @@ namespace TPSBR
 			_weapons.OnRender();
 		}
 
-		private void OnLateRender()
+		protected void OnLateRender()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -261,7 +261,7 @@ namespace TPSBR
 			_character.OnLateRender();
 		}
 
-		private void ProcessFixedInput()
+		protected void ProcessFixedInput()
 		{
 			if (Object.IsProxy == true)
 				return;
@@ -347,7 +347,7 @@ namespace TPSBR
 			_agentInput.SetFixedInput(input, false);
 		}
 
-		private void ProcessRenderInput()
+		protected void ProcessRenderInput()
 		{
 			if (Object.HasInputAuthority == false)
 				return;
@@ -393,7 +393,7 @@ namespace TPSBR
 			}
 		}
 
-		private void TryFire(bool attack, bool hold)
+		protected void TryFire(bool attack, bool hold)
 		{
 			var currentWeapon = _weapons.CurrentWeapon;
 			if (currentWeapon is ThrowableWeapon && currentWeapon.WeaponSlot == _weapons.PendingWeaponSlot)
@@ -417,7 +417,7 @@ namespace TPSBR
 			}
 		}
 
-		private void TryReload(bool autoReload)
+		protected void TryReload(bool autoReload)
 		{
 			if (_weapons.CanReloadWeapon(autoReload) == false)
 				return;
@@ -428,7 +428,7 @@ namespace TPSBR
 			}
 		}
 
-		private bool CanAim(KCCData kccData)
+		protected bool CanAim(KCCData kccData)
 		{
 			if (kccData.IsGrounded == false)
 				return false;
@@ -436,7 +436,7 @@ namespace TPSBR
 			return _weapons.CanAim();
 		}
 
-		private void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
+		protected void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
 		{
 			if (lookRotationDelta.IsZero() == true && recoil.IsZero() == true && _character.CharacterController.Data.Recoil == Vector2.zero)
 			{
@@ -480,7 +480,7 @@ namespace TPSBR
 			newRecoil = recoil;
 		}
 
-		private void CheckFallDamage()
+		protected void CheckFallDamage()
 		{
 			if (Object.IsProxy == true)
 				return;
@@ -527,7 +527,7 @@ namespace TPSBR
 			(_health as IHitTarget).ProcessHit(ref hitData);
 		}
 
-		private void OnCullingUpdated(bool isCulled)
+		protected void OnCullingUpdated(bool isCulled)
 		{
 			bool isActive = isCulled == false;
 

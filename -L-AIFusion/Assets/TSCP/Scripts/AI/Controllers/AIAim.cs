@@ -595,10 +595,10 @@ namespace CoverShooter
             if (DebugAim)
                 Debug.DrawLine(_motor.GunOrigin, position, Color.red);
 #endif
-            var gun = _motor.EquippedWeapon.Gun;
+            //var gun = _motor.Weapon;
 
-            if (gun != null)
-                gun.AddErrorThisFrame(AccuracyError);
+            //if (gun != null)
+            //    gun.AddErrorThisFrame(AccuracyError);
         }
 
 #endregion

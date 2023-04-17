@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if Melee
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CoverShooter
@@ -157,3 +158,4 @@ namespace CoverShooter
         }
     }
 }
+#endif

@@ -31,7 +31,7 @@ namespace CoverShooter
         {
             base.Apply(target, position, normal, fraction);
 
-            var motor = target.GetComponent<CharacterMotor>();
+            var motor = target.GetComponent<ICharacterMotor>();
             if (motor == null) return;
 
             var buff = target.GetComponent<VisionBuff>();

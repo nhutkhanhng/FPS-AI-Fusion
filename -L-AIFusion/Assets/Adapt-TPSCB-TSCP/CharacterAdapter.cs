@@ -6,7 +6,7 @@ using TPSBR;
 using UnityEngine;
 
 
-public class CharacterAdapter : NetworkBehaviour
+public class CharacterAdapter : ContextBehaviour
 {
     /// <summary>
     /// Team number used by the AI.

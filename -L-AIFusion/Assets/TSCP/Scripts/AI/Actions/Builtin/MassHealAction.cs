@@ -67,7 +67,7 @@ namespace CoverShooter
             if (target.Side != _actor.Side)
                 return;
 
-            var motor = target.GetComponent<CharacterMotor>();
+            var motor = target.GetComponent<ICharacterMotor>();
 
             if (!motor.IsAlive)
                 motor.InputResurrect();

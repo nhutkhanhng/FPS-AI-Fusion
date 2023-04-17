@@ -204,7 +204,7 @@ namespace CoverShooter
             if (_hasExploded || !_isActivated)
                 return;
 
-            ThirdPersonCamera.Shake(transform.position, ShakeIntensity, ShakeDuration);
+            // ThirdPersonCamera.Shake(transform.position, ShakeIntensity, ShakeDuration);
 
             _hasExploded = true;
 
@@ -265,7 +265,7 @@ namespace CoverShooter
 
             if (damage > float.Epsilon)
             {
-                var hit = new Hit(position, normal, damage, null, target, HitType.Explosion, 0);
+                var hit = new Hit(position, normal, damage, null, target, TPSBR.EHitType.Grenade, 0);
                 target.SendMessage("OnHit", hit, SendMessageOptions.DontRequireReceiver);
             }
         }
