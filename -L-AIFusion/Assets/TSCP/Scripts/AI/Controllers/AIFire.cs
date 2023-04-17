@@ -5,7 +5,7 @@ namespace CoverShooter
     /// <summary>
     /// Controls the equipment of weapons and their fire. Makes the AI take a peek from a cover if they are covered.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(Actor))]
     public class AIFire : AIItemBase, ICharacterCoverListener
     {
@@ -52,7 +52,7 @@ namespace CoverShooter
         #region Private fields
 
         private Actor _actor;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private bool _isFiring;
         private bool _isAiming;
@@ -180,7 +180,7 @@ namespace CoverShooter
             base.Awake();
 
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public override void FixedUpdateNetwork()
@@ -188,14 +188,21 @@ namespace CoverShooter
             if (!_actor.IsAlive)
                 return;
 
-            var wantsToAlwaysAim = AlwaysAim && _motor.Cover == null;
+            var wantsToAlwaysAim = AlwaysAim
+#if Cover
+                && _motor.Cover == null
+#endif
+                ;
 
             if (wantsToAlwaysAim)
                 EquipWeapon(_motor);
 
-            var gun = _motor.EquippedWeapon.Gun;
+            var gun = _motor.Gun;
 
             if (gun == null)
+                return;
+
+            if (_motor.IsGun == false)
                 return;
 
             if (_isReloading)
@@ -211,7 +218,7 @@ namespace CoverShooter
             if (_isFiring && _isAimingAtAPosition)
             {
                 var origin = transform.position;
-
+#if Cover
                 if (_motor.Cover != null && _motor.Cover.IsTall)
                 {
                     if (_motor.CoverDirection > 0 && _motor.IsNearRightCorner)
@@ -219,7 +226,7 @@ namespace CoverShooter
                     else if (_motor.CoverDirection < 0 && _motor.IsNearLeftCorner)
                         origin = _motor.Cover.LeftCorner(transform.position.y, _motor.CoverSettings.CornerOffset.x);
                 }
-
+#endif
                 var start = origin + Vector3.up * 2;
                 var distance = Vector3.Distance(start, _aim);
 
@@ -227,12 +234,23 @@ namespace CoverShooter
                     isObstructed = AIUtil.IsObstructed(start, _aim);
             }
 
+#if Cover
             if (_motor.Cover == null && (_isAiming || wantsToAlwaysAim) && !_isReloading)
                 _motor.InputAim();
+#else
+            if ((_isAiming || wantsToAlwaysAim) && !_isReloading)
+                _motor.InputAim();
+#endif
 
             if (_isFiring && !_isReloading && !isObstructed)
             {
-                var cycleDuration = _motor.Cover != null ? CoverBursts.CycleDuration : Bursts.CycleDuration;
+                var cycleDuration =
+#if Cover
+                                _motor.Cover != null ? 
+                                            CoverBursts.CycleDuration 
+                                            : 
+#endif
+                                                Bursts.CycleDuration;
 
                 if (_fireCycle >= cycleDuration)
                 {
@@ -251,7 +269,7 @@ namespace CoverShooter
                         _motor.InputReload();
                     }
                 }
-
+#if Cover
                 if (_motor.Cover != null)
                 {
                     if (_fireCycle >= CoverBursts.Wait)
@@ -273,6 +291,7 @@ namespace CoverShooter
                     }
                 }
                 else
+#endif
                 {
                     _motor.InputAim();
 
@@ -298,6 +317,6 @@ namespace CoverShooter
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace TPSBR
 {
-	public abstract class Weapon : ContextBehaviour, IDynamicPickupProvider
+	public abstract class Weapon : 
+        ContextBehaviour, IDynamicPickupProvider
 	{
 		// PUBLIC MEMBERS
 

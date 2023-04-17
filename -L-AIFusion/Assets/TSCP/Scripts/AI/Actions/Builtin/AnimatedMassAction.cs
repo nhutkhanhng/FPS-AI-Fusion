@@ -25,7 +25,7 @@ namespace CoverShooter
         [Tooltip("Associated UI color.")]
         public Color Color = Color.white;
 
-        protected CharacterMotor _motor;
+        protected ICharacterMotor _motor;
 
         private bool _isAnimating;
 
@@ -34,7 +34,7 @@ namespace CoverShooter
         /// </summary>
         protected override bool Start()
         {
-            _motor = _actor.GetComponent<CharacterMotor>();
+            _motor = _actor.GetComponent<ICharacterMotor>();
             return true;
         }
 

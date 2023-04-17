@@ -7,7 +7,7 @@ namespace CoverShooter
     /// Continuously checks the situation. If the AI is in danger makes a call for backup.
     /// </summary>
     [RequireComponent(typeof(Actor))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class AIBackupCall : AIBase
     {
         #region Public fields
@@ -59,7 +59,7 @@ namespace CoverShooter
         #region Private fields
 
         private Actor _actor;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private bool _canCall;
         private float _firstTriggerWait;
@@ -144,7 +144,7 @@ namespace CoverShooter
         public void Awake()
         {
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public override void FixedUpdateNetwork()
@@ -195,7 +195,7 @@ namespace CoverShooter
                         }
                     }
                     else
-                        _triggerWait += kINetworkTimer.deltaTime;
+                        _triggerWait += GetDeltaTime();
                 }
                 else
                     _triggerWait = 0;

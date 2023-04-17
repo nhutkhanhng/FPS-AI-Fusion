@@ -13,14 +13,14 @@ namespace CoverShooter
         /// Target character motor.
         /// </summary>
         [Tooltip("Target character motor.")]
-        public CharacterMotor Target;
+        public ICharacterMotor Target;
 
         /// <summary>
         /// Executed on every camera target change.
         /// </summary>
         public Action TargetChanged;
 
-        private CharacterMotor _cachedTarget;
+        private ICharacterMotor _cachedTarget;
 
         private MonoBehaviour _targetComponent;
 

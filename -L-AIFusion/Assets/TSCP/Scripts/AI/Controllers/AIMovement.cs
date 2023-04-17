@@ -7,7 +7,7 @@ namespace CoverShooter
     /// <summary>
     /// Takes movement commands from other components and uses pathfinding to walk the character motor towards a destination.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(Actor))]
     public class AIMovement : AIBase
     {
@@ -74,7 +74,7 @@ namespace CoverShooter
             circle
         }
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private Actor _actor;
 
         private Mode _mode;
@@ -253,6 +253,7 @@ namespace CoverShooter
             moveFrom(target, 0.5f);
         }
 
+#if Sprint
         /// <summary>
         /// Told by the brains to sprint away from a position.
         /// </summary>
@@ -272,6 +273,7 @@ namespace CoverShooter
             _isRunningAwayTemp = false;
             moveFrom(target, 0.5f);
         }
+#endif
 
         /// <summary>
         /// Told by the brains to sprint away from a position. Stops sprinting of not being told so in the following frames.
@@ -291,14 +293,14 @@ namespace CoverShooter
             _mode = Mode.none;
         }
 
-        #endregion
+#endregion
 
-        #region Behaviour
+#region Behaviour
 
         private void Awake() 
         {
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
             _obstacle = GetComponent<NavMeshObstacle>();
 
             _path = new NavMeshPath();
@@ -475,7 +477,9 @@ namespace CoverShooter
                             {
                                 if (vector.magnitude < 0.2f)
                                 {
+#if Cover
                                     _motor.InputImmediateCoverSearch();
+#endif
                                     transform.position = Util.Lerp(transform.position, _target, 6);
                                 }
                                 else
@@ -598,9 +602,9 @@ namespace CoverShooter
             _wasMoving = _isMoving;
         }
 
-        #endregion
+#endregion
 
-        #region Private methods
+#region Private methods
 
         private bool checkIncomingCollisions(Vector3 ownMovement, float speed)
         {
@@ -834,6 +838,6 @@ namespace CoverShooter
             _positionToCheckIfReachable = _target;
         }
 
-        #endregion
+#endregion
     }
 }

@@ -5,7 +5,7 @@ namespace CoverShooter
     /// <summary>
     /// Plays various sounds on AI events.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class AISounds : MonoBehaviour
     {
         /// <summary>
@@ -44,11 +44,11 @@ namespace CoverShooter
         [Tooltip("Possible sounds to play when the AI begins an assault.")]
         public AudioClip[] Assault;
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         /// <summary>

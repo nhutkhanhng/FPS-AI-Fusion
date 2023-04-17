@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 
+#if AIPhone
 namespace CoverShooter
 {
     /// <summary>
     /// Allows the AI to take phonecalls and film using a phone. Mostly used by Civilian Brain and AI Follow
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(Actor))]
     public class AIPhone : AIItemBase
     {
-        #region Private fields
+#region Private fields
 
         private Actor _actor;
         private CharacterMotor _motor;
@@ -17,9 +18,9 @@ namespace CoverShooter
         private bool _isFilming;
         private bool _wantsToCall;
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
         /// <summary>
         /// Told by the brains to start filming.
@@ -77,9 +78,9 @@ namespace CoverShooter
             if (_wantsToCall) Message("CallResponse");
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Registers that the character has made a call.
@@ -89,16 +90,16 @@ namespace CoverShooter
             _wantsToCall = false;
         }
 
-        #endregion
+#endregion
 
-        #region Behaviour
+#region Behaviour
 
         protected override void Awake()
         {
             base.Awake();
 
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public override void FixedUpdateNetwork()
@@ -115,6 +116,7 @@ namespace CoverShooter
             }
         }
 
-        #endregion
+#endregion
     }
 }
+#endif

@@ -20,7 +20,7 @@ namespace CoverShooter
         /// Owning object with a CharacterMotor component.
         /// </summary>
         [HideInInspector]
-        public CharacterMotor Character;
+        public ICharacterMotor Character;
 
         /// <summary>
         /// Return true if an attack can be started.

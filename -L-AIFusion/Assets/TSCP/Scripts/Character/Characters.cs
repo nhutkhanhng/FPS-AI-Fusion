@@ -21,7 +21,7 @@ namespace CoverShooter
         /// <summary>
         /// Link to the character motor of the character.
         /// </summary>
-        public CharacterMotor Motor;
+        public ICharacterMotor Motor;
 
         /// <summary>
         /// Link to the actor of the character.
@@ -105,7 +105,7 @@ namespace CoverShooter
             return _list[index];
         }
 
-        public static void Register(CharacterMotor motor)
+        public static void Register(ICharacterMotor motor)
         {
             if (motor == null)
                 return;
@@ -114,7 +114,9 @@ namespace CoverShooter
             _dictionary[motor.gameObject] = build;
 
             if (MainPlayer.Object == null)
-                if (motor.GetComponent<ThirdPersonController>() || motor.GetComponent<MobileController>())
+                if (motor.GetComponent<ThirdPersonController>() 
+                    // || motor.GetComponent<MobileController>()
+                    )
                     MainPlayer = build;
 
             var isContained = false;
@@ -130,7 +132,7 @@ namespace CoverShooter
                 _list.Add(build);
         }
 
-        public static void Unregister(CharacterMotor motor)
+        public static void Unregister(ICharacterMotor motor)
         {
             if (motor != null && _dictionary.ContainsKey(motor.gameObject))
                 _dictionary.Remove(motor.gameObject);
@@ -149,7 +151,7 @@ namespace CoverShooter
         public static Character Get(GameObject gameObject)
         {
             if (!_dictionary.ContainsKey(gameObject))
-                _dictionary[gameObject] = Build(gameObject.GetComponent<CharacterMotor>());
+                _dictionary[gameObject] = Build(gameObject.GetComponent<ICharacterMotor>());
 
             return _dictionary[gameObject];
         }
@@ -157,7 +159,7 @@ namespace CoverShooter
         /// <summary>
         /// Creates and returns character description for the given object.
         /// </summary>
-        public static Character Build(CharacterMotor motor)
+        public static Character Build(ICharacterMotor motor)
         {
             Character character;
 

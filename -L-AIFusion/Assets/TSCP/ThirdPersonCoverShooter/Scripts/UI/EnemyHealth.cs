@@ -12,7 +12,7 @@ namespace CoverShooter
         /// Character whose aim is used to determine the enemy.
         /// </summary>
         [Tooltip("Character whose aim is used to determine the enemy.")]
-        public CharacterMotor Motor;
+        public ICharacterMotor Motor;
 
         /// <summary>
         /// Delay after which the health bar is hidden when there is no target.

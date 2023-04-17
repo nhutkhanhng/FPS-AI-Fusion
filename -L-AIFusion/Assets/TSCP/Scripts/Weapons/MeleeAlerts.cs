@@ -28,7 +28,7 @@ namespace CoverShooter
 
         private BaseMelee _melee;
         private Actor _actor;
-        private CharacterMotor _cachedMotor;
+        private ICharacterMotor _cachedMotor;
 
         private void Awake()
         {

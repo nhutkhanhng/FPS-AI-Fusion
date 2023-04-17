@@ -18,7 +18,7 @@ namespace CoverShooter
         /// <summary>
         /// The call has been made.
         /// </summary>
-        public override void Use(CharacterMotor character, bool isAlternate)
+        public override void Use(ICharacterMotor character, bool isAlternate)
         {
             if (!isAlternate)
                 character.SendMessage("OnCallMade", SendMessageOptions.DontRequireReceiver);

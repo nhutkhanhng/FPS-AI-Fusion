@@ -28,7 +28,7 @@ namespace CoverShooter
 
         private BaseGun _gun;
         private Actor _actor;
-        private CharacterMotor _cachedMotor;
+        private ICharacterMotor _cachedMotor;
 
         private void Awake()
         {

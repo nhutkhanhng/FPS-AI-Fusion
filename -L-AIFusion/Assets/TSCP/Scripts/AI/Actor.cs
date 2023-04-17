@@ -168,7 +168,7 @@ namespace CoverShooter
         /// <summary>
         /// Character motor attached to the object.
         /// </summary>
-        public CharacterMotor Motor
+        public ICharacterMotor Motor
         {
             get { return _motor; }
         }
@@ -193,7 +193,7 @@ namespace CoverShooter
         private float _height;
 
         private Collider _collider;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private CharacterHealth _health;
         private Rigidbody _body;
         private BaseBrain _brain;
@@ -350,7 +350,7 @@ namespace CoverShooter
         private void Awake()
         {
             _collider = GetComponent<Collider>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
             _health = GetComponent<CharacterHealth>();
             _brain = GetComponent<BaseBrain>();
             _body = GetComponent<Rigidbody>();

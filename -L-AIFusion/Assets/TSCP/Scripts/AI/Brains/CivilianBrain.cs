@@ -18,7 +18,7 @@ namespace CoverShooter
     /// Simulates a peaceful civilian. Notices enemies and follows them. Calls police.
     /// </summary>
     [RequireComponent(typeof(Actor))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class CivilianBrain : BaseBrain, IAlertListener
     {
         #region Properties

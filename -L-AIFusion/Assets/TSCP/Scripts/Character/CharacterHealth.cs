@@ -66,7 +66,7 @@ namespace CoverShooter
         /// </summary>
         public Action<float> Changed;
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private bool _isDead;
         private float _previousHealth;
@@ -89,7 +89,7 @@ namespace CoverShooter
         private void Awake()
         {
             _previousHealth = Health;
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         private void OnEnable()

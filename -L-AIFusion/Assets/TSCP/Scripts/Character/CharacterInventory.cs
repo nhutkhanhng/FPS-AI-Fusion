@@ -2,7 +2,7 @@
 
 namespace CoverShooter
 {
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class CharacterInventory : MonoBehaviour
     {
         /// <summary>
@@ -13,20 +13,20 @@ namespace CoverShooter
 
         private void Awake()
         {
-            var motor = GetComponent<CharacterMotor>();
+            //var motor = GetComponent<ICharacterMotor>();
 
-            for (int i = 0; i < Weapons.Length; i++)
-            {
-                var weapon = Weapons[i];
+            //for (int i = 0; i < Weapons.Length; i++)
+            //{
+            //    var weapon = Weapons[i];
 
-                if (weapon.RightItem != null && (!motor.IsEquipped || motor.Weapon.RightItem != weapon.RightItem)) weapon.RightItem.SetActive(false);
-                if (weapon.RightHolster != null && (!motor.IsEquipped || motor.Weapon.RightHolster != weapon.RightHolster)) weapon.RightHolster.SetActive(true);
+            //    if (weapon.RightItem != null && (!motor.IsEquipped || motor.Weapon.RightItem != weapon.RightItem)) weapon.RightItem.SetActive(false);
+            //    if (weapon.RightHolster != null && (!motor.IsEquipped || motor.Weapon.RightHolster != weapon.RightHolster)) weapon.RightHolster.SetActive(true);
 
-                if (weapon.LeftItem != null && (!motor.IsEquipped || motor.Weapon.LeftItem != weapon.LeftItem)) weapon.LeftItem.SetActive(false);
-                if (weapon.LeftHolster != null && (!motor.IsEquipped || motor.Weapon.LeftHolster != weapon.LeftHolster)) weapon.LeftHolster.SetActive(true);
+            //    if (weapon.LeftItem != null && (!motor.IsEquipped || motor.Weapon.LeftItem != weapon.LeftItem)) weapon.LeftItem.SetActive(false);
+            //    if (weapon.LeftHolster != null && (!motor.IsEquipped || motor.Weapon.LeftHolster != weapon.LeftHolster)) weapon.LeftHolster.SetActive(true);
 
-                if (weapon.Shield != null && (!motor.IsEquipped || motor.Weapon.Shield != weapon.Shield)) weapon.Shield.SetActive(false);
-            }
+            //    if (weapon.Shield != null && (!motor.IsEquipped || motor.Weapon.Shield != weapon.Shield)) weapon.Shield.SetActive(false);
+            //}
         }
     }
 }

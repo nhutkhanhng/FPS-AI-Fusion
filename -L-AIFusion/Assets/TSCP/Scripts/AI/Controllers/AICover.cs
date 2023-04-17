@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
+#if Cover
 namespace CoverShooter
 {
     /// <summary>
@@ -763,3 +764,4 @@ namespace CoverShooter
         #endregion
     }
 }
+#endif

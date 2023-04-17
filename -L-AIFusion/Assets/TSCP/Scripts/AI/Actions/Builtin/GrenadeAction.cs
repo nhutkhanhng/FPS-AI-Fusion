@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+#if Grenade
 namespace CoverShooter
 {
     /// <summary>
@@ -197,3 +198,4 @@ namespace CoverShooter
         }
     }
 }
+#endif

@@ -35,7 +35,7 @@ namespace CoverShooter
     /// <summary>
     /// Manages head, body and arm direction for both civilians and fighters.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(Actor))]
     public class AIAim : AIBase
     {
@@ -136,7 +136,7 @@ namespace CoverShooter
         #region Private fields
 
         private Actor _actor;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private Vector3 _body;
         private Vector3 _aim;
@@ -340,7 +340,7 @@ namespace CoverShooter
         public void Awake()
         {
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
             _walkDirection = transform.position;
             _currentAim = transform.forward;
 
@@ -552,6 +552,7 @@ namespace CoverShooter
 
         private void aimMotorAt(Vector3 position)
         {
+#if Cover
             if (_motor.IsInTallCover)
             {
                 var vector = position - transform.position;
@@ -586,18 +587,20 @@ namespace CoverShooter
                     }
                 }
             }
+#endif
 
             _motor.SetAimTarget(position);
 
+#if Debug_Shooter
             if (DebugAim)
                 Debug.DrawLine(_motor.GunOrigin, position, Color.red);
-
+#endif
             var gun = _motor.EquippedWeapon.Gun;
 
             if (gun != null)
                 gun.AddErrorThisFrame(AccuracyError);
         }
 
-        #endregion
+#endregion
     }
 }

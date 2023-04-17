@@ -7,7 +7,7 @@ namespace TPSBR
 	using UnityEngine.Profiling;
 
 	[OrderBefore(typeof(HitboxManager))]
-	public sealed class Agent : ChatacterMix
+	public class Agent : ChatacterMix
     {
 		// PUBLIC METHODS
 
@@ -50,7 +50,7 @@ namespace TPSBR
 
 		private AgentInput     _agentInput;
 		private Character      _character;
-		private Weapons        _weapons;
+		protected Weapons        _weapons;
 		private Jetpack        _jetpack;
 		private AgentSenses    _senses;
 		private Health         _health;

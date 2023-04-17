@@ -5,7 +5,7 @@ namespace CoverShooter
     /// <summary>
     /// Turns off some components of character object when it is far away from the player’s character. Components are turned on when the player approaches the character.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(CapsuleCollider))]
@@ -23,7 +23,7 @@ namespace CoverShooter
         [Tooltip("Distance to the player when to deactivate the character.")]
         public float Off = 60;
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private Rigidbody _body;
         private Animator _animator;
         private CapsuleCollider _capsule;
@@ -34,7 +34,7 @@ namespace CoverShooter
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
             _body = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
             _capsule = GetComponent<CapsuleCollider>();

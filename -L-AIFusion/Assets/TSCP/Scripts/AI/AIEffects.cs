@@ -5,7 +5,7 @@ namespace CoverShooter
     /// <summary>
     /// Listens for events comign from AI components and instantiates effects.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class AIEffects : MonoBehaviour
     {
         /// <summary>
@@ -44,11 +44,11 @@ namespace CoverShooter
         [Tooltip("Effect prefab to instantiate when the AI begins an assault.")]
         public GameObject Assault;
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         /// <summary>

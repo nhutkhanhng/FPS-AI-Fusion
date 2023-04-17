@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if Grenade
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace CoverShooter
@@ -95,3 +96,4 @@ namespace CoverShooter
         }
     }
 }
+#endif

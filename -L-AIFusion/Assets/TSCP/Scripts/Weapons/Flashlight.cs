@@ -24,7 +24,7 @@ namespace CoverShooter
             _light = GetComponent<Light>();
         }
 
-        public override void ContinuousUse(CharacterMotor character, bool isAlternate)
+        public override void ContinuousUse(ICharacterMotor character, bool isAlternate)
         {
             _isOn = true;
         }

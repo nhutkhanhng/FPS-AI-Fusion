@@ -14,7 +14,7 @@ namespace CoverShooter
         /// Character whose gun information is displayed.
         /// </summary>
         [Tooltip("")]
-        public CharacterMotor Motor;
+        public ICharacterMotor Motor;
 
         /// <summary>
         /// Determines if the display is hidden when the motor is dead.
@@ -40,7 +40,7 @@ namespace CoverShooter
             if (Motor == null)
                 return;
 
-            var gun = Motor.Weapon.Gun;
+            var gun = Motor.Gun;
             if (!Motor.IsEquipped) gun = null;
 
             if (gun != null)

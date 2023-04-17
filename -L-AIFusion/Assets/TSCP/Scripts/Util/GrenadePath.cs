@@ -32,15 +32,16 @@ namespace CoverShooter
         /// <summary>
         /// Calculates point of grenade path origin for the given character.
         /// </summary>
-        public static Vector3 Origin(CharacterMotor motor, float lookAngle)
+        public static Vector3 Origin(ICharacterMotor motor, float lookAngle)
         {
             var origin = Vector3.zero;
 
+#if Grenade
             if (motor.IsInLowCover)
                 origin = motor.Grenade.CrouchOrigin;
             else
                 origin = motor.Grenade.StandingOrigin;
-
+#endif
             if (motor.IsThrowingLeft)
                 origin.x *= -1;
 

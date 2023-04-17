@@ -52,7 +52,7 @@ namespace CoverShooter
 
         public float HeightSpeed = 1;
 
-        private CharacterMotor _lastTarget;
+        private ICharacterMotor _lastTarget;
         private float _targetTravel;
         private Vector3 _travelStart;
 

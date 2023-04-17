@@ -1,21 +1,22 @@
-﻿using UnityEngine;
+﻿using TPSBR;
+using UnityEngine;
 
 namespace CoverShooter
 {
-    public enum HitType
-    {
-        Pistol,
-        Rifle,
-        Shotgun,
-        Sniper,
-        Fist,
-        Machete,
-        PistolMelee,
-        RifleMelee,
-        ShotgunMelee,
-        SniperMelee,
-        Explosion
-    }
+    //public enum EHitType
+    //{
+    //    Pistol,
+    //    Rifle,
+    //    Shotgun,
+    //    Sniper,
+    //    Fist,
+    //    Machete,
+    //    PistolMelee,
+    //    RifleMelee,
+    //    ShotgunMelee,
+    //    SniperMelee,
+    //    Explosion
+    //}
 
     /// <summary>
     /// Description of a bullet hit. Used when passed to OnHit events.
@@ -26,19 +27,21 @@ namespace CoverShooter
         {
             get
             {
-                switch (Type)
-                {
-                    case HitType.Fist:
-                    case HitType.Machete:
-                    case HitType.PistolMelee:
-                    case HitType.RifleMelee:
-                    case HitType.ShotgunMelee:
-                    case HitType.SniperMelee:
-                        return true;
+                return false;
 
-                    default:
-                        return false;
-                }
+                //switch (Type)
+                //{
+                //    case EHitType.Fist:
+                //    case EHitType.Machete:
+                //    case EHitType.PistolMelee:
+                //    case EHitType.RifleMelee:
+                //    case EHitType.ShotgunMelee:
+                //    case EHitType.SniperMelee:
+                //        return true;
+
+                //    default:
+                //        return false;
+                //}
             }
         }
 
@@ -70,7 +73,7 @@ namespace CoverShooter
         /// <summary>
         /// Type of the damage.
         /// </summary>
-        public HitType Type;
+        public EHitType Type;
 
         /// <summary>
         /// Time in seconds between hits that the character will respond to with hurt animations.
@@ -87,7 +90,7 @@ namespace CoverShooter
         /// <param name="target">Object that was hit.</param>
         /// <param name="type">Type of the damage dealt.</param>
         /// <param name="reactionDelay">Time in seconds between hits that the character will respond to with hurt animations.</param>
-        public Hit(Vector3 position, Vector3 normal, float damage, GameObject attacker, GameObject target, HitType type, float reactionDelay)
+        public Hit(Vector3 position, Vector3 normal, float damage, GameObject attacker, GameObject target, EHitType type, float reactionDelay)
         {
             Position = position;
             Normal = normal;

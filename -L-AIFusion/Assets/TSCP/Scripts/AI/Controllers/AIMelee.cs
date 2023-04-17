@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-
+#if AIMelee
 namespace CoverShooter
 {
     [RequireComponent(typeof(BaseBrain))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class AIMelee : AIBase
     {
         /// <summary>
@@ -18,7 +18,7 @@ namespace CoverShooter
         private void Awake()
         {
             _brain = GetComponent<BaseBrain>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public override void FixedUpdateNetwork()
@@ -42,3 +42,4 @@ namespace CoverShooter
         }
     }
 }
+#endif

@@ -34,8 +34,8 @@ namespace CoverShooter
         [Tooltip("Distance to the target at which the action is performed.")]
         public float Distance = 1;
 
-        protected CharacterMotor _motor;
-        protected CharacterMotor _targetMotor;
+        protected ICharacterMotor _motor;
+        protected ICharacterMotor _targetMotor;
 
         private bool _isAnimating;
         private bool _hasMoveTarget;
@@ -56,8 +56,8 @@ namespace CoverShooter
         /// </summary>
         protected override bool Start()
         {
-            _motor = _actor.GetComponent<CharacterMotor>();
-            _targetMotor = _targetActor.GetComponent<CharacterMotor>();
+            _motor = _actor.GetComponent<ICharacterMotor>();
+            _targetMotor = _targetActor.GetComponent<ICharacterMotor>();
 
             _actor.SendMessage("ToDisarm");
 

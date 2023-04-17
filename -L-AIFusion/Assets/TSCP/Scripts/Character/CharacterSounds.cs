@@ -6,7 +6,7 @@ namespace CoverShooter
     /// <summary>
     /// Spawns sound instances on various character events. Sounds are randomly picked from lists.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class CharacterSounds : MonoBehaviour, ICharacterPhysicsListener, ICharacterHealthListener
     {
         /// <summary>
@@ -63,13 +63,13 @@ namespace CoverShooter
         [Tooltip("Damage that has to be dealt to play big hit sound.")]
         public float BigDamageThreshold = 50;
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private float _hurtSoundTimer;
         private float _fallSoundTimer;
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         private void LateUpdate()

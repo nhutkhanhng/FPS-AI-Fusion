@@ -43,7 +43,7 @@ namespace CoverShooter
 
         private Transform _cachedTransform;
         private AISight _cachedSight;
-        private CharacterMotor _cachedMotor;
+        private ICharacterMotor _cachedMotor;
 
         private void Awake()
         {
@@ -59,7 +59,7 @@ namespace CoverShooter
             {
                 _cachedTransform = targetTransform;
                 _cachedSight = _cachedTransform.GetComponent<AISight>();
-                _cachedMotor = _cachedTransform.GetComponent<CharacterMotor>();
+                _cachedMotor = _cachedTransform.GetComponent<ICharacterMotor>();
             }
 
             if (_cachedSight == null)

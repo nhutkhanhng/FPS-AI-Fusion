@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
+#if Assault
 namespace CoverShooter
 {
     /// <summary>
     /// Makes the AI run towards the enemy as an assault.
     /// </summary>
     [RequireComponent(typeof(Actor))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     [RequireComponent(typeof(BaseBrain))]
     public class AIAssault : AIBase, ICharacterSuccessfulHitListener
     {
-        #region Public fields
+#region Public fields
 
         /// <summary>
         /// Distance at which the AI stops it's assault if attacking to fire.
@@ -80,9 +81,9 @@ namespace CoverShooter
         [Tooltip("Amount of time after a melee attack to not block incoming melee attacks.")]
         public float PostHitFreezeDuration = 0.5f;
 
-        #endregion
+#endregion
 
-        #region Private fields
+#region Private fields
 
         private Actor _actor;
         private CharacterMotor _motor;
@@ -107,9 +108,9 @@ namespace CoverShooter
         private float _preHitTime = 0;
         private bool _isGoingToHit = false;
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Responds with an answer to a brain enquiry.
@@ -177,9 +178,9 @@ namespace CoverShooter
                 ToStopAssault();
         }
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
         public void ToKeepCloseTo(KeepCloseTo value)
         {
@@ -234,9 +235,9 @@ namespace CoverShooter
             }
         }
 
-        #endregion
+#endregion
 
-        #region Behaviour
+#region Behaviour
 
         public void Awake()
         {
@@ -407,20 +408,21 @@ namespace CoverShooter
                 OnPositionUnreachable(position);
         }
 
-        #endregion
+#endregion
 
-        #region Private properties
+#region Private properties
 
         private bool isMelee
         {
-            get { return _motor.Weapon.HasMelee; }
+            get { return _motor.IsMelee; }
         }
 
         private bool isGun
         {
-            get { return _motor.Weapon.Gun != null; }
+            get { return _motor.IsGun; }
         }
 
-        #endregion
+#endregion
     }
 }
+#endif

@@ -107,5 +107,15 @@ namespace CoverShooter
             else
                 return false;
         }
+
+        public override bool CanFire(bool keyDown)
+        {
+            return keyDown && IsAllowed;
+        }
+
+        public override void Fire(Vector3 firePosition, Vector3 targetPosition, LayerMask hitMask)
+        {
+            
+        }
     }
 }

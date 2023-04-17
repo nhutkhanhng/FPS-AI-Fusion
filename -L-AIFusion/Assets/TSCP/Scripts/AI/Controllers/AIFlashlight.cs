@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+#if AIFlashlight
 namespace CoverShooter
 {
     /// <summary>
@@ -8,18 +8,18 @@ namespace CoverShooter
     [RequireComponent(typeof(Actor))]
     public class AIFlashlight : AIItemBase
     {
-        #region Private fields
+#region Private fields
 
         private Actor _actor;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private int _darkzoneCount;
 
         private bool _isUsing;
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
         /// <summary>
         /// Registers a command to take out a flashlight. Ignored if currently equipped weapon already has a flashlight attached.
@@ -64,9 +64,9 @@ namespace CoverShooter
             _isUsing = false;
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Notified of an entrance to a dark area.
@@ -90,9 +90,9 @@ namespace CoverShooter
                 Message("OnDontNeedLight");
         }
 
-        #endregion
+#endregion
 
-        #region Behaviour
+#region Behaviour
 
         protected override void Awake()
         {
@@ -129,6 +129,7 @@ namespace CoverShooter
                 return false;
         }
 
-        #endregion
+#endregion
     }
 }
+#endif

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+#if AmmoBar
 namespace CoverShooter
 {
     /// <summary>
@@ -19,7 +20,7 @@ namespace CoverShooter
         /// Motor which will be assigned the weapon when pressed.
         /// </summary>
         [Tooltip("Motor which will be assigned the weapon when pressed.")]
-        public CharacterMotor Motor;
+        public ICharacterMotor Motor;
 
         /// <summary>
         /// Current value of the ammo bar.
@@ -80,8 +81,7 @@ namespace CoverShooter
                     if (inventory.Weapons[i].Gun == Target)
                     {
                         Motor.InputCancelGrenade();
-                        Motor.Weapon = inventory.Weapons[i];
-                        Motor.IsEquipped = true;
+                        Motor.SwitchWeapon(i);
                         break;
                     }
             }
@@ -138,3 +138,4 @@ namespace CoverShooter
         }
     }
 }
+#endif

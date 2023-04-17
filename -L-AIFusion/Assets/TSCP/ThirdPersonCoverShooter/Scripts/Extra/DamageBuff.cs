@@ -5,7 +5,7 @@ namespace CoverShooter
     /// <summary>
     /// Multiplies damage dealt by the character's weapons.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class DamageBuff : BaseBuff
     {
         /// <summary>
@@ -16,7 +16,7 @@ namespace CoverShooter
 
         private float _multiplier;
         private float _original;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         public DamageBuff()
         {
@@ -26,7 +26,7 @@ namespace CoverShooter
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         protected override void Begin()

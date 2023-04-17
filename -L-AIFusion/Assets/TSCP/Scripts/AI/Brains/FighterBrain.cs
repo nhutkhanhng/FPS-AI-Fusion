@@ -209,7 +209,7 @@ namespace CoverShooter
     /// Simulates a fighter, takes cover, assaults, uses weapons, throws grenades, etc.
     /// </summary>
     [RequireComponent(typeof(Actor))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class FighterBrain : BaseBrain, IAlertListener, ICharacterHealthListener
     {
         #region Properties
@@ -386,7 +386,7 @@ namespace CoverShooter
 
         #region Private fields
 
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private CharacterInventory _inventory;
         private CharacterHealth _health;
         private AISight _sight;
@@ -1361,7 +1361,7 @@ namespace CoverShooter
             Actor.IsAggressive = true;
 
             _health = GetComponent<CharacterHealth>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
             _inventory = GetComponent<CharacterInventory>();
 
             _sight = GetComponent<AISight>();
@@ -2213,6 +2213,7 @@ namespace CoverShooter
 
         private void checkAndThrowGrenade()
         {
+#if Grenade
             if (Threat == null || InvestigationWait < ThreatAge || _thrownGrenadeCount >= Grenades.GrenadeCount)
                 return;
 
@@ -2300,10 +2301,12 @@ namespace CoverShooter
             }
             else
                 _grenadeCheckTimer = 0;
+#endif
         }
 
         private void findGrenades()
         {
+#if Grenade
             for (int i = 0; i < GrenadeList.Count; i++)
             {
                 var grenade = GrenadeList.Get(i);
@@ -2324,6 +2327,7 @@ namespace CoverShooter
             }
 
             _grenadeAvoidReaction = 0;
+#endif
         }
 
         private bool checkAllySpacingAndMoveIfNeeded()
@@ -2407,7 +2411,7 @@ namespace CoverShooter
 
         private bool tryFire()
         {
-            if (_motor.Weapon.Gun != null)
+            if (_motor.IsGun)
                 return true;
 
             if (_inventory != null)
@@ -2418,9 +2422,9 @@ namespace CoverShooter
             return false;
         }
 
-        #endregion
+#endregion
 
-        #region Threat
+#region Threat
 
         private bool canSetThreat
         {
@@ -2547,6 +2551,6 @@ namespace CoverShooter
                 Message("ToOpenFire");
         }
 
-        #endregion
+#endregion
     }
 }

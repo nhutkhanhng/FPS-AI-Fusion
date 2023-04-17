@@ -6,7 +6,7 @@ namespace CoverShooter
     /// <summary>
     /// Maintains character health.
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class CharacterStamina : mNetworkTransform, ICharacterWalkListener, ICharacterHealthListener
     {
         /// <summary>
@@ -52,7 +52,7 @@ namespace CoverShooter
         public float SprintTrigger = 50;
 
         private bool _isDead;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
         private float _consumption;
 
         private void OnValidate()
@@ -63,7 +63,7 @@ namespace CoverShooter
 
         private void Awake()
         {
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public void OnStop()

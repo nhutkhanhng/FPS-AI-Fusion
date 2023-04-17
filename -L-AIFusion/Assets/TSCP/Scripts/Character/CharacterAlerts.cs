@@ -44,12 +44,12 @@ namespace CoverShooter
         public float Resurrect = 10;
 
         private Actor _actor;
-        private CharacterMotor _motor;
+        private ICharacterMotor _motor;
 
         private void Awake()
         {
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         /// <summary>

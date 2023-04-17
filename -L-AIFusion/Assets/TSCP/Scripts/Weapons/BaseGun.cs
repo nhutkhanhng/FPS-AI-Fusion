@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TPSBR;
 using UnityEngine;
 
 namespace CoverShooter
@@ -11,7 +12,7 @@ namespace CoverShooter
     /// The intended position of the left hand might differ in some animations, to handle that there are left hand marker overwrites you can use to set up IK for the left hand for some specific situations. Empty values are not used as overwrites.
     /// Currently there are two kinds of weapons, pistols and rifles. The type defines character animations when using the weapon.
     /// </summary>
-    public abstract class BaseGun : mNetworkTransform
+    public abstract class BaseGun : WeaponAdapt
     {
         #region Properties
 
@@ -279,7 +280,7 @@ namespace CoverShooter
         /// Owning object with a CharacterMotor component.
         /// </summary>
         [HideInInspector]
-        public CharacterMotor Character;
+        public ICharacterMotor Character;
 
         #endregion
 
@@ -560,11 +561,11 @@ namespace CoverShooter
 
                         if (Character != null)
                         {
-                            if (PumpAfterFire)
-                                Character.InputPump(0.1f);
+                            //if (PumpAfterFire)
+                            //    Character.InputPump(0.1f);
 
-                            Character.InputRecoil(Recoil.Vertical, Recoil.Horizontal);
-                            ThirdPersonCamera.Shake(Character, Recoil.ShakeIntensity, Recoil.ShakeTime);
+                            //Character.InputRecoil(Recoil.Vertical, Recoil.Horizontal);
+                            //ThirdPersonCamera.Shake(Character, Recoil.ShakeIntensity, Recoil.ShakeTime);
                         }
                     }
                     else
@@ -988,17 +989,17 @@ namespace CoverShooter
 
                 var damage = Damage * (Character != null ? Character.DamageMultiplier : 1);
 
-                HitType type;
+                EHitType type;
 
                 switch (Type)
                 {
-                    case WeaponType.Pistol: type = HitType.Pistol; break;
-                    case WeaponType.Rifle: type = HitType.Rifle; break;
-                    case WeaponType.Shotgun: type = HitType.Shotgun; break;
-                    case WeaponType.Sniper: type = HitType.Sniper; break;
+                    case WeaponType.Pistol: type = EHitType.Pistol; break;
+                    case WeaponType.Rifle: type = EHitType.Rifle; break;
+                    case WeaponType.Shotgun: type = EHitType.Shotgun; break;
+                    case WeaponType.Sniper: type = EHitType.Sniper; break;
 
                     default:
-                        type = HitType.Pistol;
+                        type = EHitType.Pistol;
                         Debug.Assert(false, "Invalid gun type");
                         break;
                 }

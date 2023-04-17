@@ -47,7 +47,7 @@ namespace CoverShooter
         [Tooltip("Effect radius.")]
         public float Radius = 6;
 
-        protected CharacterMotor _motor;
+        protected ICharacterMotor _motor;
 
         private bool _isAnimating;
         private bool _isMoving;
@@ -57,7 +57,7 @@ namespace CoverShooter
         /// </summary>
         protected override bool Start()
         {
-            _motor = _actor.GetComponent<CharacterMotor>();
+            _motor = _actor.GetComponent<ICharacterMotor>();
             _isMoving = false;
             return true;
         }

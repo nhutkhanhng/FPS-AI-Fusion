@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CoverShooter
 {
-    [CustomEditor(typeof(CharacterMotor))]
+    [CustomEditor(typeof(rCharacterMotor))]
     [CanEditMultipleObjects]
     public class CharacterMotorEditor : Editor
     {
@@ -17,7 +17,7 @@ namespace CoverShooter
 
             foreach (var object_ in targets)
             {
-                var motor = (CharacterMotor)object_;
+                var motor = (rCharacterMotor)object_;
 
                 if (motor.Weapons != null && motor.Weapons.Length > 0)
                 {
@@ -33,7 +33,7 @@ namespace CoverShooter
 
                     foreach (var object_ in targets)
                     {
-                        var motor = (CharacterMotor)object_;
+                        var motor = (rCharacterMotor)object_;
 
                         if (motor.Weapons == null || motor.Weapons.Length == 0)
                         {

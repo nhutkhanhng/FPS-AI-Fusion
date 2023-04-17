@@ -45,14 +45,14 @@ namespace CoverShooter
         /// <summary>
         /// Method used every frame on the tool during the use animation.
         /// </summary>
-        public virtual void ContinuousUse(CharacterMotor character, bool isAlternate)
+        public virtual void ContinuousUse(ICharacterMotor character, bool isAlternate)
         {
         }
 
         /// <summary>
         /// Method called during a specific moment in the use animation.
         /// </summary>
-        public virtual void Use(CharacterMotor character, bool isAlternate)
+        public virtual void Use(ICharacterMotor character, bool isAlternate)
         {
         }
     }

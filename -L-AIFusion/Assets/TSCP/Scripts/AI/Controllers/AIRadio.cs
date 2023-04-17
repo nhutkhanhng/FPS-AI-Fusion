@@ -7,14 +7,14 @@ namespace CoverShooter
     /// Allows the AI to use a radio to take calls. Mostly used by AI Backup Call.
     /// </summary>
     [RequireComponent(typeof(Actor))]
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(ICharacterMotor))]
     public class AIRadio : AIItemBase
     {
         #region Private fields
 
         private Actor _actor;
-        private CharacterMotor _motor;
-
+        private ICharacterMotor _motor;
+        
         private bool _wantsToCall;
 
         #endregion
@@ -82,7 +82,7 @@ namespace CoverShooter
             base.Awake();
 
             _actor = GetComponent<Actor>();
-            _motor = GetComponent<CharacterMotor>();
+            _motor = GetComponent<ICharacterMotor>();
         }
 
         public override void FixedUpdateNetwork()
@@ -90,7 +90,7 @@ namespace CoverShooter
             if (!_actor.IsAlive)
                 return;
 
-            if (_wantsToCall && _motor.EquippedWeapon.ToolType == ToolType.radio)
+            if (_wantsToCall && _motor.HasRadio)
                 _motor.InputUseTool();
         }
 
