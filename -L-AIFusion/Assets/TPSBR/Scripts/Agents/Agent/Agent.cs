@@ -35,6 +35,7 @@ namespace TPSBR
 		private float _bottomCameraAngleLimit;
 		[SerializeField]
 		private KCCProcessor _fastMovementProcessor;
+
 		[SerializeField]
 		private GameObject _visualRoot;
 
@@ -48,17 +49,16 @@ namespace TPSBR
 		[SerializeField]
 		private float _minFallDamageVelocity = 5f;
 
-		private AgentInput     _agentInput;
-		private Character      _character;
-		private Weapons        _weapons;
-		private Jetpack        _jetpack;
-		private AgentSenses    _senses;
-		private Health         _health;
-		private AgentVFX       _agentVFX;
-		private NetworkCulling _networkCulling;
-		private Quaternion     _cachedLookRotation;
-		private Quaternion     _cachedPitchRotation;
-
+		public AgentInput     _agentInput;
+		public Character      _character;
+		public Weapons        _weapons;
+		public Jetpack        _jetpack;
+		public AgentSenses    _senses;
+		public Health         _health;
+		public AgentVFX       _agentVFX;
+		public NetworkCulling _networkCulling;
+        public Quaternion     _cachedLookRotation;
+        public Quaternion     _cachedPitchRotation;
 		// NetworkBehaviour INTERFACE
 
 		public override void Spawned()
@@ -224,13 +224,16 @@ namespace TPSBR
 
 			if (Object.IsProxy == false && _health.IsAlive == true)
 			{
-				bool attackWasActivated   = _agentInput.WasActivated(EGameplayInputAction.Attack);
-				bool reloadWasActivated   = _agentInput.WasActivated(EGameplayInputAction.Reload);
-				bool interactWasActivated = _agentInput.WasActivated(EGameplayInputAction.Interact);
+                if (_agentInput)
+                {
+                    bool attackWasActivated = _agentInput.WasActivated(EGameplayInputAction.Attack);
+                    bool reloadWasActivated = _agentInput.WasActivated(EGameplayInputAction.Reload);
+                    bool interactWasActivated = _agentInput.WasActivated(EGameplayInputAction.Interact);
 
-				TryFire(attackWasActivated, _agentInput.FixedInput.Attack);
-				TryReload(reloadWasActivated == false);
-				_weapons.TryInteract(interactWasActivated, _agentInput.FixedInput.Interact);
+                    TryFire(attackWasActivated, _agentInput.FixedInput.Attack);
+                    TryReload(reloadWasActivated == false);
+                    _weapons.TryInteract(interactWasActivated, _agentInput.FixedInput.Interact);
+                }
 			}
 
 			_weapons.OnLateFixedUpdate();
@@ -238,7 +241,8 @@ namespace TPSBR
 
 			if (Object.IsProxy == false)
 			{
-				_agentInput.SetLastKnownInput(_agentInput.FixedInput, true);
+                if (_agentInput)
+                    _agentInput.SetLastKnownInput(_agentInput.FixedInput, true);
 			}
 		}
 
@@ -260,8 +264,17 @@ namespace TPSBR
 
 			_character.OnLateRender();
 		}
-
-		private void ProcessFixedInput()
+        public KCC currentKCC => _character.CharacterController;
+        public override bool IsAlive
+        {
+            get => _health.IsAlive;
+            set 
+            {
+                if (value == false)
+                    _health.ApplyDamage(999f);
+            }
+        }
+        private void ProcessFixedInput()
 		{
 			if (Object.IsProxy == true)
 				return;
@@ -271,7 +284,10 @@ namespace TPSBR
 
 			GameplayInput input = default;
 
-			if (_health.IsAlive == true)
+            if (_agentInput == null)
+                return;
+
+            if (_health.IsAlive == true)
 			{
 				input = _agentInput.FixedInput;
 			}
@@ -356,6 +372,9 @@ namespace TPSBR
 			KCCData kccFixedData  = kcc.FixedData;
 
 			GameplayInput input = default;
+
+            if (_agentInput == null)
+                return;
 
 			if (_health.IsAlive == true)
 			{

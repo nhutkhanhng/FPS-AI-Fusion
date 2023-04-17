@@ -518,6 +518,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gameplay
       objectReference: {fileID: 0}
+    - target: {fileID: 8889212205540581364, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: enemyTemplate
+      value: 
+      objectReference: {fileID: 828455360360197660, guid: 3e4cc8c6fe845fc4bace44ecc39dfdd3, type: 3}
+    - target: {fileID: 8889212205540581364, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: _disableSpawner
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
 --- !u!114 &701041036 stripped

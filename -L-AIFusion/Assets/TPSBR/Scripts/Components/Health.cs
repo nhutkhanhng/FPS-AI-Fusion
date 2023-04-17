@@ -207,7 +207,7 @@ namespace TPSBR
 			_hitData.Set(hitIndex, bodyHitData);
 		}
 
-		private float ApplyDamage(float damage)
+		public float ApplyDamage(float damage)
 		{
 			if (damage <= 0f)
 				return 0f;

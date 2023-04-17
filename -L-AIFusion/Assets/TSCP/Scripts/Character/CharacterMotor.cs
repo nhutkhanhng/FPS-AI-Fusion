@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Fusion.KCC;
+using System;
 using System.Collections.Generic;
+using TPSBR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,10 +38,10 @@ namespace CoverShooter
     /// A character can be setup to have many hitboxes for various body parts. Setup is done inside Character Health component.
     /// </summary>
     [RequireComponent(typeof(CapsuleCollider))]
-    [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(Rigidbody))]
     public class CharacterMotor : mNetworkTransform
     {
+        [SerializeField] Agent agent;
         #region Properties
 
         /// <summary>
@@ -1064,19 +1066,13 @@ namespace CoverShooter
         /// Controls wheter the character is in a state of death. Dead characters have no collisions and ignore any input.
         /// </summary>
         [Tooltip("Controls wheter the character is in a state of death.")]
-        public bool IsAlive = true;
+        public override bool IsAlive { get => this.agent.IsAlive; set => this.agent.IsAlive = value; }
 
         /// <summary>
         /// Speed multiplier for the movement speed. Adjusts animations.
         /// </summary>
         [Tooltip("Speed multiplier for the movement speed. Adjusts animations.")]
         public float Speed = 1.0f;
-
-        /// <summary>
-        /// Multiplies movement speed without adjusting animations.
-        /// </summary>
-        [Tooltip("Multiplies movement speed without adjusting animations.")]
-        public float MoveMultiplier = 1.0f;
 
         /// <summary>
         /// Toggles character's ability to run. Used by the CharacterStamina.
@@ -1116,7 +1112,7 @@ namespace CoverShooter
         /// Gravity force applied to this character.
         /// </summary>
         [Tooltip("Gravity force applied to this character.")]
-        public float Gravity = 10;
+        public float Gravity => kccData.Gravity.y;
 
         /// <summary>
         /// Degrees recovered per second after a recoil.
@@ -1401,10 +1397,6 @@ namespace CoverShooter
         private WalkMode _lastWalkMode;
 
         private bool _hasRegistered;
-
-        private CapsuleCollider _capsule;
-        private Rigidbody _body;
-        private Animator _animator;
         private Visibility[] _visibility;
         private Actor _actor;
 
@@ -1458,14 +1450,17 @@ namespace CoverShooter
         private bool _isInProcess;
         private CharacterProcess _process;
 
-        private bool _isGrounded = true;
-        private bool _wasGrounded;
-        private bool _isFalling;
+        protected KCC kcc => this.agent.Character.CharacterController;
+        protected KCCData kccData => this.agent.Character.CharacterController.Data;
 
-        private float _verticalRecoil;
-        private float _horizontalRecoil;
+        private bool _isGrounded { get => kccData.IsGrounded; set => kccData.IsGrounded = value; }
+        private bool _wasGrounded => kccData.WasGrounded;
+        private bool _isFalling => kccData.IsGrounded == false || kccData.WasGrounded == true;
 
-        private bool _wasAimingGun;
+        private float _verticalRecoil => kccData.Recoil.y;
+        private float _horizontalRecoil => kccData.Recoil.x;
+
+        private bool _wasAimingGun => kccData.Aim;
 
         private bool _wantsToZoom;
         private bool _wantedToZoom;
@@ -1700,7 +1695,7 @@ namespace CoverShooter
         {
             _climbSearch.Update(_cover,
                                 transform.position,
-                                _animator.GetBoneTransform(HumanBodyBones.Head).position,
+                                this.kcc.Collider.transform.position,
                                 0,
                                 0,
                                 CoverSettings.ClimbDistance,
@@ -1766,8 +1761,9 @@ namespace CoverShooter
             _isPerformingCustomAction = true;
             _cover.Clear();
             clearPotentialCovers();
-
+            #if USE_ANIMATOR
             _animator.SetTrigger(name);
+            #endif
         }
 
         /// <summary>
@@ -1826,7 +1822,9 @@ namespace CoverShooter
 
             if (!gotHit)
             {
+#if USE_ANIMATOR
                 _animator.SetTrigger("SuccessfulBlock");
+#endif
                 SendMessage("OnBlock", hit, SendMessageOptions.DontRequireReceiver);
                 return;
             }
@@ -1854,8 +1852,9 @@ namespace CoverShooter
                 if (_isPerformingMelee)
                 {
                     _useMeleeRootMotion = false;
+#if USE_ANIMATOR
                     _animator.SetTrigger("EndMelee");
-
+#endif
                     {
                         var melee = weapon.RightMelee;
 
@@ -1870,13 +1869,15 @@ namespace CoverShooter
                             melee.End();
                     }
                 }
-
+#if USE_ANIMATOR
                 _animator.SetFloat("GetHitAngle", Mathf.DeltaAngle(transform.eulerAngles.y, Util.HorizontalAngle(hit.Normal)));
-
+#endif
                 if (_localMovement.magnitude > 0.1f && !_isGettingHit)
                 {
+#if USE_ANIMATOR
                     _animator.SetFloat("GetHitType", -1);
                     _animator.SetFloat("GetHitMove", Mathf.DeltaAngle(0, Util.HorizontalAngle(_localMovement)));
+#endif
                 }
                 else
                 {
@@ -1884,14 +1885,16 @@ namespace CoverShooter
                     int toolValue;
                     float gunVariant;
                     getWeaponProperties(out bodyValue, out toolValue, out gunVariant);
-
+#if USE_ANIMATOR
                     _animator.SetFloat("GetHitType", bodyValue);
+#endif
                 }
 
                 _lastHitTime = Time.timeSinceLevelLoad;
-
+#if USE_ANIMATOR
                 _animator.ResetTrigger("CancelGetHit");
                 _animator.SetTrigger("GetHit");
+#endif
             }
 
             SendMessage("OnTakenHit", hit);
@@ -1922,9 +1925,9 @@ namespace CoverShooter
                 gun.NotifyRechamber();
         }
 
-        #endregion
+#endregion
 
-        #region Notifications
+#region Notifications
 
         public void NotifyZoom()
         {
@@ -1994,9 +1997,9 @@ namespace CoverShooter
                 SuccessfullyHit.Invoke(hit);
         }
 
-        #endregion
+#endregion
 
-        #region Input
+#region Input
 
         /// <summary>
         /// Tell the character to be block melee attacks.
@@ -2297,11 +2300,11 @@ namespace CoverShooter
         public void CancelAndPreventGetHit(float time, bool triggerAnimation = true)
         {
             _getHitWait = time;
-
+#if USE_ANIMATOR
             if (_isGettingHit)
                 if (triggerAnimation)
                     _animator.SetTrigger("CancelGetHit");
-
+#endif
             _isGettingHit = false;
         }
 
@@ -2314,7 +2317,9 @@ namespace CoverShooter
                 if (triggerAnimation)
                 {
                     _getHitWait = time;
+#if USE_ANIMATOR
                     _animator.SetTrigger("CancelGetHit");
+#endif
                 }
 
             _isGettingHit = false;
@@ -2333,11 +2338,11 @@ namespace CoverShooter
         /// </summary>
         public void InputRecoil(float vertical, float horizontal)
         {
-            _verticalRecoil += vertical;
-            _horizontalRecoil += horizontal;
+            //_verticalRecoil += vertical;
+            //_horizontalRecoil += horizontal;
 
-            _verticalRecoil = Mathf.Clamp(_verticalRecoil, -30, 30);
-            _horizontalRecoil = Mathf.Clamp(_horizontalRecoil, -30, 30);
+            //_verticalRecoil = Mathf.Clamp(_verticalRecoil, -30, 30);
+            //_horizontalRecoil = Mathf.Clamp(_horizontalRecoil, -30, 30);
         }
 
         /// <summary>
@@ -2396,7 +2401,9 @@ namespace CoverShooter
             if (!IsAlive && !_isResurrecting)
             {
                 _isResurrecting = true;
+#if USE_ANIMATOR
                 _animator.SetTrigger("Resurrect");
+#endif
             }
         }
 
@@ -2408,8 +2415,10 @@ namespace CoverShooter
             _isInProcess = true;
             _process = desc;
 
+#if USE_ANIMATOR
             if (desc.AnimationTrigger != null && desc.AnimationTrigger.Length > 0)
                 _animator.SetTrigger(desc.AnimationTrigger);
+#endif
         }
 
         /// <summary>
@@ -2438,7 +2447,9 @@ namespace CoverShooter
                 recreateGrenades(grenadeOverride);
 
                 _isGrenadeTakenOut = true;
+#if USE_ANIMATOR
                 _animator.SetTrigger("TakeGrenade");
+#endif
             }
         }
 
@@ -3021,8 +3032,9 @@ namespace CoverShooter
             if (gun.ReloadWithMagazines || gun.Type == WeaponType.Pistol)
             {
                 _isLoadingMagazine = true;
+#if USE_ANIMATOR
                 _animator.SetTrigger("LoadMagazine");
-
+#endif
                 if (gun != null)
                     gun.NotifyMagazineLoadStart();
             }
@@ -3075,9 +3087,9 @@ namespace CoverShooter
             _immediateAim = true;
         }
 
-        #endregion
+#endregion
 
-        #region Behaviour
+#region Behaviour
 
         private void OnEnable()
         {
@@ -3098,14 +3110,16 @@ namespace CoverShooter
 
         private void OnDestroy()
         {
+#if USE_ANIMATOR
             animatorToMotorMap.Remove(_animator);
+#endif
         }
-
+        protected CapsuleCollider _capsule => this.agent.Character.CharacterController.Collider;
         private void Awake()
         {
-            _capsule = GetComponent<CapsuleCollider>();
-            _body = GetComponent<Rigidbody>();
+#if USE_ANIMATOR
             _animator = GetComponent<Animator>();
+#endif
             _actor = GetComponent<Actor>();
 
             _physicsListeners = Util.GetInterfaces<ICharacterPhysicsListener>(gameObject);
@@ -3118,7 +3132,7 @@ namespace CoverShooter
             _heightListeners = Util.GetInterfaces<ICharacterHeightListener>(gameObject);
             _coverListeners = Util.GetInterfaces<ICharacterCoverListener>(gameObject);
             _healthListeners = Util.GetInterfaces<ICharacterHealthListener>(gameObject);
-
+#if USE_ANIMATOR
             _leftFoot = _animator.GetBoneTransform(HumanBodyBones.LeftFoot);
             _rightFoot = _animator.GetBoneTransform(HumanBodyBones.RightFoot);
 
@@ -3141,6 +3155,7 @@ namespace CoverShooter
                 _animator.SetFloat("GunVariant", gunVariant);
             }
             else
+#endif
                 immediateBodyValue(0);
 
             _ik.Setup(this);
@@ -3167,7 +3182,7 @@ namespace CoverShooter
                 var collider = Grenade.Left.GetComponent<Collider>();
 
                 if (collider != null)
-                    Physics.IgnoreCollision(_capsule, collider, true);
+                    this.agent.currentKCC.SetIgnoreCollider(collider, true);
             }
 
             if (Grenade.Right != null)
@@ -3175,7 +3190,7 @@ namespace CoverShooter
                 var collider = Grenade.Right.GetComponent<Collider>();
 
                 if (collider != null)
-                    Physics.IgnoreCollision(_capsule, collider, true);
+                    this.agent.currentKCC.SetIgnoreCollider(collider, true);
             }
 
             for (int i = 0; i < _heightListeners.Length; i++)
@@ -3190,10 +3205,10 @@ namespace CoverShooter
 
         private void FixedUpdate()
         {
-            updateFeet();
+            // updateFeet();
         }
 
-        private void LateUpdate()
+        public override void _LateUpdate()
         {
             if (IsAlive && !_hasRegistered)
             {
@@ -3268,7 +3283,7 @@ namespace CoverShooter
                 }
 
                 updateAngles();
-
+#if Climb
                 if (IsAlive && !_isClimbing)
                 {
                     var force = new Vector3(0, Gravity, 0) * GetDeltaTime();
@@ -3285,7 +3300,7 @@ namespace CoverShooter
                             _body.velocity -= force;
                     }
                 }
-
+#endif
                 if (EquippedWeapon.Gun != null && !IsInCover && !EquippedWeapon.PreventArmLowering)
                 {
                     var origin = VirtualHead;
@@ -3312,7 +3327,9 @@ namespace CoverShooter
                 else if (_isClimbing)
                 {
                     clearPotentialCovers();
+#if Climb
                     updateClimb();
+#endif
                 }
                 else
                     updateCommon();
@@ -3411,8 +3428,6 @@ namespace CoverShooter
             {
                 _isCrouching = false;
                 _isWeaponBlocked = false;
-                _body.velocity = Vector3.zero;
-                updateGround();
             }
 
             updateCapsule();
@@ -3459,47 +3474,6 @@ namespace CoverShooter
 
             var gun = EquippedWeapon.Gun;
 
-            // Recoil recover
-            if (gun != null)
-            {
-                var rate = gun.Recoil.RecoveryRate * RecoilRecovery * GetDeltaTime();
-
-                if (_verticalRecoil > 0)
-                {
-                    if (_verticalRecoil > rate)
-                        _verticalRecoil -= rate;
-                    else
-                        _verticalRecoil = 0;
-                }
-                else
-                {
-                    if (_verticalRecoil < -rate)
-                        _verticalRecoil += rate;
-                    else
-                        _verticalRecoil = 0;
-                }
-
-                if (_horizontalRecoil > 0)
-                {
-                    if (_horizontalRecoil > rate)
-                        _horizontalRecoil -= rate;
-                    else
-                        _horizontalRecoil = 0;
-                }
-                else
-                {
-                    if (_horizontalRecoil < -rate)
-                        _horizontalRecoil += rate;
-                    else
-                        _horizontalRecoil = 0;
-                }
-            }
-            else
-            {
-                _horizontalRecoil = 0;
-                _verticalRecoil = 0;
-            }
-
             if (_inputMovement.IsMoving)
             {
                 _inputMovementTimer += GetDeltaTime();
@@ -3531,7 +3505,6 @@ namespace CoverShooter
                 _inputMovement = _lastMovingInputMovement;
             }
 
-            _wasAimingGun = IsAimingGun;
             _targetLayer = Layers.Character;
             _wantsToAim = false;
             _wouldTurnImmediately = false;
@@ -3577,9 +3550,9 @@ namespace CoverShooter
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private methods
+#region Private methods
 
         private void updateCoverPlane()
         {
@@ -3800,6 +3773,7 @@ namespace CoverShooter
                 return;
             }
 
+#if USE_ANIMATOR
             if (back && _backOffset == CoverOffsetState.None)
             {
                 if (_sideOffset == CoverOffsetState.Using || IsInLowCover)
@@ -3952,6 +3926,7 @@ namespace CoverShooter
                     _coverOffsetBack = backOffset;
                 }
             }
+#endif
         }
 
         private void beginCoverOffsetTransition(bool side, bool back, Vector3 sideOffset, Vector3 forwardOffset)
@@ -3985,8 +3960,9 @@ namespace CoverShooter
         private void loadBullet()
         {
             _isLoadingBullet = true;
+#if USE_ANIMATOR
             _animator.SetTrigger("LoadBullet");
-
+#endif
             var gun = EquippedWeapon.Gun;
 
             if (gun != null)
@@ -4074,7 +4050,9 @@ namespace CoverShooter
 
             if (_isIntendingToRoll && !_isRolling && Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, _rollAngle)) < 60)
             {
+#if USE_ANIMATOR
                 _animator.SetTrigger("Roll");
+#endif
                 _isIntendingToRoll = false;
                 _isRolling = true;
             }
@@ -4223,7 +4201,9 @@ namespace CoverShooter
                 if (!_hasBeganThrowAnimation && (Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, _throwBodyAngle)) < 30))
                 {
                     _hasBeganThrowAnimation = true;
+#if USE_ANIMATOR
                     _animator.SetTrigger("ThrowGrenade");
+#endif
                 }
             }
             else if (_isGrenadeTakenOut)
@@ -4247,8 +4227,9 @@ namespace CoverShooter
         {
             _isPumping = true;
             _willPerformPump = false;
+#if USE_ANIMATOR
             _animator.SetTrigger("Pump");
-
+#endif
             var gun = EquippedWeapon.Gun;
 
             if (gun != null)
@@ -4303,23 +4284,27 @@ namespace CoverShooter
             if (_cover.In)
                 stickToCover();
 
-            var animatorMovement = _animator.deltaPosition / GetDeltaTime();
-            var animatorSpeed = animatorMovement.magnitude;
-
+            var animatorMovement = kccData.DesiredVelocity;
+            var animatorSpeed = kccData.RealSpeed;
+            Quaternion deltaRotation = Quaternion.Inverse(agent._cachedLookRotation) * kcc.RenderData.LookRotation;
             if (!IsAlive)
             {
             }
             else if (IsMovingToCoverOffset)
             {
+#if USE_ANIMATOR
                 if (!_canAimInThisOffsetAnimationOrIsAtTheEndOfIt || !IsAiming)
                     transform.Rotate(0, _animator.deltaRotation.eulerAngles.y, 0);
                 else
+#endif
                 {
                     _horizontalAngleDiff = Mathf.DeltaAngle(transform.eulerAngles.y, _horizontalAngle);
                     turn(TurnSettings.StandingRotationSpeed);
                 }
             }
-            else if (_isClimbing)
+#if Climb && Rolling
+            else 
+            if (_isClimbing)
             {
                 var y = animatorMovement.y;
                 animatorMovement *= (_isClimbingAVault ? VaultSettings.HorizontalScale : ClimbSettings.HorizontalScale);
@@ -4358,7 +4343,8 @@ namespace CoverShooter
 
                 transform.rotation = Util.Lerp(transform.rotation, Quaternion.Euler(0, angle, 0), 20);
             }
-            else if (_isRolling || _isIntendingToRoll)
+            else 
+            if (_isRolling || _isIntendingToRoll)
             {
                 turn(RollSettings.RotationSpeed);
 
@@ -4382,6 +4368,9 @@ namespace CoverShooter
                     _body.velocity = new Vector3(xz.x, _body.velocity.y, xz.z);
                 }
             }
+         
+#endif
+
             else if (_isJumping || _isIntendingToJump)
             {
                 turn(JumpSettings.RotationSpeed);
@@ -4392,8 +4381,11 @@ namespace CoverShooter
             }
             else if (_isGettingHit)
             {
-                _body.velocity = _animator.deltaPosition / GetDeltaTime();
+                // kccData.ki.velocity = _animator.deltaPosition / GetDeltaTime();
+                // kcc.SetLookRotation()
+#if USE_ANIMATOR
                 transform.rotation = _animator.deltaRotation * transform.rotation;
+#endif
             }
             else if (_isPerformingCustomAction || _useMeleeRootMotion)
             {
@@ -4401,7 +4393,9 @@ namespace CoverShooter
                     turn(TurnSettings.MeleeAttackRotationSpeed);
 
                 applyVelocityToTheGround(animatorMovement);
+#if USE_ANIMATOR
                 transform.rotation = _animator.deltaRotation * transform.rotation;
+#endif
             }
             else
             {
@@ -4433,7 +4427,7 @@ namespace CoverShooter
 
                     turn(manualSpeed);
                 }
-
+#if Cover
                 if (_cover.In)
                 {
                     if (animatorSpeed > float.Epsilon)
@@ -4450,7 +4444,10 @@ namespace CoverShooter
                     else
                         _body.velocity = new Vector3(0, _body.velocity.y, 0);
                 }
-                else if (_movementInput > float.Epsilon)
+                else 
+#endif
+#if NOT_ACC
+                if (_movementInput > float.Epsilon)
                 {
                     var speed = animatorMovement.magnitude;
 
@@ -4473,6 +4470,7 @@ namespace CoverShooter
                 }
                 else
                     _body.velocity = Vector3.zero;
+#endif
             }
 
             {
@@ -4525,36 +4523,38 @@ namespace CoverShooter
 
         private void applyVelocityToTheGround(Vector3 velocity)
         {
-            velocity.y = 0;
+            return;
 
-            if (_isOnSlope && _isGrounded)
-            {
-                var right = Vector3.Cross(_groundNormal, Vector3.up);
-                right.y = 0;
+            //velocity.y = 0;
 
-                if (right.sqrMagnitude > float.Epsilon)
-                    right.Normalize();
+            //if (_isOnSlope && _isGrounded)
+            //{
+            //    var right = Vector3.Cross(_groundNormal, Vector3.up);
+            //    right.y = 0;
 
-                var result = Quaternion.AngleAxis(-_slope, right) * velocity;
-                var speed = result.magnitude;
+            //    if (right.sqrMagnitude > float.Epsilon)
+            //        right.Normalize();
 
-                if (speed > float.Epsilon)
-                {
-                    var angle = Mathf.Asin(result.y / speed) * Mathf.Rad2Deg;
+            //    var result = Quaternion.AngleAxis(-_slope, right) * velocity;
+            //    var speed = result.magnitude;
 
-                    if (angle >= MinSlope)
-                    {
-                        result = Quaternion.AngleAxis(-MinSlope, right) * velocity;
-                        result *= 1.0f - Mathf.Clamp01((angle - MinSlope) / (MaxSlope - MinSlope));
-                    }
+            //    if (speed > float.Epsilon)
+            //    {
+            //        var angle = Mathf.Asin(result.y / speed) * Mathf.Rad2Deg;
 
-                    _body.velocity = result;
-                }
-                else
-                    _body.velocity = Vector3.zero;
-            }
-            else
-                _body.velocity = velocity;
+            //        if (angle >= MinSlope)
+            //        {
+            //            result = Quaternion.AngleAxis(-MinSlope, right) * velocity;
+            //            result *= 1.0f - Mathf.Clamp01((angle - MinSlope) / (MaxSlope - MinSlope));
+            //        }
+
+            //        _body.velocity = result;
+            //    }
+            //    else
+            //        _body.velocity = Vector3.zero;
+            //}
+            //else
+            //    _body.velocity = velocity;
         }
 
         private void turn(float speed)
@@ -4591,6 +4591,7 @@ namespace CoverShooter
             }
         }
 
+#if Climb
         private void updateClimb()
         {
             if (_isClimbing)
@@ -4627,6 +4628,7 @@ namespace CoverShooter
 
             if (!_isFalling)
                 updateGround();
+
         }
 
         private bool startClimb(Cover cover, bool isVault)
@@ -4669,7 +4671,8 @@ namespace CoverShooter
 
             return false;
         }
-
+#endif
+#if Cover
         private void updateCover(bool isForcedToMaintain)
         {
             if (_cover.In && IsMovingToCoverOffset)
@@ -4803,7 +4806,7 @@ namespace CoverShooter
                 _wasMovingInCover = false;
             }
         }
-
+#endif
         private int gunType
         {
             get
@@ -4895,9 +4898,10 @@ namespace CoverShooter
             if (_ik.HasSwitchedHands)
             {
                 _ik.Unmirror();
-
+#if USE_ANIMATOR
                 var direction = _animator.GetFloat("CoverDirection");
                 _animator.SetFloat("CoverDirection", direction * -1);
+#endif
             }
         }
 
@@ -4914,9 +4918,10 @@ namespace CoverShooter
             var right = weapon.RightItem == null ? null : weapon.RightItem.transform;
             var left = weapon.LeftItem == null ? null : weapon.LeftItem.transform;
             _ik.Mirror(right, left, weapon.PreferSwapping);
-
+#if USE_ANIMATOR
             var direction = _animator.GetFloat("CoverDirection");
             _animator.SetFloat("CoverDirection", direction * -1);
+#endif
         }
 
         private void updateWeapons()
@@ -4941,10 +4946,11 @@ namespace CoverShooter
                     {
                         unmirror();
                         _weaponEquipState = WeaponEquipState.unequipping;
+#if USE_ANIMATOR
                         _animator.ResetTrigger("Hit");
                         _animator.ResetTrigger("ComboHit");
                         _animator.SetTrigger("Unequip");
-
+#endif
                         if (_equippedWeapon.Gun != null)
                             _equippedWeapon.Gun.CancelFire();
                     }
@@ -4955,9 +4961,12 @@ namespace CoverShooter
                         _isUnequippedButGoingToGrab = true;
                         _equippedWeapon = new WeaponDescription();
                         _equippingWeapon = Weapon;
+
+#if USE_ANIMATOR
                         _animator.ResetTrigger("Hit");
                         _animator.ResetTrigger("ComboHit");
                         _animator.SetTrigger("Equip");
+#endif
                     }
 
                     for (int i = 0; i < _weaponChangeListeners.Length; i++)
@@ -5041,9 +5050,12 @@ namespace CoverShooter
                 {
                     _isWaitingForComboHit = true;
                     _useMeleeRootMotion = true;
+
+#if USE_ANIMATOR
                     _animator.SetInteger("MeleeType", meleeType);
                     _animator.SetTrigger("ComboHit");
                     _animator.ResetTrigger("Hit");
+#endif
                 }
             }
             else
@@ -5061,10 +5073,11 @@ namespace CoverShooter
                         _cover.Clear();
                         _meleeScan = 0;
                         _meleeMoment = 0;
-
+#if USE_ANIMATOR
                         _animator.SetInteger("MeleeType", meleeType);
                         _animator.SetTrigger("Hit");
                         _animator.ResetTrigger("ComboHit");
+#endif
                     }
                 }
                 else
@@ -5097,7 +5110,9 @@ namespace CoverShooter
                             if (_isLoadingBullet)
                             {
                                 _isLoadingBullet = false;
+#if USE_ANIMATOR
                                 _animator.SetTrigger("InterruptLoad");
+#endif
                             }
 
                             _coverAim.Angle = _horizontalAngle;
@@ -5201,7 +5216,10 @@ namespace CoverShooter
                 }
 
                 _coverUpdateTimer = UnityEngine.Random.Range(-0.05f, 0.1f);
+
+#if Cover
                 updateCover(false);
+#endif
             }
 
             if (_isWeaponBlocked && _hasCrouchCover && wantsToAim)
@@ -5216,7 +5234,9 @@ namespace CoverShooter
 
                 if (climb != CoverClimb.No)
                 {
+#if Climb
                     startClimb(_wantsToClimbCover, climb == CoverClimb.Vault);
+#endif
                     _wantsToClimbCover = null;
                 }
             }
@@ -5256,6 +5276,7 @@ namespace CoverShooter
             }
         }
 
+#if CharacterIK
         private void updateFeet()
         {
             if (!IsAlive)
@@ -5334,7 +5355,7 @@ namespace CoverShooter
             _previousLeftFootHeight = leftHeight;
             _previousRightFootHeight = rightHeight;
         }
-    
+#endif
         private void updateWalk()
         {
             Vector3 movement;
@@ -5733,98 +5754,98 @@ namespace CoverShooter
 
         private void updateVertical()
         {
-            if (_jumpTimer < 999) _jumpTimer += GetDeltaTime();
-            if (_ignoreFallTimer > 0) _ignoreFallTimer -= GetDeltaTime();
-            if (_ignoreJumpTimer > 0) _ignoreJumpTimer -= GetDeltaTime();
+            //if (_jumpTimer < 999) _jumpTimer += GetDeltaTime();
+            //if (_ignoreFallTimer > 0) _ignoreFallTimer -= GetDeltaTime();
+            //if (_ignoreJumpTimer > 0) _ignoreJumpTimer -= GetDeltaTime();
 
-            updateGround();
+            //updateGround();
 
-            if (EquippedWeapon.IsHeavy)
-                _isIntendingToJump = false;
+            //if (EquippedWeapon.IsHeavy)
+            //    _isIntendingToJump = false;
 
-            if (_isGrounded)
-            {
-                if (_nextJumpTimer > -float.Epsilon) _nextJumpTimer -= GetDeltaTime();
+            //if (_isGrounded)
+            //{
+            //    if (_nextJumpTimer > -float.Epsilon) _nextJumpTimer -= GetDeltaTime();
 
-                if (!_cover.In && !_isClimbing && !_isJumping && _nextJumpTimer < float.Epsilon && _wantsToJump)
-                    _isIntendingToJump = true;
-            }
-            else if (_body.velocity.y < -5)
-                _isJumping = false;
+            //    if (!_cover.In && !_isClimbing && !_isJumping && _nextJumpTimer < float.Epsilon && _wantsToJump)
+            //        _isIntendingToJump = true;
+            //}
+            //else if (_body.velocity.y < -5)
+            //    _isJumping = false;
 
-            if (_isGrounded && _ignoreJumpTimer <= float.Epsilon)
-            {
-                if (_isIntendingToJump && Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, _jumpAngle)) < 10)
-                {
-                    if (!_isJumping)
-                    {
-                        _animator.SetTrigger("Jump");
-                        _isJumping = true;
-                        _jumpTimer = 0;
+            //if (_isGrounded && _ignoreJumpTimer <= float.Epsilon)
+            //{
+            //    if (_isIntendingToJump && Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, _jumpAngle)) < 10)
+            //    {
+            //        if (!_isJumping)
+            //        {
+            //            _animator.SetTrigger("Jump");
+            //            _isJumping = true;
+            //            _jumpTimer = 0;
 
-                        for (int i = 0; i < _physicsListeners.Length; i++)
-                            _physicsListeners[i].OnJump();
+            //            for (int i = 0; i < _physicsListeners.Length; i++)
+            //                _physicsListeners[i].OnJump();
 
-                        if (Jumped != null)
-                            Jumped.Invoke();
-                    }
+            //            if (Jumped != null)
+            //                Jumped.Invoke();
+            //        }
 
-                    _animator.SetFloat("JumpSpeed", _jumpForwardMultiplier);
+            //        _animator.SetFloat("JumpSpeed", _jumpForwardMultiplier);
 
-                    var v = _jumpForwardMultiplier * Util.HorizontalVector(_jumpAngle) * JumpSettings.Speed;
-                    v.y = JumpSettings.Strength;
-                    _body.velocity = v;
-                }
-                else if (_isJumping)
-                    _isJumping = false;
-            }
-            else
-                _isIntendingToJump = false;
+            //        var v = _jumpForwardMultiplier * Util.HorizontalVector(_jumpAngle) * JumpSettings.Speed;
+            //        v.y = JumpSettings.Strength;
+            //        _body.velocity = v;
+            //    }
+            //    else if (_isJumping)
+            //        _isJumping = false;
+            //}
+            //else
+            //    _isIntendingToJump = false;
 
-            if (_ignoreFallTimer <= float.Epsilon)
-            {
-                if (!_isFalling)
-                {
-                    if (((!_isJumping && _body.velocity.y < -1) || (_isJumping && _body.velocity.y < -4)) &&
-                        !findGround(FallThreshold))
-                    {
-                        _animator.SetTrigger("Fall");
-                        _isFalling = true;
-                    }
-                }
-                else
-                {
-                    if (_isGrounded)
-                        _isFalling = false;
-                }
-            }
-            else
-                _isFalling = false;
+            //if (_ignoreFallTimer <= float.Epsilon)
+            //{
+            //    if (!_isFalling)
+            //    {
+            //        if (((!_isJumping && _body.velocity.y < -1) || (_isJumping && _body.velocity.y < -4)) &&
+            //            !findGround(FallThreshold))
+            //        {
+            //            _animator.SetTrigger("Fall");
+            //            _isFalling = true;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (_isGrounded)
+            //            _isFalling = false;
+            //    }
+            //}
+            //else
+            //    _isFalling = false;
 
-            if (_isFalling)
-            {
-                Vector3 edge;
-                if (findEdge(out edge, 0.1f))
-                {
-                    var offset = transform.position - edge;
-                    offset.y = 0;
-                    var distance = offset.magnitude;
+            //if (_isFalling)
+            //{
+            //    Vector3 edge;
+            //    if (findEdge(out edge, 0.1f))
+            //    {
+            //        var offset = transform.position - edge;
+            //        offset.y = 0;
+            //        var distance = offset.magnitude;
 
-                    if (distance > 0.01f)
-                    {
-                        offset /= distance;
-                        transform.position += offset * Mathf.Clamp(GetDeltaTime() * 3, 0, distance);
-                    }
-                }
-            }
+            //        if (distance > 0.01f)
+            //        {
+            //            offset /= distance;
+            //            transform.position += offset * Mathf.Clamp(GetDeltaTime() * 3, 0, distance);
+            //        }
+            //    }
+            //}
         }
 
         private void updateGround()
         {
-            if (_ignoreFallTimer < float.Epsilon)
-                findGroundAndSlope(GroundThreshold);
-            else
-                _isGrounded = true;
+            //if (_ignoreFallTimer < float.Epsilon)
+            //    findGroundAndSlope(GroundThreshold);
+            //else
+            //    _isGrounded = true;
 
             if (_isGrounded && !_wasGrounded && IsAlive && _nogroundTimer >= 0.3f)
             {
@@ -5837,7 +5858,7 @@ namespace CoverShooter
                     Landed.Invoke();
             }
 
-            _wasGrounded = _isGrounded;
+            //_wasGrounded = _isGrounded;
         }
 
         internal bool wantsToFire
@@ -6047,213 +6068,214 @@ namespace CoverShooter
 
         private void updateAnimator()
         {
-            if (IsAlive)
-            {
-                if (_immediateIdle)
-                {
-                    if (!_immediateAim)
-                        _animator.SetTrigger("ImmediateIdle");
+            //if (IsAlive)
+            //{
+            //    if (_immediateIdle)
+            //    {
+            //        if (!_immediateAim)
+            //            _animator.SetTrigger("ImmediateIdle");
 
-                    _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : 1);
-                    _animator.SetFloat("MovementSpeed", 0);
-                    _animator.SetFloat("Rotation", 0);
+            //        _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : 1);
+            //        _animator.SetFloat("MovementSpeed", 0);
+            //        _animator.SetFloat("Rotation", 0);
 
-                    transform.Rotate(0, _horizontalAngleDiff, 0);
-                    _currentAnimatedAngle = transform.eulerAngles.y;
-                    _currentStep = 0;
+            //        transform.Rotate(0, _horizontalAngleDiff, 0);
+            //        _currentAnimatedAngle = transform.eulerAngles.y;
+            //        _currentStep = 0;
 
-                    _immediateIdle = false;
-                }
+            //        _immediateIdle = false;
+            //    }
 
-                if (_immediateAim)
-                {
-                    _animator.SetTrigger("ImmediateAim");
-                    _immediateAim = false;
-                }
+            //    if (_immediateAim)
+            //    {
+            //        _animator.SetTrigger("ImmediateAim");
+            //        _immediateAim = false;
+            //    }
 
-                _animator.SetFloat("Speed", Speed);
-                _animator.SetBool("IsDead", false);
+            //    _animator.SetFloat("Speed", Speed);
+            //    _animator.SetBool("IsDead", false);
 
-                if (_coverOffset.magnitude > float.Epsilon)
-                {
-                    _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
-                    _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
-                }
-                else if (_wantsToRotateSmoothly)
-                {
-                    if (_isGrounded && _movementInput < 0.5f && !_isClimbing && !_isFalling)
-                        _animator.SetFloat("SmoothRotation", _currentStep, 0.05f, GetDeltaTime());
-                    else
-                        _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
+            //    if (_coverOffset.magnitude > float.Epsilon)
+            //    {
+            //        _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
+            //        _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
+            //    }
+            //    else if (_wantsToRotateSmoothly)
+            //    {
+            //        if (_isGrounded && _movementInput < 0.5f && !_isClimbing && !_isFalling)
+            //            _animator.SetFloat("SmoothRotation", _currentStep, 0.05f, GetDeltaTime());
+            //        else
+            //            _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
 
-                    _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
-                }
-                else
-                {
-                    _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
-                    _animator.SetFloat("Rotation", _currentStep, 0.05f, GetDeltaTime());
-                }
+            //        _animator.SetFloat("Rotation", 0, 0.05f, GetDeltaTime());
+            //    }
+            //    else
+            //    {
+            //        _animator.SetFloat("SmoothRotation", 0, 0.05f, GetDeltaTime());
+            //        _animator.SetFloat("Rotation", _currentStep, 0.05f, GetDeltaTime());
+            //    }
 
-                var movement = _localMovement;
+            //    var movement = _localMovement;
 
-                if (_currentMovement.Magnitude > float.Epsilon)
-                    movement /= _currentMovement.Magnitude;
+            //    if (_currentMovement.Magnitude > float.Epsilon)
+            //        movement /= _currentMovement.Magnitude;
 
-                if (_ik.HasSwitchedHands)
-                    movement.x *= -1;
+            //    if (_ik.HasSwitchedHands)
+            //        movement.x *= -1;
 
-                _animator.SetBool("IsMirrored", _ik.HasSwitchedHands);
+            //    _animator.SetBool("IsMirrored", _ik.HasSwitchedHands);
 
-                var movementSpeed = _currentMovement.Magnitude;
+            //    var movementSpeed = _currentMovement.Magnitude;
 
-                var outOfCoverStand = 1.0f;
+            //    var outOfCoverStand = 1.0f;
 
-                if (_hasCrouchCover && !IsAiming && !(_cover.In && _cover.IsTall))
-                    outOfCoverStand = Mathf.Clamp01((Vector3.Distance(transform.position, _crouchCoverPosition) / (CoverSettings.MaxCrouchDistance - CoverSettings.MinCrouchDistance)) - CoverSettings.MinCrouchDistance);
+            //    if (_hasCrouchCover && !IsAiming && !(_cover.In && _cover.IsTall))
+            //        outOfCoverStand = Mathf.Clamp01((Vector3.Distance(transform.position, _crouchCoverPosition) / (CoverSettings.MaxCrouchDistance - CoverSettings.MinCrouchDistance)) - CoverSettings.MinCrouchDistance);
 
-                if (_useSprintingAnimation)
-                    movementSpeed = 2;
-                else if (_isCrouching || _cover.In)
-                    movementSpeed = 0.5f;
-                else if (movementSpeed >= 1 - float.Epsilon && !_useSprintingAnimation)
-                    movementSpeed = 1;
+            //    if (_useSprintingAnimation)
+            //        movementSpeed = 2;
+            //    else if (_isCrouching || _cover.In)
+            //        movementSpeed = 0.5f;
+            //    else if (movementSpeed >= 1 - float.Epsilon && !_useSprintingAnimation)
+            //        movementSpeed = 1;
 
-                _animator.SetFloat("ArmLift", _wantsToLiftArms ? 1 : 0, 0.14f, GetDeltaTime());
+            //    _animator.SetFloat("ArmLift", _wantsToLiftArms ? 1 : 0, 0.14f, GetDeltaTime());
 
-                if (_movementInput > 0.5f)
-                {
-                    _animator.SetFloat("MovementSpeed", movementSpeed * _movementInput, AccelerationDamp * 0.1f, GetDeltaTime());
-                    _animator.SetFloat("MovementX", movement.x, AccelerationDamp * 0.02f, GetDeltaTime());
-                    _animator.SetFloat("MovementZ", movement.z, AccelerationDamp * 0.02f, GetDeltaTime());
-                }
-                else
-                {
-                    _animator.SetFloat("MovementSpeed", 0, DeccelerationDamp * 0.1f, GetDeltaTime());
-                    _animator.SetFloat("MovementX", movement.x, DeccelerationDamp * 0.02f, GetDeltaTime());
-                    _animator.SetFloat("MovementZ", movement.z, DeccelerationDamp * 0.02f, GetDeltaTime());
-                }
+            //    if (_movementInput > 0.5f)
+            //    {
+            //        _animator.SetFloat("MovementSpeed", movementSpeed * _movementInput, AccelerationDamp * 0.1f, GetDeltaTime());
+            //        _animator.SetFloat("MovementX", movement.x, AccelerationDamp * 0.02f, GetDeltaTime());
+            //        _animator.SetFloat("MovementZ", movement.z, AccelerationDamp * 0.02f, GetDeltaTime());
+            //    }
+            //    else
+            //    {
+            //        _animator.SetFloat("MovementSpeed", 0, DeccelerationDamp * 0.1f, GetDeltaTime());
+            //        _animator.SetFloat("MovementX", movement.x, DeccelerationDamp * 0.02f, GetDeltaTime());
+            //        _animator.SetFloat("MovementZ", movement.z, DeccelerationDamp * 0.02f, GetDeltaTime());
+            //    }
 
-                _animator.SetBool("IsFalling", _isFalling && !_isJumping);
-                _animator.SetBool("IsGrounded", _isGrounded);
+            //    _animator.SetBool("IsFalling", _isFalling && !_isJumping);
+            //    _animator.SetBool("IsGrounded", _isGrounded);
 
-                // Small hacks. Better animation transitions.
-                _animator.SetBool("IsWeaponReady", IsWeaponReady || _isRolling || (_isClimbing && _normalizedClimbTime > 0.7f));
+            //    // Small hacks. Better animation transitions.
+            //    _animator.SetBool("IsWeaponReady", IsWeaponReady || _isRolling || (_isClimbing && _normalizedClimbTime > 0.7f));
 
-                _animator.SetInteger("GunType", gunType);
-                _animator.SetInteger("MeleeType", meleeType);
+            //    _animator.SetInteger("GunType", gunType);
+            //    _animator.SetInteger("MeleeType", meleeType);
 
-                if (gunType == 0)
-                {
-                    if (_equippedWeapon.IsNull)
-                        _animator.SetBool("IsTool", IsEquipped ? Weapon.Tool != null : false);
-                    else
-                        _animator.SetBool("IsTool", _equippedWeapon.Tool != null);
-                }
-                else
-                    _animator.SetBool("IsTool", false);
+            //    if (gunType == 0)
+            //    {
+            //        if (_equippedWeapon.IsNull)
+            //            _animator.SetBool("IsTool", IsEquipped ? Weapon.Tool != null : false);
+            //        else
+            //            _animator.SetBool("IsTool", _equippedWeapon.Tool != null);
+            //    }
+            //    else
+            //        _animator.SetBool("IsTool", false);
 
-                _animator.SetBool("IsBlocking", IsBlocking);
+            //    _animator.SetBool("IsBlocking", IsBlocking);
 
-                int bodyValue;
-                int toolValue;
-                float gunVariant;
-                getWeaponProperties(out bodyValue, out toolValue, out gunVariant);
+            //    int bodyValue;
+            //    int toolValue;
+            //    float gunVariant;
+            //    getWeaponProperties(out bodyValue, out toolValue, out gunVariant);
 
-                _animator.SetFloat("BodyValue", bodyValue, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue", bodyValue, 0.1f, GetDeltaTime());
 
-                _animator.SetFloat("BodyValue0", bodyValue == 0 ? 1 : 0, 0.1f, GetDeltaTime());
-                _animator.SetFloat("BodyValue1", bodyValue == 1 ? 1 : 0, 0.1f, GetDeltaTime());
-                _animator.SetFloat("BodyValue2", bodyValue == 2 ? 1 : 0, 0.1f, GetDeltaTime());
-                _animator.SetFloat("BodyValue3", bodyValue == 3 ? 1 : 0, 0.1f, GetDeltaTime());
-                _animator.SetFloat("BodyValue4", bodyValue == 4 ? 1 : 0, 0.1f, GetDeltaTime());
-                _animator.SetFloat("BodyValue5", bodyValue == 5 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue0", bodyValue == 0 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue1", bodyValue == 1 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue2", bodyValue == 2 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue3", bodyValue == 3 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue4", bodyValue == 4 ? 1 : 0, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("BodyValue5", bodyValue == 5 ? 1 : 0, 0.1f, GetDeltaTime());
 
-                _animator.SetFloat("GunVariant", gunVariant, 0.1f, GetDeltaTime());
-                _animator.SetFloat("Tool", toolValue, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("GunVariant", gunVariant, 0.1f, GetDeltaTime());
+            //    _animator.SetFloat("Tool", toolValue, 0.1f, GetDeltaTime());
 
-                if (IsAiming || (_cover.In && _wantsToLiftArms))
-                    _animator.SetFloat("IdleToAim", 1, 0.05f, GetDeltaTime());
-                else
-                    _animator.SetFloat("IdleToAim", 0, 0.05f, GetDeltaTime());
+            //    if (IsAiming || (_cover.In && _wantsToLiftArms))
+            //        _animator.SetFloat("IdleToAim", 1, 0.05f, GetDeltaTime());
+            //    else
+            //        _animator.SetFloat("IdleToAim", 0, 0.05f, GetDeltaTime());
 
-                var gun = EquippedWeapon.Gun;
+            //    var gun = EquippedWeapon.Gun;
 
-                _dontChangeArmAimingJustYet = false;
+            //    _dontChangeArmAimingJustYet = false;
 
-                if (gun != null)
-                {
-                    if (_cover.In)
-                        if (_sideOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Using)
-                        {
-                            _ik.ImmediateArmAim();
-                            _dontChangeArmAimingJustYet = true;
-                            _animator.SetBool("IsUsingWeapon", true);
-                        }
+            //    if (gun != null)
+            //    {
+            //        if (_cover.In)
+            //            if (_sideOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Using)
+            //            {
+            //                _ik.ImmediateArmAim();
+            //                _dontChangeArmAimingJustYet = true;
+            //                _animator.SetBool("IsUsingWeapon", true);
+            //            }
 
-                    if (!_dontChangeArmAimingJustYet)
-                    {
-                        _animator.SetBool("IsUsingWeapon", !IsGoingToSprint &&
-                                                           !IsSprinting &&
-                                                           !HasGrenadeInHand &&
-                                                           !IsMovingToCoverOffsetAndCantAim &&
-                                                           (IsAiming ||
-                                                            (_wantsToAim && IsReloading) ||
-                                                            (_isRolling && _wantsToAim) ||
-                                                            (IsChangingWeapon && _wantsToAim)));
-                    }
-                }
-                else
-                {
-                    _animator.SetBool("IsAlternateUse", _isUsingWeaponAlternate);
-                    _animator.SetBool("IsUsingWeapon", _isUsingWeapon);
-                }
+            //        if (!_dontChangeArmAimingJustYet)
+            //        {
+            //            _animator.SetBool("IsUsingWeapon", !IsGoingToSprint &&
+            //                                               !IsSprinting &&
+            //                                               !HasGrenadeInHand &&
+            //                                               !IsMovingToCoverOffsetAndCantAim &&
+            //                                               (IsAiming ||
+            //                                                (_wantsToAim && IsReloading) ||
+            //                                                (_isRolling && _wantsToAim) ||
+            //                                                (IsChangingWeapon && _wantsToAim)));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        _animator.SetBool("IsAlternateUse", _isUsingWeaponAlternate);
+            //        _animator.SetBool("IsUsingWeapon", _isUsingWeapon);
+            //    }
 
-                var isInCover = isInAnimatedCover;
+            //    var isInCover = isInAnimatedCover;
 
-                if (_cover.In && isInCover && !IsMovingToCoverOffset && (_sideOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Using))
-                    setCoverOffsets(false, false, Vector3.zero, Vector3.zero);
+            //    if (_cover.In && isInCover && !IsMovingToCoverOffset && (_sideOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Using))
+            //        setCoverOffsets(false, false, Vector3.zero, Vector3.zero);
 
-                _animator.SetBool("IsInCover", isInCover);
-                _animator.SetBool("IsInLowCover", isInCover && (!_cover.IsTall || _isCrouching));
-                _animator.SetBool("IsInTallLeftCover", isInCover && _cover.IsTall && !_isCrouching && _cover.IsStandingLeft);
-                _animator.SetBool("IsInTallCoverBack", isInCover && _cover.IsTall && _cover.Main.IsFrontField(_throwAngle, 180));
+            //    _animator.SetBool("IsInCover", isInCover);
+            //    _animator.SetBool("IsInLowCover", isInCover && (!_cover.IsTall || _isCrouching));
+            //    _animator.SetBool("IsInTallLeftCover", isInCover && _cover.IsTall && !_isCrouching && _cover.IsStandingLeft);
+            //    _animator.SetBool("IsInTallCoverBack", isInCover && _cover.IsTall && _cover.Main.IsFrontField(_throwAngle, 180));
 
-                if (_cover.In)
-                {
-                    _animator.SetFloat("CoverDirection", (_ik.HasSwitchedHands ? -1 : 1) * _cover.Direction, 0.2f, GetDeltaTime());
-                    _animator.SetFloat("CoverHeight", (_cover.IsTall && !_isCrouching) ? 1.0f : 0.0f, 0.1f, GetDeltaTime());
+            //    if (_cover.In)
+            //    {
+            //        _animator.SetFloat("CoverDirection", (_ik.HasSwitchedHands ? -1 : 1) * _cover.Direction, 0.2f, GetDeltaTime());
+            //        _animator.SetFloat("CoverHeight", (_cover.IsTall && !_isCrouching) ? 1.0f : 0.0f, 0.1f, GetDeltaTime());
 
-                    var angle = _isThrowing ? _throwAngle : _horizontalAngle;
+            //        var angle = _isThrowing ? _throwAngle : _horizontalAngle;
 
-                    if (_cover.Main.IsFrontField(angle, 180))
-                        angle = Mathf.DeltaAngle(_cover.ForwardAngle, angle);
-                    else if (_cover.IsStandingRight)
-                        angle = 90;
-                    else
-                        angle = -90;
+            //        if (_cover.Main.IsFrontField(angle, 180))
+            //            angle = Mathf.DeltaAngle(_cover.ForwardAngle, angle);
+            //        else if (_cover.IsStandingRight)
+            //            angle = 90;
+            //        else
+            //            angle = -90;
 
-                    _animator.SetFloat("ThrowAngle", angle);
-                }
+            //        _animator.SetFloat("ThrowAngle", angle);
+            //    }
 
-                _animator.SetFloat("ClimbHeight", _climbHeight);
-                _animator.SetBool("IsVault", _isClimbingAVault);
+            //    _animator.SetFloat("ClimbHeight", _climbHeight);
+            //    _animator.SetBool("IsVault", _isClimbingAVault);
 
-                if (IsAiming && IsInLowCover)
-                    _animator.SetFloat("CrouchToStand", ((!_cover.IsTall || _isCrouching) && !_isAimingThroughCoverPlane) ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
-                else
-                    _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
+            //    if (IsAiming && IsInLowCover)
+            //        _animator.SetFloat("CrouchToStand", ((!_cover.IsTall || _isCrouching) && !_isAimingThroughCoverPlane) ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
+            //    else
+            //        _animator.SetFloat("CrouchToStand", _isCrouching ? 0 : outOfCoverStand, 0.1f, GetDeltaTime());
 
-                _animator.SetBool("HasGrenade", _isGrenadeTakenOut);
-            }
-            else
-            {
-                _animator.SetBool("IsDead", true);
-                _animator.SetBool("IsUsingWeapon", false);
-            }
+            //    _animator.SetBool("HasGrenade", _isGrenadeTakenOut);
+            //}
+            //else
+            //{
+            //    _animator.SetBool("IsDead", true);
+            //    _animator.SetBool("IsUsingWeapon", false);
+            //}
         }
 
         private void immediateBodyValue(int value)
         {
+#if USE_ANIMATOR
             _animator.SetFloat("BodyValue", value);
 
             _animator.SetFloat("BodyValue0", value == 0 ? 1 : 0);
@@ -6262,16 +6284,21 @@ namespace CoverShooter
             _animator.SetFloat("BodyValue3", value == 3 ? 1 : 0);
             _animator.SetFloat("BodyValue4", value == 4 ? 1 : 0);
             _animator.SetFloat("BodyValue5", value == 5 ? 1 : 0);
+#endif
         }
 
         private void instantCoverAnimatorUpdate()
         {
+#if USE_ANIMATOR
             _animator.SetFloat("CoverDirection", _cover.Direction);
             _animator.SetFloat("CoverHeight", (_cover.IsTall && !_isCrouching) ? 1.0f : 0.0f);
+#endif
         }
 
         private void updateIK()
         {
+            return;
+
             if (!IsAlive)
                 return;
 
@@ -6324,7 +6351,7 @@ namespace CoverShooter
             if (Runner)
                 return Runner.GetPhysicsScene();
 
-            Scene activeScene = SceneManager.GetActiveScene();
+            UnityEngine.SceneManagement.Scene activeScene = SceneManager.GetActiveScene();
             if (activeScene.IsValid() == true)
             {
                 PhysicsScene physicsScene = activeScene.GetPhysicsScene();
@@ -6432,6 +6459,6 @@ namespace CoverShooter
             return cover.GetClimbAt(transform.position, _capsule.radius, 3.0f, 1.05f, 1.1f);
         }
 
-        #endregion
+#endregion
     }
 }

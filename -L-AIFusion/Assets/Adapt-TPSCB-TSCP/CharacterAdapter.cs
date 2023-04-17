@@ -13,12 +13,12 @@ public class CharacterAdapter : NetworkBehaviour
     [Tooltip("Team number used by the AI.")]
     public int Side = 0;
 
-    protected bool _isAlive = true;
     /// <summary>
     /// Is the object alive.
     /// </summary>
-    public bool IsAlive
+    public virtual bool IsAlive
     {
-        get { return _isAlive; }
+        get { return true; }
+        set { }
     }
 }

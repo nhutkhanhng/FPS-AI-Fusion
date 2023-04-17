@@ -282,7 +282,7 @@ namespace CoverShooter
         /// </summary>
         public void OnDead()
         {
-            _isAlive = false;
+            IsAlive = false;
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace CoverShooter
         /// </summary>
         public void OnResurrect()
         {
-            _isAlive = true;
+            IsAlive = true;
         }
 
         /// <summary>
