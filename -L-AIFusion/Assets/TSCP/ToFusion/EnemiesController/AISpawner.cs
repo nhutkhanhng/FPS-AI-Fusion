@@ -35,6 +35,8 @@ namespace TPSBR
         public void InitGameMode(GameplayMode gameMode) => this._currentGameMode = gameMode;
         public override void FixedUpdateNetwork()
         {
+            return;
+
             if (_disableSpawner || !Object.HasStateAuthority || _currentGameMode == null)
                 return;
 
