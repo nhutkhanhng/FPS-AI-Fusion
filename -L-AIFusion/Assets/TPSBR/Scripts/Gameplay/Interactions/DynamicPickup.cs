@@ -1,6 +1,5 @@
 using Fusion;
 using UnityEngine;
-using Plugins.Outline;
 
 namespace TPSBR
 {
@@ -41,7 +40,7 @@ namespace TPSBR
 		private string _name;
 		private string _description;
 
-		private OutlineBehaviour _outline;
+		// private OutlineBehaviour _outline;
 		private Color _defaultOutlineColor;
 		private Color _noOutlineColor;
 
@@ -161,14 +160,14 @@ namespace TPSBR
 		protected void Awake()
 		{
 			_networkRigidbody = GetComponent<NetworkRigidbody>();
-			_outline = GetComponent<OutlineBehaviour>();
+			//_outline = GetComponent<OutlineBehaviour>();
 
-			if (_outline != null)
-			{
-				_defaultOutlineColor = _outline.Settings.Color;
-				_noOutlineColor = _defaultOutlineColor;
-				_noOutlineColor.a = 0f;
-			}
+			//if (_outline != null)
+			//{
+			//	_defaultOutlineColor = _outline.Settings.Color;
+			//	_noOutlineColor = _defaultOutlineColor;
+			//	_noOutlineColor.a = 0f;
+			//}
 		}
 
 		protected void Update()
@@ -187,35 +186,37 @@ namespace TPSBR
 
 		private void UpdateOutline()
 		{
-			if (Runner == null)
-				return;
+            return;
 
-			if (Runner.IsPlayer == false)
-				return;
+			//if (Runner == null)
+			//	return;
 
-			if (_outline == null)
-				return;
+			//if (Runner.IsPlayer == false)
+			//	return;
 
-			if (_dynamicObject == null)
-				return;
+			//if (_outline == null)
+			//	return;
 
-			var agent = Context.ObservedAgent;
-			if (agent == null)
-				return;
+			//if (_dynamicObject == null)
+			//	return;
 
-			float sqrDistance = (agent.transform.position - transform.position).sqrMagnitude;
+			//var agent = Context.ObservedAgent;
+			//if (agent == null)
+			//	return;
 
-			if (sqrDistance > _noOutlineDistance * _noOutlineDistance)
-			{
-				_outline.enabled = false;
-				return;
-			}
+			//float sqrDistance = (agent.transform.position - transform.position).sqrMagnitude;
 
-			float distance = Mathf.Sqrt(sqrDistance);
-			float progress = (distance - _fullOutlineDistance) / (_noOutlineDistance - _fullOutlineDistance);
+			//if (sqrDistance > _noOutlineDistance * _noOutlineDistance)
+			//{
+			//	_outline.enabled = false;
+			//	return;
+			//}
 
-			_outline.enabled = true;
-			_outline.Settings.Color = Color.Lerp(_defaultOutlineColor, _noOutlineColor, progress);
+			//float distance = Mathf.Sqrt(sqrDistance);
+			//float progress = (distance - _fullOutlineDistance) / (_noOutlineDistance - _fullOutlineDistance);
+
+			//_outline.enabled = true;
+			//_outline.Settings.Color = Color.Lerp(_defaultOutlineColor, _noOutlineColor, progress);
 		}
 	}
 }

@@ -335,7 +335,7 @@ namespace TPSBR
 			return true;
 		}
 
-		public bool SwitcWeapon(int weaponSlot)
+		public bool SwitchWeapon(int weaponSlot)
 		{
 			if (weaponSlot == PendingWeaponSlot)
 				return false;

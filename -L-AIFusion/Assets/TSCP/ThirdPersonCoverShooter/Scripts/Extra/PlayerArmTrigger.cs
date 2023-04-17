@@ -22,7 +22,7 @@ namespace CoverShooter
 
         private void OnTriggerEnter(Collider other)
         {
-            var motor = other.GetComponent<CharacterMotor>();
+            var motor = other.GetComponent<ICharacterMotor>();
             if (motor == null) return;
 
             var inventory = other.GetComponent<CharacterInventory>();
@@ -30,11 +30,13 @@ namespace CoverShooter
 
             if (WeaponToUse > 0 && WeaponToUse <= inventory.Weapons.Length)
             {
-                motor.Weapon = inventory.Weapons[WeaponToUse - 1];
-                motor.IsEquipped = true;
+                motor.SwitchWeapon(WeaponToUse - 1);
+
+                //motor.Weapon = inventory.Weapons[WeaponToUse - 1];
+                //motor.IsEquipped = true;
             }
-            else
-                motor.IsEquipped = false;
+            //else
+            //    motor.IsEquipped = false;
         }
     }
 }

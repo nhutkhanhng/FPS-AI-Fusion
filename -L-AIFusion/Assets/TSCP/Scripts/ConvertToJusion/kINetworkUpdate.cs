@@ -27,12 +27,13 @@ public abstract class ICharacterMotor : mNetworkTransform
     public BaseGun Gun => IsGun ? Weapon as BaseGun : null;
     public void SwitchWeapon(int indexWeapon)
     {
-        if (Weapons.SwitcWeapon(indexWeapon))
+        if (Weapons.SwitchWeapon(indexWeapon))
         {
 
         }
     }
 
+    
     public bool IsGunReady { get; }
     public void InputCancelGrenade() { }
     protected bool _isInProcess;
@@ -46,6 +47,9 @@ public abstract class ICharacterMotor : mNetworkTransform
     public abstract void InputCrouch();
     public abstract void InputMovement(CharacterMovement movementData);
     public abstract void InputUseTool();
+    public abstract void InputResurrect();
+
+    public abstract GameObject AskForTarget();
 
     public bool CanRun { get; set; }
     public bool CanSprint { get; set; }

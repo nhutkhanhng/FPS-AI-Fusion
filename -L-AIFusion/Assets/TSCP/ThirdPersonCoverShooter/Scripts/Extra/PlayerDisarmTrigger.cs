@@ -10,10 +10,10 @@ namespace CoverShooter
     {
         private void OnTriggerEnter(Collider other)
         {
-            var motor = other.GetComponent<CharacterMotor>();
+            var motor = other.GetComponent<ICharacterMotor>();
             if (motor == null) return;
 
-            motor.IsEquipped = false;
+            // motor.IsEquipped = false;
         }
     }
 }
