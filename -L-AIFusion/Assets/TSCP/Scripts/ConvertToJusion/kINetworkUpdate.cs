@@ -4,28 +4,28 @@ using System.Collections.Generic;
 using TPSBR;
 using UnityEngine;
 
- public interface kINetworkUpdate
+public interface kINetworkUpdate
 {
     void FixedUpdateNetwork();
     void kRender();
 }
 
- public interface ICharacterAdapt
+public interface ICharacterAdapt
 {
     bool IsAlive { get; }
     bool IsInCover { get; }
 }
 
- interface ICharacterMotor
+public abstract class ICharacterMotor : mNetworkTransform
 {
-     Weapons Weapons { get; }
-     Weapon Weapon { get; }
-     bool IsEquipped => Weapon != null;
-     bool IsGun => Weapon != null && Weapon is FirearmWeapon;
-     bool IsTool => false;
-     bool HasRadio => false;
-     BaseGun Gun => IsGun ? Weapon as BaseGun : null;
-     void SwitchWeapon(int indexWeapon)
+    public Weapons Weapons => _weapons;
+    public Weapon Weapon => Weapons.CurrentWeapon;
+    public bool IsEquipped => Weapon != null;
+    public bool IsGun => Weapon != null && Weapon is FirearmWeapon;
+    public bool IsTool => false;
+    public bool HasRadio => false;
+    public BaseGun Gun => IsGun ? Weapon as BaseGun : null;
+    public void SwitchWeapon(int indexWeapon)
     {
         if (Weapons.SwitchWeapon(indexWeapon))
         {
@@ -33,39 +33,39 @@ using UnityEngine;
         }
     }
 
-     abstract Vector3 BodyLookTarget { get; }
-     abstract void SetBodyTarget(Vector3 direction, float speed);
-     abstract bool IsAimingGun { get; }
-     bool IsAimingTool => false;
-     bool IsGunReady { get; }
-     void InputCancelGrenade() { }
+    public abstract Vector3 BodyLookTarget { get; }
+    public abstract void SetBodyTarget(Vector3 direction, float speed);
+    public abstract bool IsAimingGun { get; }
+    public bool IsAimingTool => false;
+    public bool IsGunReady { get; }
+    public void InputCancelGrenade() { }
     protected bool _isInProcess;
-     abstract bool InputProcessEnd();
-     abstract void InputProcess(CharacterProcess desc);
-     abstract void InputAim();
-     abstract void SetAimTarget(Vector3 position);
+    public abstract bool InputProcessEnd();
+    public abstract void InputProcess(CharacterProcess desc);
+    public abstract void InputAim();
+    public abstract void SetAimTarget(Vector3 position);
 
-     abstract void InputFireOnCondition(int side);
-     abstract void InputReload();
-     abstract void InputCrouch();
-     abstract void InputMovement(CharacterMovement movementData);
-     abstract void InputUseTool();
-     abstract void InputResurrect();
+    public abstract void InputFireOnCondition(int side);
+    public abstract void InputReload();
+    public abstract void InputCrouch();
+    public abstract void InputMovement(CharacterMovement movementData);
+    public abstract void InputUseTool();
+    public abstract void InputResurrect();
 
-     abstract GameObject AskForTarget();
+    public abstract GameObject AskForTarget();
 
-     bool CanRun { get; set; }
-     bool CanSprint { get; set; }
-     bool IsFreeToMove(Vector3 direction)
+    public bool CanRun { get; set; }
+    public bool CanSprint { get; set; }
+    public bool IsFreeToMove(Vector3 direction)
     {
         return IsFree(direction, ObstacleDistance, 0.2f, false, true);
     }
-     bool IsFreeToMove(Vector3 direction, float distance, float height)
+    public bool IsFreeToMove(Vector3 direction, float distance, float height)
     {
         return IsFree(direction, distance, height, false, true);
     }
 
-     bool IsFree(Vector3 direction, float distance, float height, bool coverMeansFree, bool actorMeansFree)
+    public bool IsFree(Vector3 direction, float distance, float height, bool coverMeansFree, bool actorMeansFree)
     {
         CapsuleCollider _capsule = gameObject.GetComponent<CapsuleCollider>();
 
@@ -76,9 +76,9 @@ using UnityEngine;
                            coverMeansFree,
                            actorMeansFree);
     }
-     abstract void Resurrect();
-     abstract void Die();
-     void NotifyStartGunFire()
+    public abstract void Resurrect();
+    public abstract void Die();
+    public void NotifyStartGunFire()
     {
 
     }
@@ -90,17 +90,17 @@ using UnityEngine;
     }
 
     
-     void NotifyStopGunFire()
+    public void NotifyStopGunFire()
     {
 
     }
 
 
-     abstract bool IsInLowCover { get; }
-     abstract bool IsThrowingLeft { get; }
-     abstract bool IsCrouching { get; }
-     bool IsInCover { get => false; }
-     Vector3 AimForward
+    public abstract bool IsInLowCover { get; }
+    public abstract bool IsThrowingLeft { get; }
+    public abstract bool IsCrouching { get; }
+    public bool IsInCover { get => false; }
+    public Vector3 AimForward
     {
         get
         {
@@ -111,22 +111,22 @@ using UnityEngine;
         }
     }
 
-      abstract Vector3 AimTarget { get; }
-     abstract bool IsZooming { get; }
+    public  abstract Vector3 AimTarget { get; }
+    public abstract bool IsZooming { get; }
 
-     abstract bool IsMelee { get; }
+    public abstract bool IsMelee { get; }
 
-     float Speed { get; set; } = 1.0f;
-     abstract Vector3 MovementDirection { get; }
+    public float Speed { get; set; } = 1.0f;
+    public abstract Vector3 MovementDirection { get; }
     
     [Tooltip("Damage multiplier for weapons.")]
-     float DamageMultiplier { get; set; } = 1;
+    public float DamageMultiplier { get; set; } = 1;
     
     protected float _postFireAimWait;
 
     [Tooltip("Movement to obstacles closer than this is ignored.")]
     [Range(0, 2)]
-     float ObstacleDistance = 0.05f;
+    public float ObstacleDistance = 0.05f;
 
     protected Weapons _weapons;
     

@@ -32,3 +32,12 @@ MonoBehaviour:
     _icon: {fileID: 21300000, guid: 9f4607891e0c46343aa052ce9c2017f4, type: 3}
     _agentPrefab: {fileID: 4282139267378355678, guid: b9f04dd6fe389b04b8d0b0bfed89e770, type: 3}
     _menuAgentPrefab: {fileID: 2529299778790674133, guid: 4e02b22e9ad831646a16d09da1821534, type: 3}
+  - _id: Agent.Metaleon
+    _displayName: Metaleon
+    _description: Nobody knows where Soldier 66 came from. There are rumors that
+      he was a high profile hitman before undergoing a series of experimental operations
+      to become half human and half machine. He is famous for not following any sort
+      of rules which makes him particularly dangerous... thing.
+    _icon: {fileID: 21300000, guid: 9f4607891e0c46343aa052ce9c2017f4, type: 3}
+    _agentPrefab: {fileID: 1694779990722270844, guid: 90363f37e751eca4da9c72b37ffada0f, type: 3}
+    _menuAgentPrefab: {fileID: 7541083745476037979, guid: 4e860ab7f5a68d940af4b419960e6dd5, type: 3}
