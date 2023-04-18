@@ -19,7 +19,6 @@ namespace TPSBR
 
         public override void Spawned()
         {
-            Debug.LogError("Enemies Spaner is Spawned");
             _spawnDelay = TickTimer.CreateFromSeconds(Runner, 5f);
             base.Spawned();
         }
@@ -65,7 +64,8 @@ namespace TPSBR
             enemyTemplate.transform.localRotation = Quaternion.identity;
             PTemplate.transform.localRotation = Quaternion.identity;
 
-            var enemy = Runner.Spawn(template, spawnPoint.position, rotation, PlayerRef.None, onBeforeSpawned: _OnBeforeSpawned);
+            var enemy = Runner.Spawn(template, spawnPoint.position, rotation, Context.LocalPlayerRef, onBeforeSpawned: _OnBeforeSpawned);
+            Debug.Break();
             AllEnemies.Add(enemy);
         }
 

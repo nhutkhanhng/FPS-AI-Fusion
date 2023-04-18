@@ -398,7 +398,7 @@ namespace TPSBR
 
 			var _agent =  SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
             _allAgentInGame.TryAdd(player, _agent);
-            Debug.LogError(_agent);
+
             return _agent;
         }
 

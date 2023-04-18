@@ -164,7 +164,7 @@ namespace Fusion.KCC
 		private KCCUpdater          _updater;
 		private KCCDebug            _debug                 = new KCCDebug();
 		private KCCStatistics       _statistics            = new KCCStatistics();
-		private KCCCollider         _collider              = new KCCCollider();
+        [SerializeField] private KCCCollider         _collider              = new KCCCollider();
 		private KCCData             _fixedData             = new KCCData();
 		private KCCData             _renderData            = new KCCData();
 		private KCCData[]           _historyData           = new KCCData[HISTORY_SIZE];

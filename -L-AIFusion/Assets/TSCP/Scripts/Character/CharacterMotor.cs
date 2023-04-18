@@ -677,7 +677,11 @@ namespace CoverShooter
         {
             get
             {
-                var flip = _ik.HasSwitchedHands ? -1f : 1f;
+                var flip =
+#if _IK
+                    _ik.HasSwitchedHands ? -1f : 
+#endif
+                    1f;
                 var right = Vector3.Cross(Vector3.up, _bodyTarget - transform.position).normalized;
 
                 return VirtualHead + right * _capsule.radius * flip * 0.75f;
@@ -691,7 +695,11 @@ namespace CoverShooter
         {
             get
             {
-                var flip = _ik.HasSwitchedHands ? -1f : 1f;
+                var flip =
+#if _IK
+                    _ik.HasSwitchedHands ? -1f : 
+#endif
+                    1f;
                 var right = Vector3.Cross(Vector3.up, _aimTarget - transform.position).normalized;
 
                 var head = transform.position + _capsule.height * Vector3.up * 0.75f;
@@ -707,7 +715,11 @@ namespace CoverShooter
         {
             get
             {
-                var flip = _ik.HasSwitchedHands ? -1f : 1f;
+                var flip =
+#if _IK
+                    _ik.HasSwitchedHands ? -1f : 
+#endif
+                    1f;
                 var right = Vector3.Cross(Vector3.up, _bodyTarget - transform.position).normalized;
                 var result = VirtualHead + right * _capsule.radius * flip * 0.75f;
 
@@ -725,7 +737,7 @@ namespace CoverShooter
         {
             get
             {
-                var position = transform.position + _capsule.height * Vector3.up * 0.75f;
+                var position = agent.Character.ThirdPersonView.HeadTransform.position;
 
                 if (_cover.In)
                     position -= _coverOffset;
@@ -866,10 +878,7 @@ namespace CoverShooter
         {
             get
             {
-                if (_currentMovement.Magnitude < 0.25f)
-                    return Vector3.zero;
-                else
-                    return _currentMovement.Direction;
+                return kcc.RenderData.DesiredVelocity;
             }
         }
 
@@ -1058,9 +1067,9 @@ namespace CoverShooter
             get { return _isPerformingMelee; }
         }
 
-        #endregion
+#endregion
 
-        #region Public fields
+#region Public fields
 
         /// <summary>
         /// Controls wheter the character is in a state of death. Dead characters have no collisions and ignore any input.
@@ -1253,9 +1262,9 @@ namespace CoverShooter
         [Tooltip("Settings for hit response IK.")]
         public HitResponseSettings HitResponseSettings = HitResponseSettings.Default();
 
-        #endregion
+#endregion
 
-        #region Actions
+#region Actions
 
         /// <summary>
         /// Executed when the normal standing height changes.
@@ -1371,9 +1380,9 @@ namespace CoverShooter
 
         public Action Unscoped;
 
-        #endregion
+#endregion
 
-        #region Internal fields
+#region Internal fields
 
         internal bool internalIsWalkingAnimation;
         internal bool internalIsCoverAnimation;
@@ -1382,9 +1391,9 @@ namespace CoverShooter
 
         internal static Dictionary<Animator, CharacterMotor> animatorToMotorMap = new Dictionary<Animator, CharacterMotor>();
 
-        #endregion
+#endregion
 
-        #region Private fields
+#region Private fields
 
         enum WalkMode
         {
@@ -1402,7 +1411,7 @@ namespace CoverShooter
 
         private CharacterCamera _cameraToLateUpdate;
 
-        private CharacterIK _ik;
+        // private CharacterIK _ik;
 
         private CoverState _cover;
         private Cover _potentialCover;
@@ -1450,8 +1459,8 @@ namespace CoverShooter
         private bool _isInProcess;
         private CharacterProcess _process;
 
-        protected KCC kcc => this.agent.Character.CharacterController;
-        protected KCCData kccData => this.agent.Character.CharacterController.Data;
+        public KCC kcc => this.agent.Character.CharacterController;
+        public KCCData kccData => this.agent.Character.CharacterController.Data;
 
         private bool _isGrounded { get => kccData.IsGrounded; set => kccData.IsGrounded = value; }
         private bool _wasGrounded => kccData.WasGrounded;
@@ -1662,9 +1671,9 @@ namespace CoverShooter
         private ICharacterCoverListener[] _coverListeners;
         private ICharacterHealthListener[] _healthListeners;
 
-        #endregion
+#endregion
 
-        #region Public methods
+#region Public methods
 
         /// <summary>
         /// An object the motor is currently aiming at. Only objects with CharacterHealth are considered.
@@ -1731,9 +1740,9 @@ namespace CoverShooter
             _hasAimTarget = true;
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Catch the animation event at the end of the resurrection.
@@ -1761,9 +1770,9 @@ namespace CoverShooter
             _isPerformingCustomAction = true;
             _cover.Clear();
             clearPotentialCovers();
-            #if USE_ANIMATOR
+#if USE_ANIMATOR
             _animator.SetTrigger(name);
-            #endif
+#endif
         }
 
         /// <summary>
@@ -1844,8 +1853,10 @@ namespace CoverShooter
                 _weaponEquipState == WeaponEquipState.equipping || 
                 _weaponEquipState == WeaponEquipState.unequipping)
             {
+#if _IK
                 if (!_isPerformingMelee)
                     _ik.Hit(hit.Normal, HitResponseSettings.Strength, HitResponseSettings.Wait);
+#endif
             }
             else
             {
@@ -3093,7 +3104,7 @@ namespace CoverShooter
 
         private void OnEnable()
         {
-            if (IsAlive)
+            if (_hasRegistered == false)
             {
                 _immediateIdle = true;
 
@@ -3114,13 +3125,19 @@ namespace CoverShooter
             animatorToMotorMap.Remove(_animator);
 #endif
         }
-        protected CapsuleCollider _capsule => this.agent.Character.CharacterController.Collider;
+        public CapsuleCollider _capsule => this.agent.Character.CharacterController.Collider;
         private void Awake()
+        {
+            _actor = GetComponent<Actor>();
+            agent = GetComponent<Agent>();
+        }
+        public override void Spawned()
         {
 #if USE_ANIMATOR
             _animator = GetComponent<Animator>();
 #endif
             _actor = GetComponent<Actor>();
+            agent = GetComponent<Agent>();
 
             _physicsListeners = Util.GetInterfaces<ICharacterPhysicsListener>(gameObject);
             _weaponChangeListeners = Util.GetInterfaces<ICharacterWeaponChangeListener>(gameObject);
@@ -3157,8 +3174,9 @@ namespace CoverShooter
             else
 #endif
                 immediateBodyValue(0);
-
+#if _IK
             _ik.Setup(this);
+#endif
 
             _renderers = GetComponentsInChildren<Renderer>();
             _visibility = new Visibility[_renderers.Length];
@@ -3342,8 +3360,10 @@ namespace CoverShooter
                 {
                     if (IsAiming)
                         isArmMirrored = _cover.IsStandingLeft;
+#if _IK
                     else
                         isArmMirrored = _ik.HasSwitchedHands;
+#endif
                 }
                 else if (_wantsToMirror)
                 {
@@ -4895,6 +4915,7 @@ namespace CoverShooter
 
         private void unmirror()
         {
+#if _IK
             if (_ik.HasSwitchedHands)
             {
                 _ik.Unmirror();
@@ -4902,11 +4923,14 @@ namespace CoverShooter
                 var direction = _animator.GetFloat("CoverDirection");
                 _animator.SetFloat("CoverDirection", direction * -1);
 #endif
+
             }
+#endif
         }
 
         private void mirror()
         {
+#if _IK
             if (_ik.HasSwitchedHands || !IsEquipped)
                 return;
 
@@ -4918,13 +4942,14 @@ namespace CoverShooter
             var right = weapon.RightItem == null ? null : weapon.RightItem.transform;
             var left = weapon.LeftItem == null ? null : weapon.LeftItem.transform;
             _ik.Mirror(right, left, weapon.PreferSwapping);
+#endif
 #if USE_ANIMATOR
             var direction = _animator.GetFloat("CoverDirection");
             _animator.SetFloat("CoverDirection", direction * -1);
 #endif
-        }
+    }
 
-        private void updateWeapons()
+    private void updateWeapons()
         {
             if ((_weaponEquipState == WeaponEquipState.equipped || _weaponEquipState == WeaponEquipState.unequipped) && 
                 _isGrounded && 
@@ -4993,7 +5018,13 @@ namespace CoverShooter
 
                 gun.AddErrorThisFrame(MovementError);
                 gun.SetBaseErrorMultiplierThisFrame(IsZooming ? ZoomErrorMultiplier : 1);
-                gun.Allow(IsGunReady && !_isFalling && (!_cover.In || _coverAim.Step == AimStep.Aiming) && Vector3.Dot(vector, transform.forward) > 0.5f && _ik.IsAimingArms);
+                gun.Allow(IsGunReady && !_isFalling && (!_cover.In || _coverAim.Step == AimStep.Aiming) && Vector3.Dot(vector, transform.forward) > 0.5f &&
+#if _IK
+                    _ik.IsAimingArms
+#else
+                    true
+#endif
+                    );
             }
 
             var melee = _equippedWeapon.RightMelee;
@@ -6297,6 +6328,7 @@ namespace CoverShooter
 
         private void updateIK()
         {
+#if _IK
             return;
 
             if (!IsAlive)
@@ -6327,6 +6359,7 @@ namespace CoverShooter
 
             if (gun != null && _needsTarget)
                 _target = gun.FindCurrentAimedHealthTarget();
+#endif
         }
 
         private bool findGround(float threshold)

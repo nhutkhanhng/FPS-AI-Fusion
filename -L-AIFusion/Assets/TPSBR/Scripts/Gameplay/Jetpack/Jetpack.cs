@@ -184,7 +184,7 @@ namespace TPSBR
 
 		public override void Render()
 		{
-			float moveDirectionY = _agent.IsLocal == true ? _agent.AgentInput.CachedInput.MoveDirection.y : default;
+			float moveDirectionY = _agent.IsLocal == true && _agent.AgentInput ? _agent.AgentInput.CachedInput.MoveDirection.y : default;
 
 			float targetMountAngle = MathUtility.Map(-1, 1, _mountBackwardAngle, _mountForwardAngle, moveDirectionY);
 			_mountAngle = Mathf.Lerp(_mountAngle, targetMountAngle, Time.deltaTime * _mountChangeSpeed);

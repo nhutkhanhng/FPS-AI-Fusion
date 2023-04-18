@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Fusion;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CoverShooter
@@ -6,7 +7,7 @@ namespace CoverShooter
     /// <summary>
     /// Each character inside the level must have this component as the AI only regards objects with Actor as characters.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
+    [OrderAfter(typeof(CharacterMotor))]
     public class Actor : CharacterAdapter, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
     {
         #region Properties
@@ -190,13 +191,14 @@ namespace CoverShooter
         private Cover _cover;
         private bool _hasStandingHeight;
         private float _standingHeight;
-        private float _height;
 
-        private Collider _collider;
-        private CharacterMotor _motor;
-        private CharacterHealth _health;
-        private Rigidbody _body;
-        private BaseBrain _brain;
+        private float _height => _motor.kcc.Settings.Height;
+
+        private Collider _collider => _motor._capsule;
+        [SerializeField] private CharacterMotor _motor;
+        [SerializeField] private CharacterHealth _health;
+        [SerializeField] private Rigidbody _body;
+        [SerializeField] private BaseBrain _brain;
 
         private Actor _possibleThreat;
 
@@ -339,23 +341,22 @@ namespace CoverShooter
 
         #region Behaviour
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
-            _height = _collider.bounds.extents.y * 2;
-
             if (_cover != null)
                 _cover.RegisterUser(this, transform.position);
         }
 
         private void Awake()
-        {
-            _collider = GetComponent<Collider>();
-            _motor = GetComponent<CharacterMotor>();
-            _health = GetComponent<CharacterHealth>();
-            _brain = GetComponent<BaseBrain>();
-            _body = GetComponent<Rigidbody>();
+        {            
+            _motor ??= GetComponent<CharacterMotor>();
+            // _collider = _motor._capsule;
 
-            _height = _collider.bounds.extents.y * 2;
+            _health ??= GetComponent<CharacterHealth>();
+
+            _brain ??= GetComponent<BaseBrain>();
+
+            _body ??= GetComponent<Rigidbody>();
         }
         #endregion
 
@@ -406,8 +407,6 @@ namespace CoverShooter
                 _list.Add(actor);
 
             _map[actor.gameObject] = actor;
-
-            Debug.LogError(_list.Count);
         }
 
         public static void Unregister(Actor actor)

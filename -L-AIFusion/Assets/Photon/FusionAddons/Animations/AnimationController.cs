@@ -71,8 +71,8 @@ namespace Fusion.Animations
 			_evaluationRate = evaluationRate;
 		}
 
-		public void SetEvaluationSeed(int evaluationSeed)
-		{
+        public void SetEvaluationSeed(int evaluationSeed)
+        {
 			if (evaluationSeed < 0)
 				throw new ArgumentException(nameof(evaluationSeed));
 

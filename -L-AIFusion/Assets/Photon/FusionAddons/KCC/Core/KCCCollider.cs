@@ -2,6 +2,7 @@ namespace Fusion.KCC
 {
 	using UnityEngine;
 
+    [System.Serializable]
 	/// <summary>
 	/// Custom wrapper for fast property checks and synchronization. Don't touch.
 	/// </summary>

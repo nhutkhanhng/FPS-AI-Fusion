@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using UnityEngine;
 
 namespace CoverShooter
 {
     /// <summary>
     /// Base parent class for some AI components.
     /// </summary>
+    [OrderAfter(typeof(CharacterMotor))]
     public class AIBase : mNetworkTransform, kINetworkUpdate
     {
 
