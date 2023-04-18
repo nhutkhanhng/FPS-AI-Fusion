@@ -638,7 +638,7 @@ namespace CoverShooter
                 }
                 else
                 {
-                    velocity = other.Motor.MovementDirection;
+                    velocity = other.MovementDirection;
                     magnitude = velocity.magnitude;
 
                     if (magnitude < 0.1f)
@@ -648,7 +648,7 @@ namespace CoverShooter
                         if (body == null)
                             continue;
 
-                        velocity = body.velocity;
+                        velocity = other.Velocity;
                         magnitude = velocity.magnitude;
 
                         if (magnitude < 0.1f)
@@ -790,6 +790,7 @@ namespace CoverShooter
         private void moveTo(Vector3 destination, float speed)
         {
             _mode = Mode.toPosition;
+            Debug.LogError(destination);
 
             if (Vector3.Distance(_target, destination) > 0.3f)
             {

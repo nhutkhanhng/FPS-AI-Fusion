@@ -2662,6 +2662,9 @@ namespace CoverShooter
             }
 
             _isMoving = _inputMovement.IsMoving;
+            KCC kcc = agent.currentKCC;
+            kcc.SetInputDirection(_inputMovement.Direction.IsAlmostZero() == true ? Vector3.zero : kcc.RenderData.TransformRotation * 
+                _inputMovement.Value.X0Y());
         }
 
         /// <summary>

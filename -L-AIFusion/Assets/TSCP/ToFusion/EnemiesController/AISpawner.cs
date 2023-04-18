@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using CoverShooter;
+
 namespace TPSBR
 {
     // The AsteroidSpawner does not execute any behaviour on the clients.
@@ -28,8 +30,6 @@ namespace TPSBR
         private GameplayMode _currentGameMode;
 
         protected int countSpawned = 0;
-
-
 
         public void InitGameMode(GameplayMode gameMode) => this._currentGameMode = gameMode;
         public override void FixedUpdateNetwork()
@@ -65,7 +65,17 @@ namespace TPSBR
             PTemplate.transform.localRotation = Quaternion.identity;
 
             var enemy = Runner.Spawn(template, spawnPoint.position, rotation, Context.LocalPlayerRef, onBeforeSpawned: _OnBeforeSpawned);
-            Debug.Break();
+
+            enemy.AddBehaviour<AIMovement>();
+            enemy.AddBehaviour<AISearch>();
+            enemy.AddBehaviour<AISight>();
+            enemy.AddBehaviour<AIAim>();
+            // enemy.AddBehaviour<AIAlerts>();
+            enemy.AddBehaviour<AIInvestigation>();
+            enemy.AddBehaviour<FighterBrain>();
+
+            enemy.transform.name = "Enemy";
+
             AllEnemies.Add(enemy);
         }
 

@@ -1,5 +1,7 @@
 ﻿using Fusion;
+using Fusion.KCC;
 using System.Collections.Generic;
+using TPSBR;
 using UnityEngine;
 
 namespace CoverShooter
@@ -7,7 +9,8 @@ namespace CoverShooter
     /// <summary>
     /// Each character inside the level must have this component as the AI only regards objects with Actor as characters.
     /// </summary>
-    [OrderAfter(typeof(CharacterMotor))]
+ 
+    [OrderAfter(typeof(Agent))]
     public class Actor : CharacterAdapter, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
     {
         #region Properties
@@ -63,17 +66,20 @@ namespace CoverShooter
             }
         }
 
-        private void OnEnable()
+        public Vector3 MovementDirection => _agent.currentKCC.RenderData.DesiredVelocity.normalized;
+        public Vector3 Velocity => _agent.currentKCC.RenderData.DesiredVelocity;
+
+        protected void OnEnable()
         {
             Actors.Register(this);
         }
 
-        private void OnDisable()
+        protected void OnDisable()
         {
             Actors.Unregister(this);
         }
 
-        private void OnDestroy()
+        protected void OnDestroy()
         {
             Actors.Unregister(this);
         }
@@ -186,27 +192,29 @@ namespace CoverShooter
 
         #endregion
 
-        #region Private fields
+        #region protected fields
 
-        private Cover _cover;
-        private bool _hasStandingHeight;
-        private float _standingHeight;
+        protected Cover _cover;
+        protected bool _hasStandingHeight;
+        protected float _standingHeight;
 
-        private float _height => _motor.kcc.Settings.Height;
+        protected float _height => kcc.Settings.Height;
 
-        private Collider _collider => _motor._capsule;
-        [SerializeField] private CharacterMotor _motor;
-        [SerializeField] private CharacterHealth _health;
-        [SerializeField] private Rigidbody _body;
-        [SerializeField] private BaseBrain _brain;
 
-        private Actor _possibleThreat;
+        protected Collider _collider => kcc.Collider;
+        [SerializeField] protected CharacterMotor _motor;
+        [SerializeField] protected CharacterHealth _health;
+        [SerializeField] protected Rigidbody _body;
+        [SerializeField] protected BaseBrain _brain;
+        [SerializeField] protected Agent _agent;
+        protected KCC kcc;
+        protected Actor _possibleThreat;
 
-        private List<DarkZone> _darkZones = new List<DarkZone>();
-        private List<LightZone> _lightZones = new List<LightZone>();
-        private List<GrassZone> _grassZones = new List<GrassZone>();
+        protected List<DarkZone> _darkZones = new List<DarkZone>();
+        protected List<LightZone> _lightZones = new List<LightZone>();
+        protected List<GrassZone> _grassZones = new List<GrassZone>();
 
-        private bool _isAlerted;
+        protected bool _isAlerted;
 
         #endregion
 
@@ -347,16 +355,19 @@ namespace CoverShooter
                 _cover.RegisterUser(this, transform.position);
         }
 
-        private void Awake()
-        {            
-            _motor ??= GetComponent<CharacterMotor>();
+        public override void Spawned()
+        {
+            _agent = _agent ?? GetBehaviour<Agent>();
+            kcc = _agent.Character.CharacterController;
+
+            _motor = _motor ?? GetBehaviour<CharacterMotor>();
             // _collider = _motor._capsule;
 
-            _health ??= GetComponent<CharacterHealth>();
+            _health = _health ?? GetBehaviour<CharacterHealth>();
 
-            _brain ??= GetComponent<BaseBrain>();
+            _brain = _brain ?? GetBehaviour<BaseBrain>();
 
-            _body ??= GetComponent<Rigidbody>();
+            _body = _body ?? GetComponent<Rigidbody>();
         }
         #endregion
 
@@ -385,8 +396,8 @@ namespace CoverShooter
             get { return _list.Count; }
         }
 
-        private static List<Actor> _list = new List<Actor>();
-        private static Dictionary<GameObject, Actor> _map = new Dictionary<GameObject, Actor>();
+        public static List<Actor> _list = new List<Actor>();
+        public static Dictionary<GameObject, Actor> _map = new Dictionary<GameObject, Actor>();
 
         public static Actor Get(int index)
         {

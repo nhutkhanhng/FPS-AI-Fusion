@@ -230,9 +230,12 @@ namespace TPSBR
 
 			_interpolatedDirection = Vector3.Slerp(_interpolatedDirection, targetDirection, _directionSmoothingSpeed * Time.deltaTime).normalized;
 			_interpolatedMagnitude = Mathf.Lerp(_interpolatedMagnitude, targetMagnitude, _magnitudeSmoothingSpeed * Time.deltaTime);
-		}
 
-		private float GetMaxBaseSpeed(Vector2 localNormalizedDirection)
+            if (Controller.HasInputAuthority == false)
+                Debug.LogError(_kcc.transform.name + " - realVelocityMagnitude - " + _interpolatedDirection);
+        }
+
+        private float GetMaxBaseSpeed(Vector2 localNormalizedDirection)
 		{
 			if (localNormalizedDirection == Vector2.zero)
 				return 0.0f;

@@ -111,20 +111,20 @@ namespace CoverShooter
             get { return _danger > 0; }
         }
 
-        private Actor _actor;
-        private Vector3 _startingPosition;
+        protected Actor _actor;
+        protected Vector3 _startingPosition;
 
-        private Actor _threat;
-        private Actor _forgottenThreat;
-        private Vector3 _lastKnownThreatPosition;
-        private float _lastSeenThreatTime;
-        private Cover _threatCover;
-        private bool _canSeeTheThreat;
-        private bool _isActualThreatPosition;
-        private bool _hasSeenTheEnemy;
-        private bool _hasHeardTheEnemy;
+        protected Actor _threat;
+        protected Actor _forgottenThreat;
+        protected Vector3 _lastKnownThreatPosition;
+        protected float _lastSeenThreatTime;
+        protected Cover _threatCover;
+        protected bool _canSeeTheThreat;
+        protected bool _isActualThreatPosition;
+        protected bool _hasSeenTheEnemy;
+        protected bool _hasHeardTheEnemy;
 
-        private int _danger;
+        protected int _danger;
 
         protected virtual void Awake()
         {

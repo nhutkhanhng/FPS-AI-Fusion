@@ -220,7 +220,7 @@ namespace Fusion.KCC
 			if (HasAnyAuthority == false)
 				return;
 
-			if (direction.sqrMagnitude > 1.0f)
+            if (direction.sqrMagnitude > 1.0f)
 			{
 				direction.Normalize();
 			}

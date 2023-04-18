@@ -1358,6 +1358,7 @@ namespace CoverShooter
         protected override void Awake()
         {
             base.Awake();
+            
             Actor.IsAggressive = true;
 
             _health = GetComponent<CharacterHealth>();
