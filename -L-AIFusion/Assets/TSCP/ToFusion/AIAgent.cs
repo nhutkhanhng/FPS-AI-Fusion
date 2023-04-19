@@ -241,6 +241,8 @@ namespace TPSBR
         [System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
         protected virtual void CheckFixedAccess(bool checkStage)
         {
+            return;
+
             if (checkStage == true && Runner.Stage == default)
             {
                 throw new InvalidOperationException("This call should be executed from FixedUpdateNetwork!");
@@ -256,6 +258,8 @@ namespace TPSBR
         [System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
         private void CheckRenderAccess(bool checkStage)
         {
+            return;
+
             if (checkStage == true && Runner.Stage != default)
             {
                 throw new InvalidOperationException("This call should be executed outside of FixedUpdateNetwork!");

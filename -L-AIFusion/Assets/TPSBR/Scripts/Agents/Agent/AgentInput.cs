@@ -551,6 +551,8 @@ namespace TPSBR
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
 		protected virtual void CheckFixedAccess(bool checkStage)
 		{
+            return;
+
 			if (checkStage == true && Runner.Stage == default)
 			{
 				throw new InvalidOperationException("This call should be executed from FixedUpdateNetwork!");

@@ -39,6 +39,8 @@ namespace TPSBR
 
             if (countSpawned <= 0 && _spawnDelay.Expired(Runner))
             {
+                Debug.LogError("Spawn Enemies");
+
                 countSpawned++;
                 if (countSpawned == 1)
                     SpawnEnemies(enemyTemplate);
