@@ -245,7 +245,7 @@ namespace CoverShooter
             _brain = GetComponent<BaseBrain>();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (!_isAssaulting)
                 return;

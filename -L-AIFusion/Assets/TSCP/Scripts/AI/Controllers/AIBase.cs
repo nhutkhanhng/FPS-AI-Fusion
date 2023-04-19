@@ -25,10 +25,5 @@ namespace CoverShooter
         {
             SendMessage(name, value, SendMessageOptions.DontRequireReceiver);
         }
-
-        public virtual void Update()
-        {
-            FixedUpdateNetwork();
-        }
     }
 }

@@ -144,7 +144,7 @@ namespace CoverShooter
             _health = GetComponent<CharacterHealth>();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (_isScared || !_actor.IsAlive)
                 return;

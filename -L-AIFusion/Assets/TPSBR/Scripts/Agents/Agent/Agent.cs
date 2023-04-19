@@ -275,6 +275,11 @@ namespace TPSBR
             }
         }
 
+        public virtual void SetRotationDeltaDirect(float pitch, float yaw)
+        {
+
+        }
+
         public virtual void SetInputDirection(Vector3 direction)
         {
 
@@ -468,7 +473,7 @@ namespace TPSBR
 			return _weapons.CanAim();
 		}
 
-		protected void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
+		public void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
 		{
 			if (lookRotationDelta.IsZero() == true && recoil.IsZero() == true && _character.CharacterController.Data.Recoil == Vector2.zero)
 			{

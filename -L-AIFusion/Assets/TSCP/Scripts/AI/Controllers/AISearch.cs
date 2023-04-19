@@ -230,7 +230,7 @@ namespace CoverShooter
             GlobalSearchCache.Restart();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             GlobalSearchCache.Update();
 

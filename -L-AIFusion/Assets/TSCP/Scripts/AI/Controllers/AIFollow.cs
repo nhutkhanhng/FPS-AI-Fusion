@@ -176,7 +176,7 @@ namespace CoverShooter
             _actor = GetComponent<Actor>();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (!_isFollowing)
                 return;

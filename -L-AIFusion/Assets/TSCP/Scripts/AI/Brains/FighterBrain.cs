@@ -1401,7 +1401,7 @@ namespace CoverShooter
             }
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (Actor == null || !Actor.IsAlive)
                 return;

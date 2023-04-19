@@ -26,7 +26,7 @@ namespace CoverShooter
             base.Awake();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (_health.Health / _health.MaxHealth <= Health && Brain.Threat != null)
             {

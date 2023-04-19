@@ -315,7 +315,7 @@ namespace CoverShooter
             _mode = Mode.none;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             _isMoving = false;
 

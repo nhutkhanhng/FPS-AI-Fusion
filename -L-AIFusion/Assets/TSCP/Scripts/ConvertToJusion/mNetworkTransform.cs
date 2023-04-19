@@ -30,4 +30,18 @@ public class mNetworkTransform : CharacterAdapter, kINetworkUpdate
     {
         _LateUpdate();
     }
+
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+
+        _FixedUpdateNetwork();
+    }
+
+    public virtual void _FixedUpdateNetwork()
+    {
+
+    }
 }

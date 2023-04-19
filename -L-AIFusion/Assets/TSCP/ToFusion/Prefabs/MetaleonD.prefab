@@ -2873,6 +2873,7 @@ GameObject:
   - component: {fileID: -7303928161082234650}
   - component: {fileID: -1627987507071704022}
   - component: {fileID: 4781680799286194420}
+  - component: {fileID: 4937224285930459434}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2943,6 +2944,7 @@ MonoBehaviour:
   - {fileID: -7303928161082234650}
   - {fileID: -1627987507071704022}
   - {fileID: 4781680799286194420}
+  - {fileID: 4937224285930459434}
   - {fileID: 8098325772741024417}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
@@ -3532,6 +3534,7 @@ MonoBehaviour:
     Wait: 0.5
     Strength: 20
   test: {x: 0, y: 0, z: 0}
+  pitchYaw: {x: 0, y: 0}
 --- !u!114 &7442139576927040731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3712,6 +3715,33 @@ MonoBehaviour:
     MaxRadius: 5
     AvoidDistance: 8
   DebugThreat: 0
+--- !u!114 &4937224285930459434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41236bb6df752ae4fb24ce7289485139, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  Speed: 6
+  SlowSpeed: 2
+  MinScanDuration: 3.5
+  MaxScanDuration: 5
+  MinScanDistance: 6
+  MinSweepDuration: 4
+  MaxSweepDuration: 6
+  SweepFOV: 30
+  AccuracyError: 2
+  Target:
+    Min: 0.5
+    Max: 0.8
+  DebugAim: 0
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0

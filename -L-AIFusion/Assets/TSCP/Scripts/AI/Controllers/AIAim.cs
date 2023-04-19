@@ -349,7 +349,7 @@ namespace CoverShooter
             _targetHeightTime = Time.timeSinceLevelLoad;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (!_actor.IsAlive)
                 return;

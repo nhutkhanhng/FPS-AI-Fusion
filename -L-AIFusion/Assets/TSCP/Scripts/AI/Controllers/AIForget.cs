@@ -34,7 +34,7 @@ namespace CoverShooter
             _time = 0;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (_isActive)
             {

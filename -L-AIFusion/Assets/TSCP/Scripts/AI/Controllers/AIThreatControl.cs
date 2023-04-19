@@ -72,7 +72,7 @@ namespace CoverShooter
             _threatOverride = threat;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             for (int i = _memory.Count - 1; i >= 0; i--)
                 if (Time.timeSinceLevelLoad - _memory[i].Time >= MemoryDuration)

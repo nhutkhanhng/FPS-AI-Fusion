@@ -11,7 +11,7 @@ namespace CoverShooter
     /// </summary>
  
     [OrderAfter(typeof(Agent))]
-    public class Actor : CharacterAdapter, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
+    public class Actor : mNetworkTransform, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
     {
         #region Properties
         /// <summary>
@@ -349,7 +349,7 @@ namespace CoverShooter
 
         #region Behaviour
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (_cover != null)
                 _cover.RegisterUser(this, transform.position);

@@ -421,7 +421,7 @@ namespace CoverShooter
             _isMaintainingPosition = false;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (Vector3.Distance(transform.position, _lastPosition) > 0.3f)
             {

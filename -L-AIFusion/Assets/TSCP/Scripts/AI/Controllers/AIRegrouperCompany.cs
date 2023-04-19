@@ -25,7 +25,7 @@ namespace CoverShooter
             base.Awake();
         }
 
-        public override void FixedUpdateNetwork()
+        public override void _FixedUpdateNetwork()
         {
             if (_comm.FriendCount <= TriggerCount && Brain.HasSeenTheEnemy)
             {

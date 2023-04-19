@@ -2667,8 +2667,6 @@ namespace CoverShooter
             KCC kcc = agent.currentKCC;
             var _temp = movement.Direction;
 
-            Debug.LogError(_temp);
-
             movement.Direction.y = _temp.z;
             movement.Direction.z = 0;
 
@@ -4580,15 +4578,17 @@ namespace CoverShooter
 
         protected void turnImd(float angleDiff)
         {
-            return;
-            transform.Rotate(0, angleDiff, 0);
+            KCC kcc = agent.currentKCC;
+            // kcc.AddLookRotation(new Vector2(0, angleDiff));
+            // transform.Rotate(0, angleDiff, 0);
         }
+
         private void turn(float speed)
         {
-            return;
             var angle = Util.Lerp(0, _horizontalAngleDiff, speed * 0.3f);
-
-            transform.Rotate(0, angle, 0);
+            KCC kcc = agent.currentKCC;
+            kcc.AddLookRotation(0, angle);
+            // transform.Rotate(0, angle, 0);
             _horizontalAngleDiff -= angle;
         }
 
@@ -6106,6 +6106,12 @@ namespace CoverShooter
 
         private void updateAnimator()
         {
+            //if (IsAlive)
+            //{
+            //    var kcc = agent.Character.CharacterController;
+            //    var _r = Vector2.zero;
+            //    agent.SetLookRotation(kcc.Data, new Vector2(0, _horizontalAngleDiff), Vector2.zero, out _r);
+            //}
             //if (IsAlive)
             //{
             //    if (_immediateIdle)

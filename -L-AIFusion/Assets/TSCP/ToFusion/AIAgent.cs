@@ -35,6 +35,12 @@ namespace TPSBR
             _baseFixedInput = default;
             _baseRenderInput = default;
         }
+
+        public override void SetRotationDeltaDirect(float pitch, float yaw)
+        {
+            _lastKnownInput.LookRotationDelta += new Vector2(pitch, yaw);
+            _fixedInput.LookRotationDelta += new Vector2(pitch, yaw);
+        }
         public override void SetInputDirection(Vector3 direction)
         {
             _lastKnownInput.MoveDirection = direction;
