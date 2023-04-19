@@ -66,13 +66,13 @@ namespace TPSBR
 
             var enemy = Runner.Spawn(template, spawnPoint.position, rotation, Context.LocalPlayerRef, onBeforeSpawned: _OnBeforeSpawned);
 
-            enemy.AddBehaviour<AIMovement>();
-            enemy.AddBehaviour<AISearch>();
-            enemy.AddBehaviour<AISight>();
-            enemy.AddBehaviour<AIAim>();
-            // enemy.AddBehaviour<AIAlerts>();
-            enemy.AddBehaviour<AIInvestigation>();
-            enemy.AddBehaviour<FighterBrain>();
+            //enemy.AddBehaviour<AIMovement>();
+            //// enemy.AddBehaviour<AISearch>();
+            //enemy.AddBehaviour<AISight>();
+            //// enemy.AddBehaviour<AIAim>();
+            //// enemy.AddBehaviour<AIAlerts>();
+            //// enemy.AddBehaviour<AIInvestigation>();
+            //enemy.AddBehaviour<FighterBrain>();
 
             enemy.transform.name = "Enemy";
 

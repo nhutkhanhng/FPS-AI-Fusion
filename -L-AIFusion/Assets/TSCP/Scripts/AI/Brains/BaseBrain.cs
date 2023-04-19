@@ -114,7 +114,7 @@ namespace CoverShooter
         protected Actor _actor;
         protected Vector3 _startingPosition;
 
-        protected Actor _threat;
+        [SerializeField] protected Actor _threat;
         protected Actor _forgottenThreat;
         protected Vector3 _lastKnownThreatPosition;
         protected float _lastSeenThreatTime;

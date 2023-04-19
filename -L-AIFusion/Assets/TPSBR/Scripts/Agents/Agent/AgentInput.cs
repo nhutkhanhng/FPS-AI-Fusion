@@ -9,7 +9,7 @@ namespace TPSBR
 	using TPSBR.UI;
 
 	[OrderBefore(typeof(NetworkCulling), typeof(Agent))]
-	public sealed class AgentInput : ContextBehaviour, IBeforeUpdate, IBeforeTick
+	public class AgentInput : ContextBehaviour, IBeforeUpdate, IBeforeTick
 	{
 		// PUBLIC MEMBERS
 
@@ -549,7 +549,7 @@ namespace TPSBR
 
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
-		private void CheckFixedAccess(bool checkStage)
+		protected virtual void CheckFixedAccess(bool checkStage)
 		{
 			if (checkStage == true && Runner.Stage == default)
 			{

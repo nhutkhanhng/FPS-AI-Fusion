@@ -225,9 +225,9 @@ namespace Fusion.KCC
 				direction.Normalize();
 			}
 
-			_renderData.InputDirection = direction;
-
-			if (IsInFixedUpdate == true)
+            _renderData.InputDirection = direction;
+            
+            if (IsInFixedUpdate == true)
 			{
 				_fixedData.InputDirection = direction;
 			}
@@ -1869,7 +1869,7 @@ namespace Fusion.KCC
 
 			UpdatePredictionCorrection();
 
-			if (_debug.ShowPath == true)
+            if (_debug.ShowPath == true)
 			{
 				if (_renderData.Frame == _fixedData.Frame)
 				{
@@ -2014,7 +2014,11 @@ namespace Fusion.KCC
 
 		private void Move(KCCData data)
 		{
-			_activeStage    = EKCCStage.None;
+            if (_transform.name.Contains("Enemy"))
+            if (data.DesiredVelocity.IsAlmostZero() == false)
+                UnityEngine.Debug.LogError(_transform.name + data.DesiredVelocity);
+
+            _activeStage    = EKCCStage.None;
 			_activeFeatures = _settings.Features;
 
 			float   baseTime            = data.Time;

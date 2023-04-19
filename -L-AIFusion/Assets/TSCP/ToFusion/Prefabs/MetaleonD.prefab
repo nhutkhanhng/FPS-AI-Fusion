@@ -2852,7 +2852,6 @@ GameObject:
   - component: {fileID: 1140557501186260959}
   - component: {fileID: 4057157150735386999}
   - component: {fileID: 828455360360197660}
-  - component: {fileID: 2763591867411041215}
   - component: {fileID: 2803757695749651636}
   - component: {fileID: 6646728065183178268}
   - component: {fileID: 464798699399512452}
@@ -2869,6 +2868,7 @@ GameObject:
   - component: {fileID: 5801180166602187607}
   - component: {fileID: 840214416079072565}
   - component: {fileID: 7442139576927040731}
+  - component: {fileID: 5190406139856406184}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2926,7 +2926,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4057157150735386999}
   - {fileID: 828455360360197660}
-  - {fileID: 2763591867411041215}
   - {fileID: 2803757695749651636}
   - {fileID: 464798699399512452}
   - {fileID: 3727285942377876180}
@@ -2935,6 +2934,7 @@ MonoBehaviour:
   - {fileID: 8149446342677491575}
   - {fileID: 4371376507030965249}
   - {fileID: 840214416079072565}
+  - {fileID: 5190406139856406184}
   - {fileID: 8098325772741024417}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
@@ -2960,6 +2960,7 @@ MonoBehaviour:
   _health: {fileID: 0}
   _body: {fileID: 1151874837049370324}
   _brain: {fileID: 0}
+  _agent: {fileID: 5190406139856406184}
 --- !u!114 &828455360360197660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2973,41 +2974,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
---- !u!114 &2763591867411041215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3828643222564512411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf5c6f908ab0b2d439a347a0066b22db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  Side: 0
-  _LeftSide:
-    _value: 0
-  _jumpPower: 4
-  _topCameraAngleLimit: 75
-  _bottomCameraAngleLimit: 75
-  _fastMovementProcessor: {fileID: -2977180128878109980, guid: 6259acf20feed5147afc6f8d81edb8b6, type: 3}
-  _visualRoot: {fileID: 1518040596595097668}
-  _minFallDamage: 5
-  _maxFallDamage: 150
-  _maxFallDamageVelocity: 90
-  _minFallDamageVelocity: 20
-  _agentInput: {fileID: 0}
-  _character: {fileID: 0}
-  _weapons: {fileID: 0}
-  _jetpack: {fileID: 0}
-  _senses: {fileID: 0}
-  _health: {fileID: 0}
-  _agentVFX: {fileID: 0}
-  _networkCulling: {fileID: 0}
-  _cachedLookRotation: {x: 0, y: 0, z: 0, w: 0}
-  _cachedPitchRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &2803757695749651636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3430,7 +3396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   Side: 0
-  agent: {fileID: 2763591867411041215}
+  agent: {fileID: 5190406139856406184}
   Speed: 1
   CanRun: 1
   CanSprint: 1
@@ -3557,6 +3523,7 @@ MonoBehaviour:
   HitResponseSettings:
     Wait: 0.5
     Strength: 20
+  test: {x: 0, y: 0, z: 0}
 --- !u!114 &7442139576927040731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3582,6 +3549,41 @@ MonoBehaviour:
     PreventClimbing: 0
     PreventArmLowering: 0
     Aiming: 0
+--- !u!114 &5190406139856406184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9d539a6db72a464080fd18ce19ad6e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  _LeftSide:
+    _value: 0
+  _jumpPower: 4
+  _topCameraAngleLimit: 75
+  _bottomCameraAngleLimit: 75
+  _fastMovementProcessor: {fileID: -2977180128878109980, guid: 6259acf20feed5147afc6f8d81edb8b6, type: 3}
+  _visualRoot: {fileID: 1518040596595097668}
+  _minFallDamage: 5
+  _maxFallDamage: 200
+  _maxFallDamageVelocity: 20
+  _minFallDamageVelocity: 5
+  _agentInput: {fileID: 0}
+  _character: {fileID: 0}
+  _weapons: {fileID: 0}
+  _jetpack: {fileID: 0}
+  _senses: {fileID: 0}
+  _health: {fileID: 0}
+  _agentVFX: {fileID: 0}
+  _networkCulling: {fileID: 0}
+  _cachedLookRotation: {x: 0, y: 0, z: 0, w: 0}
+  _cachedPitchRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0

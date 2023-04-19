@@ -129,8 +129,8 @@ namespace TPSBR
 			float   targetMagnitude;
 
 			if (Controller.HasInputAuthority == true || Controller.HasStateAuthority == true)
-			{
-				if (kccFixedData.InputDirection.OnlyXZ().IsAlmostZero(0.025f) == false)
+            {
+                if (kccFixedData.InputDirection.OnlyXZ().IsAlmostZero(0.025f) == false)
 				{
 					targetDirection = kccFixedData.InputDirection.OnlyXZ().normalized;
 				}
@@ -148,7 +148,7 @@ namespace TPSBR
 				float kinematicVelocityMagnitude = kccFixedData.KinematicVelocity.OnlyXZ().magnitude;
 
 				targetMagnitude = Mathf.Min(realVelocityMagnitude, Mathf.Max(kinematicVelocityMagnitude, desiredVelocityMagnitude));
-			}
+            }
 			else
 			{
 				if (kccFixedData.RealVelocity.OnlyXZ().IsAlmostZero(0.025f) == false)
@@ -230,9 +230,6 @@ namespace TPSBR
 
 			_interpolatedDirection = Vector3.Slerp(_interpolatedDirection, targetDirection, _directionSmoothingSpeed * Time.deltaTime).normalized;
 			_interpolatedMagnitude = Mathf.Lerp(_interpolatedMagnitude, targetMagnitude, _magnitudeSmoothingSpeed * Time.deltaTime);
-
-            if (Controller.HasInputAuthority == false)
-                Debug.LogError(_kcc.transform.name + " - realVelocityMagnitude - " + _interpolatedDirection);
         }
 
         private float GetMaxBaseSpeed(Vector2 localNormalizedDirection)

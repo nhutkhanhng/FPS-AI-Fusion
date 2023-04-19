@@ -766,7 +766,7 @@ namespace CoverShooter
                     updatePath();
             }
 
-            _motor.InputMovement(new CharacterMovement(direction, speed));
+            _motor.InputMovement(new CharacterMovement(Vector3.forward, 5));
             _isMoving = true;
         }
 

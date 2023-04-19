@@ -7,7 +7,7 @@ namespace TPSBR
 	using UnityEngine.Profiling;
 
 	[OrderBefore(typeof(HitboxManager))]
-	public sealed class Agent : ChatacterMix
+	public class Agent : ChatacterMix
     {
 		// PUBLIC METHODS
 
@@ -23,31 +23,31 @@ namespace TPSBR
 		public AgentVFX    Effects    => _agentVFX;
 
 		[Networked]
-		public NetworkBool LeftSide { get; private set; }
+		public NetworkBool LeftSide { get; protected set; }
 
-		// PRIVATE MEMBERS
-
-		[SerializeField]
-		private float _jumpPower;
-		[SerializeField]
-		private float _topCameraAngleLimit;
-		[SerializeField]
-		private float _bottomCameraAngleLimit;
-		[SerializeField]
-		private KCCProcessor _fastMovementProcessor;
+		// protected MEMBERS
 
 		[SerializeField]
-		private GameObject _visualRoot;
+		protected float _jumpPower;
+		[SerializeField]
+		protected float _topCameraAngleLimit;
+		[SerializeField]
+		protected float _bottomCameraAngleLimit;
+		[SerializeField]
+		protected KCCProcessor _fastMovementProcessor;
+
+		[SerializeField]
+		protected GameObject _visualRoot;
 
 		[Header("Fall Damage")]
 		[SerializeField]
-		private float _minFallDamage = 5f;
+		protected float _minFallDamage = 5f;
 		[SerializeField]
-		private float _maxFallDamage = 200f;
+		protected float _maxFallDamage = 200f;
 		[SerializeField]
-		private float _maxFallDamageVelocity = 20f;
+		protected float _maxFallDamageVelocity = 20f;
 		[SerializeField]
-		private float _minFallDamageVelocity = 5f;
+		protected float _minFallDamageVelocity = 5f;
 
 		public AgentInput     _agentInput;
 		public Character      _character;
@@ -182,7 +182,7 @@ namespace TPSBR
 
 		// MONOBEHAVIOUR
 
-		private void Awake()
+		protected void Awake()
 		{
 			_agentInput     = GetComponent<AgentInput>();
 			_character      = GetComponent<Character>();
@@ -199,9 +199,9 @@ namespace TPSBR
 			_networkCulling.Updated += OnCullingUpdated;
 		}
 
-		// PRIVATE METHODS
+		// protected METHODS
 
-		private void OnEarlyFixedUpdate()
+		protected void OnEarlyFixedUpdate()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -217,7 +217,7 @@ namespace TPSBR
 			Profiler.EndSample();
 		}
 
-		private void OnLateFixedUpdate()
+		protected virtual void OnLateFixedUpdate()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -246,7 +246,7 @@ namespace TPSBR
 			}
 		}
 
-		private void OnEarlyRender()
+		protected void OnEarlyRender()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -257,7 +257,7 @@ namespace TPSBR
 			_weapons.OnRender();
 		}
 
-		private void OnLateRender()
+		protected void OnLateRender()
 		{
 			if (_networkCulling.IsCulled == true)
 				return;
@@ -274,7 +274,20 @@ namespace TPSBR
                     _health.ApplyDamage(999f);
             }
         }
-        private void ProcessFixedInput()
+
+        public virtual void SetInputDirection(Vector3 direction)
+        {
+
+        }
+        public virtual void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
+        {
+
+        }
+        protected virtual GameplayInput GetFixedInput()
+        {
+            return _agentInput.FixedInput;
+        }
+        protected virtual void ProcessFixedInput()
 		{
 			if (Object.IsProxy == true)
 				return;
@@ -289,7 +302,7 @@ namespace TPSBR
 
             if (_health.IsAlive == true)
 			{
-				input = _agentInput.FixedInput;
+				input = GetFixedInput();
 			}
 
 			if (input.Aim == true)
@@ -363,7 +376,7 @@ namespace TPSBR
 			_agentInput.SetFixedInput(input, false);
 		}
 
-		private void ProcessRenderInput()
+		protected virtual void ProcessRenderInput()
 		{
 			if (Object.HasInputAuthority == false)
 				return;
@@ -412,7 +425,7 @@ namespace TPSBR
 			}
 		}
 
-		private void TryFire(bool attack, bool hold)
+		protected void TryFire(bool attack, bool hold)
 		{
 			var currentWeapon = _weapons.CurrentWeapon;
 			if (currentWeapon is ThrowableWeapon && currentWeapon.WeaponSlot == _weapons.PendingWeaponSlot)
@@ -436,7 +449,7 @@ namespace TPSBR
 			}
 		}
 
-		private void TryReload(bool autoReload)
+		protected void TryReload(bool autoReload)
 		{
 			if (_weapons.CanReloadWeapon(autoReload) == false)
 				return;
@@ -447,7 +460,7 @@ namespace TPSBR
 			}
 		}
 
-		private bool CanAim(KCCData kccData)
+		protected bool CanAim(KCCData kccData)
 		{
 			if (kccData.IsGrounded == false)
 				return false;
@@ -455,7 +468,7 @@ namespace TPSBR
 			return _weapons.CanAim();
 		}
 
-		private void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
+		protected void SetLookRotation(KCCData kccData, Vector2 lookRotationDelta, Vector2 recoil, out Vector2 newRecoil)
 		{
 			if (lookRotationDelta.IsZero() == true && recoil.IsZero() == true && _character.CharacterController.Data.Recoil == Vector2.zero)
 			{
@@ -499,7 +512,7 @@ namespace TPSBR
 			newRecoil = recoil;
 		}
 
-		private void CheckFallDamage()
+		protected void CheckFallDamage()
 		{
 			if (Object.IsProxy == true)
 				return;
@@ -546,7 +559,7 @@ namespace TPSBR
 			(_health as IHitTarget).ProcessHit(ref hitData);
 		}
 
-		private void OnCullingUpdated(bool isCulled)
+		protected void OnCullingUpdated(bool isCulled)
 		{
 			bool isActive = isCulled == false;
 

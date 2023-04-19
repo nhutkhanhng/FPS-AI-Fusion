@@ -2634,6 +2634,7 @@ namespace CoverShooter
                 _cover.Clear();
         }
 
+        [SerializeField] protected Vector3 test;
         /// <summary>
         /// Sets the character movement for the next update.
         /// </summary>
@@ -2663,8 +2664,7 @@ namespace CoverShooter
 
             _isMoving = _inputMovement.IsMoving;
             KCC kcc = agent.currentKCC;
-            kcc.SetInputDirection(_inputMovement.Direction.IsAlmostZero() == true ? Vector3.zero : kcc.RenderData.TransformRotation * 
-                _inputMovement.Value.X0Y());
+            agent.SetInputDirection(test);
         }
 
         /// <summary>
@@ -3224,13 +3224,11 @@ namespace CoverShooter
             if (CurrentHeightChanged != null) CurrentHeightChanged.Invoke(_defaultCapsuleHeight);
         }
 
-        private void FixedUpdate()
-        {
-            // updateFeet();
-        }
-
         public override void _LateUpdate()
         {
+            InputMovement(new CharacterMovement(Vector3.left, 1f));
+            return;
+            
             if (IsAlive && !_hasRegistered)
             {
                 _hasRegistered = true;
@@ -3349,7 +3347,7 @@ namespace CoverShooter
                 {
                     clearPotentialCovers();
 #if Climb
-                    updateClimb();
+                 0   updateClimb();
 #endif
                 }
                 else
@@ -4290,11 +4288,6 @@ namespace CoverShooter
             return transform.position + vector * length;
         }
 
-        private void OnAnimatorMove()
-        {
-            
-        }
-
         private void moveAndRotate()
         {
             if (_isMoving && _useSprintingAnimation)
@@ -4426,7 +4419,7 @@ namespace CoverShooter
                      _isInProcess ||
                      (_wouldTurnImmediately && !isInAnimatedCover && (_aimTimer > 0.2f || !IsInTallCover)))
                 {
-                    transform.Rotate(0, _horizontalAngleDiff, 0);
+                    turnImd(_horizontalAngleDiff);
                     _horizontalAngleDiff = 0;
                 }
                 else if (_isThrowing && !_hasThrown)
@@ -4580,8 +4573,14 @@ namespace CoverShooter
             //    _body.velocity = velocity;
         }
 
+        protected void turnImd(float angleDiff)
+        {
+            return;
+            transform.Rotate(0, angleDiff, 0);
+        }
         private void turn(float speed)
         {
+            return;
             var angle = Util.Lerp(0, _horizontalAngleDiff, speed * 0.3f);
 
             transform.Rotate(0, angle, 0);

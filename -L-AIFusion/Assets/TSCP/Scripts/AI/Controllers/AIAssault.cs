@@ -245,12 +245,12 @@ namespace CoverShooter
             _brain = GetComponent<BaseBrain>();
         }
 
-        public override void Update()
+        public override void FixedUpdateNetwork()
         {
             if (!_isAssaulting)
                 return;
 
-            _wait += kINetworkTimer.deltaTime;
+            _wait += GetDeltaTime();
 
             if (_wait >= MaxDuration)
             {
@@ -275,12 +275,12 @@ namespace CoverShooter
                 else
                 {
                     if (_wasEverInMeleeRange)
-                        _blockWait += kINetworkTimer.deltaTime;
+                        _blockWait += GetDeltaTime();
 
                     if (_isGoingToHit)
-                        _preHitTime -= kINetworkTimer.deltaTime;
+                        _preHitTime -= GetDeltaTime();
                     else if (_postHitTime > 0)
-                        _postHitTime -= kINetworkTimer.deltaTime;
+                        _postHitTime -= GetDeltaTime();
 
                    var isInRange = false;
 
