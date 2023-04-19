@@ -736,11 +736,15 @@ namespace CoverShooter
 
         private bool avoid(Vector3 direction, float speed)
         {
-            _avoidingTimer = 0.15f;
+            Debug.LogError("avoid : "  + direction);
+
+            _avoidingTimer = .15f;
+
             _isAvoidingMover = true;
             _avoidDirection = direction;
             _avoidSpeed = speed;
             move(direction, speed, true);
+
             return true;
         }
 
@@ -766,7 +770,7 @@ namespace CoverShooter
                     updatePath();
             }
 
-            _motor.InputMovement(new CharacterMovement(Vector3.forward, 5));
+            _motor.InputMovement(new CharacterMovement(direction, 5));
             _isMoving = true;
         }
 

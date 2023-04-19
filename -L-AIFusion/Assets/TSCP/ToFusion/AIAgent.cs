@@ -38,6 +38,8 @@ namespace TPSBR
         public override void SetInputDirection(Vector3 direction)
         {
             _lastKnownInput.MoveDirection = direction;
+            _fixedInput.MoveDirection = direction;
+
         }
         public override void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
         {
@@ -223,6 +225,17 @@ namespace TPSBR
             {
                 kcc.Jump(Vector3.up * _jumpPower);
             }
+        }
+
+        public override void Render()
+        {
+            _fixedInput = default;
+            _renderInput = default;
+            _cachedInput = default;
+            _lastKnownInput = default;
+            _baseFixedInput = default;
+            _baseRenderInput = default;
+            base.Render();
         }
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
         [System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]

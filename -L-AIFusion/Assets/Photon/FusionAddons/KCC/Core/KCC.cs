@@ -2014,10 +2014,6 @@ namespace Fusion.KCC
 
 		private void Move(KCCData data)
 		{
-            if (_transform.name.Contains("Enemy"))
-            if (data.DesiredVelocity.IsAlmostZero() == false)
-                UnityEngine.Debug.LogError(_transform.name + data.DesiredVelocity);
-
             _activeStage    = EKCCStage.None;
 			_activeFeatures = _settings.Features;
 

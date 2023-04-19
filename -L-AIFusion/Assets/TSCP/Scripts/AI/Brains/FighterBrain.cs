@@ -1220,6 +1220,7 @@ namespace CoverShooter
         public void OnSeeActor(Actor actor)
         {
             _visibleActors.Add(actor);
+            Debug.LogError(actor.name);
 
             if (actor.Side == Actor.Side)
             {
@@ -1229,11 +1230,17 @@ namespace CoverShooter
                     _visibleCivilians.Add(actor);
             }
             else if (canChangeTarget && canSetThreat)
-                if (Threat == null || 
+            {
+                Debug.LogError("canChangeTarget ????");
+                if (Threat == null ||
                     !Threat.IsAlive ||
-                    InvestigationWait < ThreatAge || 
+                    InvestigationWait < ThreatAge ||
                     Threat == actor)
+                {
+                    Debug.LogError($"set target {actor.name}");
                     setSeenThreat(actor, actor.transform.position, actor.Cover);
+                }
+            }
         }
 
         /// <summary>

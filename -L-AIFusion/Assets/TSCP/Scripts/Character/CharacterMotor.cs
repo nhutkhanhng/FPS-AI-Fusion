@@ -2663,8 +2663,16 @@ namespace CoverShooter
             }
 
             _isMoving = _inputMovement.IsMoving;
+
             KCC kcc = agent.currentKCC;
-            agent.SetInputDirection(test);
+            var _temp = movement.Direction;
+
+            Debug.LogError(_temp);
+
+            movement.Direction.y = _temp.z;
+            movement.Direction.z = 0;
+
+            agent.SetInputDirection(movement.Direction);
         }
 
         /// <summary>
@@ -3226,9 +3234,6 @@ namespace CoverShooter
 
         public override void _LateUpdate()
         {
-            InputMovement(new CharacterMovement(Vector3.left, 1f));
-            return;
-            
             if (IsAlive && !_hasRegistered)
             {
                 _hasRegistered = true;

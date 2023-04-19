@@ -2869,6 +2869,10 @@ GameObject:
   - component: {fileID: 840214416079072565}
   - component: {fileID: 7442139576927040731}
   - component: {fileID: 5190406139856406184}
+  - component: {fileID: -4769217903060999524}
+  - component: {fileID: -7303928161082234650}
+  - component: {fileID: -1627987507071704022}
+  - component: {fileID: 4781680799286194420}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2935,6 +2939,10 @@ MonoBehaviour:
   - {fileID: 4371376507030965249}
   - {fileID: 840214416079072565}
   - {fileID: 5190406139856406184}
+  - {fileID: -4769217903060999524}
+  - {fileID: -7303928161082234650}
+  - {fileID: -1627987507071704022}
+  - {fileID: 4781680799286194420}
   - {fileID: 8098325772741024417}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
@@ -2954,7 +2962,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 1
+  Side: 0
   IsAggressive: 1
   _motor: {fileID: 840214416079072565}
   _health: {fileID: 0}
@@ -3584,6 +3592,126 @@ MonoBehaviour:
   _networkCulling: {fileID: 0}
   _cachedLookRotation: {x: 0, y: 0, z: 0, w: 0}
   _cachedPitchRotation: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &-4769217903060999524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac41d31ca7a910941b5794adab391b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  RollTriggerDistance: 2
+  CircleDelay: 2
+  ObstructionRadius: 1.5
+  DebugDestination: 0
+  DebugPath: 0
+--- !u!114 &-7303928161082234650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64b9fb81c458b44c80544b0e7374659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  Distance: 300
+  ObstacleIgnoreDistance: 1
+  FieldOfView: 130
+  UpdateDelay: 0.1
+  DebugFOV: 0
+--- !u!114 &-1627987507071704022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 037c567b5563c764b826878fa050bf6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  VerifyHeight: 1
+  FieldOfView: 180
+  WalkDistance: 20
+  DebugTarget: 0
+  DebugPoints: 0
+--- !u!114 &4781680799286194420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92957a976b703e04c996b9eb8d0e002e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Side: 0
+  _threat: {fileID: 0}
+  AvoidDistance: 4
+  AllySpacing: 1.2
+  StandDuration: 2
+  CircleDuration: 2
+  CoverSwitchWait: 10
+  GuessDistance: 30
+  TakeCoverImmediatelyChance: 0
+  DistanceToGoToCoverFromStandOrCircle: 6
+  ImmediateThreatReaction: 1
+  AttackAggressors: 1
+  Start:
+    ReturnOnIdle: 0
+    Mode: 1
+    Position: {x: 0, y: 0, z: 0}
+  Speed:
+    Enabled: 0
+    Patrol: 1
+    TakeCover: 1
+    SwitchCover: 1
+    RetreatToCover: 1
+    Avoid: 1
+    Circle: 1
+    Assault: 1
+    Search: 1
+    Investigate: 1
+    Flee: 1
+  Approximation:
+    Min: 0
+    Max: 10
+    MinDistance: 5
+    MaxDistance: 30
+  Retreat:
+    Health: 25
+    HideDuration: 3
+  Investigation:
+    WaitForCovered: 10
+    WaitForUncovered: 10
+  GrenadeAvoidance:
+    ReactionTime: 1
+    Duration: 2
+  Grenades:
+    GrenadeCount: 1
+    FirstCheckDelay: 5
+    CheckInterval: 2
+    Interval: 10
+    MaxRadius: 5
+    AvoidDistance: 8
+  DebugThreat: 0
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0
