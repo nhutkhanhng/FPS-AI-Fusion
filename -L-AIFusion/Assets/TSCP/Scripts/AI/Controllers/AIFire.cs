@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using TPSBR;
 using UnityEngine;
 
 namespace CoverShooter
@@ -28,7 +29,7 @@ namespace CoverShooter
         /// Weapon type to look for, if not present any other weapon will be picked. Used only when AutoFindIndex is enabled.
         /// </summary>
         [Tooltip("Weapon type to look for, if not present any other weapon will be picked. Used only when AutoFindIndex is enabled.")]
-        public WeaponType AutoFindType = WeaponType.Pistol;
+        public EHitType AutoFindType = EHitType.Pistol;
 
         /// <summary>
         /// Should the AI always be aiming.
@@ -63,7 +64,7 @@ namespace CoverShooter
         private bool _isFiringABurst;
         private int _burstBulletCount;
         private int _bulletCountAtStart;
-        private BaseGun _gunBurstsWereCalculatedFor;
+        private Weapon _gunBurstsWereCalculatedFor;
 
         private bool _isAimingAtAPosition;
         private Vector3 _aim;
@@ -194,14 +195,14 @@ namespace CoverShooter
             if (wantsToAlwaysAim)
                 EquipWeapon(_motor);
 
-            var gun = _motor.EquippedWeapon.Gun;
+            var gun = _motor.EquippedWeapon.Gun as FirearmWeapon;
 
             if (gun == null)
                 return;
 
             if (_isReloading)
                 _isReloading = !_motor.IsGunReady;
-            else if (gun != null && gun.LoadedBulletsLeft <= 0)
+            else if (gun != null && gun.MagazineAmmo <= 0)
             {
                 _isReloading = true;
                 _motor.InputReload();
@@ -240,13 +241,13 @@ namespace CoverShooter
                     if (_isFiringABurst)
                     {
                         _gunBurstsWereCalculatedFor = gun;
-                        _burstBulletCount = _bulletCountAtStart - gun.LoadedBulletsLeft;
+                        _burstBulletCount = _bulletCountAtStart - gun.MagazineAmmo;
                     }
 
                     _isFiringABurst = false;
                     _fireCycle -= cycleDuration;
 
-                    if (_gunBurstsWereCalculatedFor == gun && gun.LoadedBulletsLeft < _burstBulletCount)
+                    if (_gunBurstsWereCalculatedFor == gun && gun.MagazineAmmo < _burstBulletCount)
                     {
                         _isReloading = true;
                         _motor.InputReload();
@@ -264,7 +265,7 @@ namespace CoverShooter
                         {
                             if (!_isFiringABurst)
                             {
-                                _bulletCountAtStart = gun.LoadedBulletsLeft;
+                                _bulletCountAtStart = gun.MagazineAmmo;
                                 _isFiringABurst = true;
                             }
 
@@ -281,7 +282,7 @@ namespace CoverShooter
                     {
                         if (!_isFiringABurst)
                         {
-                            _bulletCountAtStart = gun.LoadedBulletsLeft;
+                            _bulletCountAtStart = gun.MagazineAmmo;
                             _isFiringABurst = true;
                         }
 

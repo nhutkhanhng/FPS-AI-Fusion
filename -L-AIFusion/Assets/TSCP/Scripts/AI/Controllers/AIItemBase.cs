@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TPSBR;
+using UnityEngine;
 
 namespace CoverShooter
 {
@@ -72,7 +73,7 @@ namespace CoverShooter
         /// <summary>
         /// Equips a weapon of specific kind if possible.
         /// </summary>
-        protected bool Equip(CharacterMotor motor, WeaponType type)
+        protected bool Equip(CharacterMotor motor, EHitType type)
         {
             if (!isActiveAndEnabled)
                 return false;
@@ -146,7 +147,7 @@ namespace CoverShooter
         /// <summary>
         /// Unequips the item if it is currently used.
         /// </summary>
-        protected bool Unequip(CharacterMotor motor, WeaponType type)
+        protected bool Unequip(CharacterMotor motor, EHitType type)
         {
             if (!isActiveAndEnabled)
                 return false;
@@ -177,7 +178,7 @@ namespace CoverShooter
         /// <summary>
         /// Finds an item index of a weapon. Prefers the given type. Returns true if a weapon was found.
         /// </summary>
-        private bool autoFind(CharacterMotor motor, WeaponType type)
+        private bool autoFind(CharacterMotor motor, EHitType type)
         {
             if (_inventory == null)
                 return false;

@@ -2244,92 +2244,92 @@ namespace CoverShooter
                     doThrow = true;
             }
 
-            if (doThrow && _motor.PotentialGrenade != null)
-            {
-                if (_grenadeCheckTimer <= float.Epsilon)
-                {
-                    GrenadeDescription desc;
-                    desc.Gravity = _motor.Grenade.Gravity;
-                    desc.Duration = _motor.PotentialGrenade.Timer;
-                    desc.Bounciness = _motor.PotentialGrenade.Bounciness;
+            //if (doThrow && _motor.PotentialGrenade != null)
+            //{
+            //    if (_grenadeCheckTimer <= float.Epsilon)
+            //    {
+            //        GrenadeDescription desc;
+            //        desc.Gravity = _motor.Grenade.Gravity;
+            //        desc.Duration = _motor.PotentialGrenade.Timer;
+            //        desc.Bounciness = _motor.PotentialGrenade.Bounciness;
 
-                    var isOk = true;
+            //        var isOk = true;
 
-                    for (int i = 0; i < GrenadeList.Count; i++)
-                    {
-                        var grenade = GrenadeList.Get(i);
+            //        for (int i = 0; i < GrenadeList.Count; i++)
+            //        {
+            //            var grenade = GrenadeList.Get(i);
 
-                        if (Vector3.Distance(grenade.transform.position, LastKnownThreatPosition) < grenade.ExplosionRadius * 0.5f)
-                        {
-                            isOk = false;
-                            break;
-                        }
-                    }
+            //            if (Vector3.Distance(grenade.transform.position, LastKnownThreatPosition) < grenade.ExplosionRadius * 0.5f)
+            //            {
+            //                isOk = false;
+            //                break;
+            //            }
+            //        }
 
-                    int pathLength = 0;
+            //        int pathLength = 0;
 
-                    if (isOk)
-                    {
-                        pathLength = GrenadePath.Calculate(GrenadePath.Origin(_motor, Util.HorizontalAngle(LastKnownThreatPosition - transform.position)),
-                                                           LastKnownThreatPosition,
-                                                           _motor.Grenade.MaxVelocity,
-                                                           desc,
-                                                           _grenadePath,
-                                                           _motor.Grenade.Step);
+            //        if (isOk)
+            //        {
+            //            pathLength = GrenadePath.Calculate(GrenadePath.Origin(_motor, Util.HorizontalAngle(LastKnownThreatPosition - transform.position)),
+            //                                               LastKnownThreatPosition,
+            //                                               _motor.Grenade.MaxVelocity,
+            //                                               desc,
+            //                                               _grenadePath,
+            //                                               _motor.Grenade.Step);
 
-                        isOk = Vector3.Distance(_grenadePath[pathLength - 1], LastKnownThreatPosition) < Grenades.MaxRadius;
-                    }
+            //            isOk = Vector3.Distance(_grenadePath[pathLength - 1], LastKnownThreatPosition) < Grenades.MaxRadius;
+            //        }
 
-                    if (isOk)
-                    {
-                        var count = AIUtil.FindActors(_grenadePath[pathLength - 1], Grenades.AvoidDistance);
+            //        if (isOk)
+            //        {
+            //            var count = AIUtil.FindActors(_grenadePath[pathLength - 1], Grenades.AvoidDistance);
 
-                        for (int i = 0; i < count; i++)
-                            if (AIUtil.Actors[i] == Actor || AIUtil.Actors[i].Side == Actor.Side)
-                            {
-                                isOk = false;
-                                break;
-                            }
-                    }
+            //            for (int i = 0; i < count; i++)
+            //                if (AIUtil.Actors[i] == Actor || AIUtil.Actors[i].Side == Actor.Side)
+            //                {
+            //                    isOk = false;
+            //                    break;
+            //                }
+            //        }
 
-                    if (isOk)
-                    {
-                        _motor.InputThrowGrenade(_grenadePath, pathLength, _motor.Grenade.Step);
-                        _thrownGrenadeCount++;
+            //        if (isOk)
+            //        {
+            //            _motor.InputThrowGrenade(_grenadePath, pathLength, _motor.Grenade.Step);
+            //            _thrownGrenadeCount++;
 
-                        _grenadeTimer = 0;
-                        _hasThrowFirstGrenade = true;
-                    }
-                    else
-                        _grenadeCheckTimer = Grenades.CheckInterval;
-                }
-                else
-                    _grenadeCheckTimer -= kINetworkTimer.deltaTime;
-            }
-            else
-                _grenadeCheckTimer = 0;
+            //            _grenadeTimer = 0;
+            //            _hasThrowFirstGrenade = true;
+            //        }
+            //        else
+            //            _grenadeCheckTimer = Grenades.CheckInterval;
+            //    }
+            //    else
+            //        _grenadeCheckTimer -= kINetworkTimer.deltaTime;
+            //}
+            //else
+            //    _grenadeCheckTimer = 0;
         }
 
         private void findGrenades()
         {
-            for (int i = 0; i < GrenadeList.Count; i++)
-            {
-                var grenade = GrenadeList.Get(i);
+            //for (int i = 0; i < GrenadeList.Count; i++)
+            //{
+            //    var grenade = GrenadeList.Get(i);
 
-                if (Vector3.Distance(grenade.transform.position, transform.position) < grenade.ExplosionRadius)
-                {
-                    _grenadeAvoidReaction += kINetworkTimer.deltaTime;
+            //    if (Vector3.Distance(grenade.transform.position, transform.position) < grenade.ExplosionRadius)
+            //    {
+            //        _grenadeAvoidReaction += kINetworkTimer.deltaTime;
 
-                    if (_grenadeAvoidReaction >= GrenadeAvoidance.ReactionTime + float.Epsilon)
-                    {
-                        _avoidedGrenadePosition = grenade.transform.position;
-                        _avoidedGrenadeRange = grenade.ExplosionRadius;
-                        setState(FighterState.avoidGrenade);
-                    }
+            //        if (_grenadeAvoidReaction >= GrenadeAvoidance.ReactionTime + float.Epsilon)
+            //        {
+            //            _avoidedGrenadePosition = grenade.transform.position;
+            //            _avoidedGrenadeRange = grenade.ExplosionRadius;
+            //            setState(FighterState.avoidGrenade);
+            //        }
 
-                    return;
-                }
-            }
+            //        return;
+            //    }
+            //}
 
             _grenadeAvoidReaction = 0;
         }

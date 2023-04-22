@@ -590,12 +590,9 @@ namespace CoverShooter
             _motor.SetAimTarget(position);
 
             if (DebugAim)
-                Debug.DrawLine(_motor.GunOrigin, position, Color.red);
+                Debug.DrawLine(_motor.Weapon.Gun.transform.position, position, Color.red);
 
             var gun = _motor.EquippedWeapon.Gun;
-
-            if (gun != null)
-                gun.AddErrorThisFrame(AccuracyError);
         }
 
         #endregion

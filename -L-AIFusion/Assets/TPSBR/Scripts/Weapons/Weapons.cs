@@ -81,9 +81,10 @@ namespace TPSBR
 
 		private AudioEffect[] _fireAudioEffects;
 
-		// PUBLIC METHODS
+        // PUBLIC METHODS
+        protected TransformData fireTransform => _agent.Character.GetFireTransform();
 
-		public void DisarmCurrentWeapon()
+        public void DisarmCurrentWeapon()
 		{
 			CurrentWeaponSlot = 0;
 		}
@@ -393,7 +394,6 @@ namespace TPSBR
 				return false;
 
 			var targetPoint = GetTargetPoint(false);
-			var fireTransform = _agent.Character.GetFireTransform();
 
 			CurrentWeapon.Fire(fireTransform.Position, targetPoint, _hitMask);
 

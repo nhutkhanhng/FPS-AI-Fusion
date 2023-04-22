@@ -7,23 +7,6 @@ using UnityEngine.Serialization;
 namespace CoverShooter
 {
     /// <summary>
-    /// Defines character animations used with a weapon.
-    /// </summary>
-    public enum WeaponType 
-    {
-        None,
-        Pistol,
-        Rifle,
-        Grenade,
-        Suicide,
-        Heal,
-        SMG,
-        Shotgun,
-        Sniper,
-        ShrinkingArea,
-    }
-
-    /// <summary>
     /// Weapon aiming setting.
     /// </summary>
     public enum WeaponAiming
@@ -87,7 +70,7 @@ namespace CoverShooter
         /// <summary>
         /// Shortcut for getting the gun component of the Item.
         /// </summary>
-        public BaseGun Gun
+        public ConvertWeapon Gun
         {
             get
             {
@@ -170,7 +153,7 @@ namespace CoverShooter
         [Tooltip("Is the character always aiming while the weapon is equipped.")]
         public WeaponAiming Aiming;
 
-        private BaseGun _cachedGun;
+        private ConvertWeapon _cachedGun;
         private MonoBehaviour _cachedComponent;
 
         private GameObject _cacheItem;
@@ -179,7 +162,7 @@ namespace CoverShooter
         {
             _cacheItem = RightItem;
             _cachedComponent = null;
-            _cachedGun = RightItem == null ? null : RightItem.GetComponent<BaseGun>();
+            _cachedGun = RightItem == null ? null : RightItem.GetComponent<ConvertWeapon>();
         }
 
         public bool IsTheSame(ref WeaponDescription other)

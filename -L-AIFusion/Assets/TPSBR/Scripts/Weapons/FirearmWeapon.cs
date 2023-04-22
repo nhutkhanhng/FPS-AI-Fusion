@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TPSBR
 {
-	public abstract class FirearmWeapon : Weapon, IDynamicPickupProvider
+	public abstract class FirearmWeapon : ConvertWeapon, IDynamicPickupProvider
 	{
 		// PUBLIC MEMBERS
 

@@ -407,7 +407,7 @@ namespace CoverShooter
         /// </summary>
         public bool IsScoping
         {
-            get { return IsAimingGun && (_wantsToScope || _wantedToScope) && EquippedWeapon.Gun != null && EquippedWeapon.Gun.Scope != null; }
+            get { return IsAimingGun && (_wantsToScope || _wantedToScope) && EquippedWeapon.Gun != null; }
         }
 
         /// <summary>
@@ -746,22 +746,7 @@ namespace CoverShooter
             }
         }
 
-        /// <summary>
-        /// Position of the currently held gun where bullets would appear. 
-        /// </summary>
-        public Vector3 GunOrigin
-        {
-            get { return EquippedWeapon.Gun == null ? transform.position : EquippedWeapon.Gun.Origin; }
-        }
-
-        /// <summary>
-        /// Direction of the gun affected by recoil.
-        /// </summary>
-        public Vector3 GunDirection
-        {
-            get { return EquippedWeapon.Gun == null ? transform.forward : EquippedWeapon.Gun.Direction; }
-        }
-
+        
         /// <summary>
         /// Position of the top of the capsule.
         /// </summary>
@@ -959,50 +944,7 @@ namespace CoverShooter
             get { return _isThrowing || _hasThrown; }
         }
 
-        /// <summary>
-        /// Grenade that would be potentially displayed in a hand if thrown.
-        /// </summary>
-        public Grenade PotentialGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (IsThrowingLeft)
-                    obj = Grenade.Left;
-                else
-                    obj = Grenade.Right;
-
-                if (obj != null)
-                    return obj.GetComponent<Grenade>();
-                else
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// Returns currently displayed grenade object in a hand.
-        /// </summary>
-        public Grenade CurrentGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (_rightGrenade != null && _rightGrenade.activeSelf)
-                    obj = _rightGrenade;
-                else if (_leftGrenade != null && _leftGrenade.activeSelf)
-                    obj = _leftGrenade;
-                else
-                    return null;
-
-                return obj.GetComponent<Grenade>();
-            }
-        }
-
-        /// <summary>
-        /// Returns true if in current situation grenades would be thrown with the left hand.
-        /// </summary>
+    
         public bool IsThrowingLeft
         {
             get
@@ -1489,8 +1431,8 @@ namespace CoverShooter
         private bool _hasAimTarget;
         private float _bodyTurnSpeed = 10;
         [SerializeField] private Vector3 _bodyTarget;
-        private Vector3 _aimTarget;
-        private Vector3 _currentBodyTarget;
+        [SerializeField] private Vector3 _aimTarget;
+        [SerializeField] private Vector3 _currentBodyTarget;
 
         [SerializeField] private float _horizontalAngle;
         [SerializeField] private float _verticalAngle;
@@ -2100,93 +2042,6 @@ namespace CoverShooter
         }
 
         /// <summary>
-        /// Catch the end of a bullet load animation.
-        /// </summary>
-        public void InputEndBulletLoad()
-        {
-            if (!_isLoadingBullet)
-                return;
-
-            _isLoadingBullet = false;
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            if (!gun.LoadBullet())
-                return;
-
-            if (BulletLoaded != null)
-                BulletLoaded.Invoke();
-
-            if (gun.IsFullyLoaded)
-            {
-                if (FullyLoaded != null)
-                    FullyLoaded.Invoke();
-
-                if (gun.PumpAfterFinalLoad)
-                    InputEndPump();
-            }
-            else if (gun.PumpAfterBulletLoad)
-                InputEndPump();
-            else
-                loadBullet();
-        }
-
-        /// <summary>
-        /// Catch the end of a magazine load animation or the load of a final bullet.
-        /// </summary>
-        public void InputEndMagazineLoad()
-        {
-            if (!_isLoadingMagazine)
-                return;
-
-            _isLoadingMagazine = false;
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            if (gun.LoadMagazine())
-                if (FullyLoaded != null)
-                    FullyLoaded.Invoke();
-
-            if (gun.PumpAfterFinalLoad)
-                InputEndPump();
-        }
-
-        /// <summary>
-        /// Catch the end of a weapon pump animation.
-        /// </summary>
-        public void InputEndPump()
-        {
-            if (!_isPumping)
-                return;
-
-            _postPumpDelay = 0.2f;
-            _isPumping = false;
-            if (Pumped != null) Pumped.Invoke();
-
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            gun.NotifyPump();
-
-            if (!gun.IsFullyLoaded && !gun.ReloadWithMagazines && gun.PumpAfterBulletLoad)
-            {
-                _willReloadAfterPump = false;
-                loadBullet();
-            }
-            else if (_willReloadAfterPump)
-            {
-                _willReloadAfterPump = false;
-                InputReload();
-            }
-        }
-
-        /// <summary>
         /// Tell the motor to look up or down during a melee.
         /// </summary>
         public void InputVerticalMeleeAngle(float value)
@@ -2209,26 +2064,6 @@ namespace CoverShooter
                 _weaponChangeListeners[i].OnWeaponChange();
 
             if (WeaponChanged != null) WeaponChanged.Invoke();
-        }
-
-        /// <summary>
-        /// Catch the moment in the equip animation when the character has grabbed the weapon.
-        /// </summary>
-        public void InputGrabWeapon()
-        {
-            if (_weaponEquipState != WeaponEquipState.unequipped)
-                return;
-
-            _equippedWeapon = _equippingWeapon;
-            _weaponEquipState = WeaponEquipState.equipping;
-            _isUnequippedButGoingToGrab = false;
-
-            _weaponGrabTimer = 0.35f;
-
-            showEquippedWeapon(false);
-
-            if (_equippedWeapon.Gun != null)
-                _equippedWeapon.Gun.CancelFire();
         }
 
         /// <summary>
@@ -2404,78 +2239,6 @@ namespace CoverShooter
         {
             _isGrenadeTakenOut = false;
         }
-
-        /// <summary>
-        /// Inputs a command to throw a grenade to the given target location.
-        /// </summary>
-        public void InputThrowGrenade(Vector3 target, GameObject grenadeOverride = null)
-        {
-            Grenade potentialGrenade;
-
-            if (grenadeOverride != null)
-                potentialGrenade = grenadeOverride.GetComponent<Grenade>();
-            else
-                potentialGrenade = PotentialGrenade;
-
-            if (potentialGrenade == null)
-                return;
-
-            GrenadeDescription desc;
-            desc.Gravity = Grenade.Gravity;
-            desc.Duration = potentialGrenade.Timer;
-            desc.Bounciness = potentialGrenade.Bounciness;
-
-            var length = GrenadePath.Calculate(GrenadePath.Origin(this, Util.HorizontalAngle(target - transform.position)),
-                                               target,
-                                               Grenade.MaxVelocity,
-                                               desc,
-                                               _grenadePath,
-                                               Grenade.Step);
-
-            InputThrowGrenade(_grenadePath, length, Grenade.Step, grenadeOverride);
-        }
-
-        /// <summary>
-        /// Calculates flight parameters given a path and launches the grenade.
-        /// </summary>
-        public void InputThrowGrenade(Vector3[] predictedPath, int predictedPathLength, float step, GameObject grenadeOverride = null)
-        {
-            if (predictedPathLength < 2)
-                return;
-
-            InputThrowGrenade(predictedPath[0], (predictedPath[1] - predictedPath[0]) / step, predictedPath[predictedPathLength - 1], grenadeOverride);
-        }
-
-        /// <summary>
-        /// Tells the character to throw a grenade in the given path.
-        /// </summary>
-        public void InputThrowGrenade(Vector3 origin, Vector3 velocity, Vector3 target, GameObject grenadeOverride = null)
-        {
-            if (!_isThrowing)
-            {
-                _isGoingToThrowLeft = IsThrowingLeft;
-
-                _wouldTurnImmediately = true;
-                _isThrowing = true;
-                _hasThrown = false;
-                _isGrenadeTakenOut = false;
-                _throwOrigin = origin;
-                _throwVelocity = velocity;
-                _throwTarget = target;
-                _hasBeganThrowAnimation = false;
-
-                _throwAngle = Util.HorizontalAngle(velocity);
-
-                if (_cover.In && _cover.Main.IsFrontField(_throwAngle, 180))
-                    _throwBodyAngle = _cover.FaceAngle(_isCrouching);
-                else
-                    _throwBodyAngle = _throwAngle;
-
-                recreateGrenades(grenadeOverride);
-            }
-        }
-
-        /// <summary>
         /// Inputs a command to roll in a specific direction.
         /// </summary>
         public void InputRoll(float angle)
@@ -2848,7 +2611,7 @@ namespace CoverShooter
 
             _willPerformPump = false;
 
-            if (gun.ReloadWithMagazines || gun.Type == WeaponType.Pistol)
+            if (gun || gun.Type == TPSBR.EHitType.Pistol)
             {
                 _isLoadingMagazine = true;
 #if USE_ANIMATOR
@@ -3199,12 +2962,6 @@ namespace CoverShooter
                         break;
                     }
 
-                if (anyVisibility || _targetLayer == Layers.Scope)
-                    updateIK();
-
-                if (EquippedWeapon.Gun != null)
-                    EquippedWeapon.Gun.UpdateManually();
-
                 if (Mathf.Abs(_movementInput) > float.Epsilon)
                     _noMovementTimer = 0;
                 else if (_noMovementTimer < 1)
@@ -3406,33 +3163,34 @@ namespace CoverShooter
                         }
                     }
 
-                    if (IsInLowCover)
-                    {
-                        if (_isAimingThroughCoverPlane || (gun.HasRaycastSetup && Vector3.Dot(_cover.Main.Forward, gun.RaycastOrigin - _cover.Main.transform.position - _coverOffset) > 0))
-                        {
-                            if ((_verticalAngle < -5 && wasAimingThroughCoverPlane) || (_verticalAngle < -8 && gun != null && gun.HasRaycastSetup && (gun.RaycastOrigin.y < _cover.Main.Top + 0.1f)))
-                            {
-                                isAimingHigh = true;
-                                _isAimingThroughCoverPlane = true;
-                                _hasCoverPlaneAngle = false;
-                            }
-                            else if (_cover.Main.IsFrontField(_horizontalAngle, 190 + Mathf.Clamp(_verticalAngle * 2, 0, 70)))
-                            {
-                                _isAimingThroughCoverPlane = true;
+                    //if (IsInLowCover)
+                    //{
+                    //    if (_isAimingThroughCoverPlane 
+                    //        || (gun.HasRaycastSetup && Vector3.Dot(_cover.Main.Forward, gun.RaycastOrigin - _cover.Main.transform.position - _coverOffset) > 0))
+                    //    {
+                    //        if ((_verticalAngle < -5 && wasAimingThroughCoverPlane) || (_verticalAngle < -8 && gun != null && gun.HasRaycastSetup && (gun.RaycastOrigin.y < _cover.Main.Top + 0.1f)))
+                    //        {
+                    //            isAimingHigh = true;
+                    //            _isAimingThroughCoverPlane = true;
+                    //            _hasCoverPlaneAngle = false;
+                    //        }
+                    //        else if (_cover.Main.IsFrontField(_horizontalAngle, 190 + Mathf.Clamp(_verticalAngle * 2, 0, 70)))
+                    //        {
+                    //            _isAimingThroughCoverPlane = true;
 
-                                if (_backOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Entering)
-                                    isAimingLowInLowCover = _verticalAngle > 20;
-                                else
-                                    isAimingLowInLowCover = _verticalAngle > 25;
+                    //            if (_backOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Entering)
+                    //                isAimingLowInLowCover = _verticalAngle > 20;
+                    //            else
+                    //                isAimingLowInLowCover = _verticalAngle > 25;
 
-                                if (!isAimingLowInLowCover)
-                                {
-                                    _hasCoverPlaneAngle = true;
-                                    _coverPlaneAngle = _horizontalAngle;
-                                }
-                            }
-                        }
-                    }
+                    //            if (!isAimingLowInLowCover)
+                    //            {
+                    //                _hasCoverPlaneAngle = true;
+                    //                _coverPlaneAngle = _horizontalAngle;
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
 
                 if (!_isAimingThroughCoverPlane)
@@ -3819,8 +3577,8 @@ namespace CoverShooter
             if (_equippedWeapon.LeftHolster != null && !_equippedWeapon.LeftHolster.activeSelf) _equippedWeapon.LeftHolster.SetActive(true);
             if (_equippedWeapon.Shield != null && _equippedWeapon.Shield.activeSelf) _equippedWeapon.Shield.SetActive(false);
 
-            if (_equippedWeapon.Gun != null)
-                _equippedWeapon.Gun.CancelFire();
+            //if (_equippedWeapon.Gun != null)
+            //    _equippedWeapon.Gun.CancelFire();
         }
 
         private void updateCapsule()
@@ -3974,12 +3732,12 @@ namespace CoverShooter
                     body.velocity += (Util.HorizontalVector(_throwBodyAngle) + Vector3.up).normalized * Grenade.MaxVelocity;
             }
 
-            var component = grenade.GetComponent<Grenade>();
-            if (component != null)
-            {
-                component.Activate(_actor);
-                component.Fly(_throwOrigin, _throwVelocity, Grenade.Gravity);
-            }
+            //var component = grenade.GetComponent<Grenade>();
+            //if (component != null)
+            //{
+            //    component.Activate(_actor);
+            //    component.Fly(_throwOrigin, _throwVelocity, Grenade.Gravity);
+            //}
         }
 
         private GameObject cloneGrenade(GameObject grenade, GameObject location)
@@ -4452,7 +4210,7 @@ namespace CoverShooter
         {
             get
             {
-                return !IsReloading && !IsChangingWeapon && IsGunReady && EquippedWeapon.Gun.LoadedBulletsLeft > 0;
+                return !IsReloading && !IsChangingWeapon && IsGunReady && EquippedWeapon.Gun.CanFire(true);
             }
         }
 
@@ -4676,7 +4434,7 @@ namespace CoverShooter
         {
             get
             {
-                WeaponType type;
+                TPSBR.EHitType type;
 
                 if (_weaponEquipState == WeaponEquipState.unequipped &&
                     !_equippedWeapon.IsTheSame(ref Weapon))
@@ -4700,10 +4458,10 @@ namespace CoverShooter
 
                 switch (type)
                 {
-                    case WeaponType.Pistol: return 1;
-                    case WeaponType.Rifle: return 2;
-                    case WeaponType.Shotgun: return 2;
-                    case WeaponType.Sniper: return 2;
+                    case TPSBR.EHitType.Pistol: return 1;
+                    case TPSBR.EHitType.Rifle: return 2;
+                    case EHitType.Shotgun: return 2;
+                    case EHitType.Sniper: return 2;
 
                     default:
                         Debug.Assert(false, "Invalid gun type!");
@@ -4809,14 +4567,11 @@ namespace CoverShooter
 
             if (gun != null)
             {
-                gun.Character = this;
-
+                gun.Owner = this.agent;
                 var vector = _aimTarget - transform.position;
                 vector.y = 0;
                 vector.Normalize();
 
-                gun.AddErrorThisFrame(MovementError);
-                gun.SetBaseErrorMultiplierThisFrame(IsZooming ? ZoomErrorMultiplier : 1);
                 gun.Allow(IsGunReady && !_isFalling && (!_cover.In || _coverAim.Step == AimStep.Aiming) && Vector3.Dot(vector, transform.forward) > 0.5f &&
 #if _IK
                     _ik.IsAimingArms
@@ -4858,7 +4613,7 @@ namespace CoverShooter
                     var canFire = !_isWeaponBlocked && !_isPumping && _postPumpDelay < float.Epsilon;
                     var gun = EquippedWeapon.Gun;
 
-                    if (gun == null || gun.LoadedBulletsLeft == 0)
+                    if (gun == null || gun.CanFire(true) == false)
                         canFire = false;
 
                     if (canFire)
@@ -5665,7 +5420,7 @@ namespace CoverShooter
 
                 switch (type)
                 {
-                    case WeaponType.Pistol:
+                    case EHitType.Pistol:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -5678,7 +5433,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Rifle:
+                    case EHitType.Rifle:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -5691,7 +5446,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Shotgun:
+                    case EHitType.Shotgun:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -5704,7 +5459,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Sniper:
+                    case EHitType.Sniper:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
