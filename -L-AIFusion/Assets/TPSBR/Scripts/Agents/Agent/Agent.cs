@@ -265,7 +265,7 @@ namespace TPSBR
 			_character.OnLateRender();
 		}
         public KCC currentKCC => _character.CharacterController;
-        public override bool IsAlive
+        public bool IsAlive
         {
             get => _health.IsAlive;
             set 

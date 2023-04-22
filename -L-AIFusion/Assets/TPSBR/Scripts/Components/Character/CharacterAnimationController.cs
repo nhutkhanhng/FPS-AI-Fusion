@@ -9,9 +9,10 @@ namespace TPSBR
 	[OrderAfter(typeof(KCC))]
 	public sealed class CharacterAnimationController : AnimationController
 	{
-		// PRIVATE MEMBERS
+        public new bool HasInputAuthority => _hasInputAuthority && _isAI == false;
+        // PRIVATE MEMBERS
 
-		[SerializeField]
+        [SerializeField]
 		private Transform       _leftHand;
 		[SerializeField]
 		private Transform       _leftLowerArm;
@@ -20,6 +21,7 @@ namespace TPSBR
 		[SerializeField][Range(0.0f, 1.0f)]
 		private float           _aimSnapPower = 0.5f;
 
+        [SerializeField] bool _isAI = false;
 		private KCC             _kcc;
 		private Agent           _agent;
 		private Weapons         _weapons;
@@ -230,7 +232,7 @@ namespace TPSBR
 				return;
 
 			Transform weaponHandle = _weapons.WeaponHandle;
-			if (HasInputAuthority == true)
+			if (HasInputAuthority == true )
 			{
 				weaponHandle.localRotation = _weapons.WeaponBaseRotation;
 

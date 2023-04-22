@@ -1075,7 +1075,7 @@ namespace CoverShooter
         /// Controls wheter the character is in a state of death. Dead characters have no collisions and ignore any input.
         /// </summary>
         [Tooltip("Controls wheter the character is in a state of death.")]
-        public override bool IsAlive { get => this.agent.IsAlive; set => this.agent.IsAlive = value; }
+        public bool IsAlive { get => this.agent.IsAlive; set => this.agent.IsAlive = value; }
 
         /// <summary>
         /// Speed multiplier for the movement speed. Adjusts animations.
@@ -1212,31 +1212,31 @@ namespace CoverShooter
         /// Settings for cover behaviour.
         /// </summary>
         [Tooltip("Settings for cover behaviour.")]
-        public CoverSettings CoverSettings = CoverSettings.Default();
+        [HideInInspector] public CoverSettings CoverSettings = CoverSettings.Default();
 
         /// <summary>
         /// Settings for climbing.
         /// </summary>
         [Tooltip("Settings for climbing.")]
-        public ClimbSettings ClimbSettings = ClimbSettings.Default();
+        [HideInInspector] public ClimbSettings ClimbSettings = ClimbSettings.Default();
 
         /// <summary>
         /// Settings for climbing.
         /// </summary>
         [Tooltip("Settings for climbing.")]
-        public VaultSettings VaultSettings = VaultSettings.Default();
+        [HideInInspector] public VaultSettings VaultSettings = VaultSettings.Default();
 
         /// <summary>
         /// Settings for jumping.
         /// </summary>
         [Tooltip("Settings for jumping.")]
-        public JumpSettings JumpSettings = JumpSettings.Default();
+        [HideInInspector] public JumpSettings JumpSettings = JumpSettings.Default();
 
         /// <summary>
         /// Settings for rolling.
         /// </summary>
         [Tooltip("Settings for rolling.")]
-        public RollSettings RollSettings = RollSettings.Default();
+        [HideInInspector] public RollSettings RollSettings = RollSettings.Default();
 
         /// <summary>
         /// Settings for aiming.
@@ -1254,13 +1254,13 @@ namespace CoverShooter
         /// Settings for camera pivot positions based on shoulders.
         /// </summary>
         [Tooltip("Settings for camera pivot positions based on shoulders.")]
-        public ShoulderSettings ShoulderSettings = ShoulderSettings.Default();
+        [HideInInspector] public ShoulderSettings ShoulderSettings = ShoulderSettings.Default();
 
         /// <summary>
         /// Settings for hit response IK.
         /// </summary>
         [Tooltip("Settings for hit response IK.")]
-        public HitResponseSettings HitResponseSettings = HitResponseSettings.Default();
+        [HideInInspector] public HitResponseSettings HitResponseSettings = HitResponseSettings.Default();
 
 #endregion
 
@@ -1490,14 +1490,14 @@ namespace CoverShooter
 
         private bool _hasAimTarget;
         private float _bodyTurnSpeed = 10;
-        private Vector3 _bodyTarget;
+        [SerializeField] private Vector3 _bodyTarget;
         private Vector3 _aimTarget;
         private Vector3 _currentBodyTarget;
 
-        private float _horizontalAngle;
-        private float _verticalAngle;
-        private float _horizontalAngleDiff;
-        private bool _wouldTurnImmediately;
+        [SerializeField] private float _horizontalAngle;
+        [SerializeField] private float _verticalAngle;
+        [SerializeField] private float _horizontalAngleDiff;
+        [SerializeField] private bool _wouldTurnImmediately;
         private float _verticalMeleeAngle;
 
         private float _currentAnimatedAngle;
@@ -1713,13 +1713,26 @@ namespace CoverShooter
 
             return _climbSearch.FindClimbCoverInDirection(direction);
         }
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawCube(_bodyTarget, Vector3.one);
 
+            Gizmos.color = Color.black;
+            Gizmos.DrawCube(transform.position + Direction, Vector3.one);
+            Gizmos.color = Color.red;
+            Gizmos.DrawCube(transform.position + NextDirection, Vector3.one);
+        }
+#endif
         /// <summary>
         /// Sets the position for the character body to turn to.
-        /// </summary>
+        /// </summary> 
         public void SetBodyTarget(Vector3 target, float speed = 8f)
         {
             _bodyTarget = target;
+#if UNITY_EDITOR
+            Debug.DrawLine(transform.position, target, Color.yellow);
+#endif
 
             if (!_hasAimTarget)
             {
@@ -2635,6 +2648,66 @@ namespace CoverShooter
         }
 
         [SerializeField] protected Vector3 test;
+
+
+        [SerializeField] protected Vector3 Direction;
+        [SerializeField] protected Vector3 NextDirection;
+        [SerializeField] protected Vector2 AngleDirection;
+
+        [SerializeField] bool isMove = false, isRotate = false;
+        public Vector2 CalculatePitchAndYaw(Transform currentTransform, Vector3 targetPosition, float rotationSpeed)
+        {
+            // Calculate the direction from the object's position to the target position
+            Vector3 direction = targetPosition - VirtualHead;
+
+            // Calculate the pitch and yaw angles using trigonometry
+            float pitch = Mathf.Asin(direction.y / direction.magnitude) * Mathf.Rad2Deg;
+            float yaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+
+            // Calculate the starting and ending rotations
+            Quaternion startRotation = kcc.Data.LookRotation;
+            Quaternion endRotation = Quaternion.Euler(pitch, yaw, 0f);
+            var r = Quaternion.Slerp(startRotation, endRotation, rotationSpeed);
+            // Interpolate between the starting and ending rotations over the specified duration
+
+            // KCCUtility.GetLookRotationAngles(r, out pitch, out yaw);
+            return new Vector2(pitch, yaw);
+        }
+
+        //public override void kRender()
+        //{
+        //    base.kRender();
+        //    var newPitchYaw = CalculatePitchAndYaw(transform, _bodyTarget, 5f);
+        //    kcc.SetLookRotation(newPitchYaw.x, newPitchYaw.y);
+        //}
+        public override void _FixedUpdateNetwork()
+        {
+            Vector3 direction = _bodyTarget - transform.position;
+            float pitch = Mathf.Asin(direction.normalized.y) * Mathf.Rad2Deg;
+            float yaw = Mathf.Atan2(direction.normalized.x, direction.normalized.z) * Mathf.Rad2Deg;
+            // AngleDirection = kcc.RenderData.GetLookRotation(true, true);
+            // Calculate the pitch (up and down rotation) and yaw (left and right rotation) angles using trigonometry
+
+            var newPitchYaw = CalculatePitchAndYaw(transform, _bodyTarget, 5f * Time.deltaTime);
+            var oldPitchYaw = kcc.Data.GetLookRotation(true, true);
+            float lpitch = Mathf.Lerp(AngleDirection.x, pitch, 10 * Time.deltaTime);
+            float lyaw = Mathf.Lerp(AngleDirection.y, yaw * Mathf.Rad2Deg, 10 * Time.deltaTime);
+
+            // if (isRotate)
+                kcc.SetLookRotation(newPitchYaw.x, newPitchYaw.y);
+            AngleDirection =   new Vector2(oldPitchYaw.x - newPitchYaw.x, newPitchYaw.y - oldPitchYaw.y);
+            //if (isRotate)
+            //    agent.SetRotationDeltaDirect(AngleDirection.x, AngleDirection.y);
+
+            Direction.y = 0;
+            Vector3 targetPositionLocal = Quaternion.Inverse(transform.rotation) * (Direction * 2);
+            var rotation = Quaternion.LookRotation(direction);
+            NextDirection = rotation * targetPositionLocal;
+
+            if (isMove)
+                agent.SetInputDirection(Direction + test);
+        }
+        
         /// <summary>
         /// Sets the character movement for the next update.
         /// </summary>
@@ -2670,7 +2743,9 @@ namespace CoverShooter
             movement.Direction.y = _temp.z;
             movement.Direction.z = 0;
 
-            agent.SetInputDirection(movement.Direction);
+            Direction = movement.Direction + test;
+
+            // agent.SetInputDirection(movement.Direction + test);
         }
 
         /// <summary>
@@ -2679,7 +2754,7 @@ namespace CoverShooter
         public void InputMoveForward(float strength = 1)
         {
             InputMovement(new CharacterMovement(Util.HorizontalVector(_horizontalAngle), 1));
-        }
+        }   
 
         /// <summary>
         /// Sets the character to move backwards during the next update.
@@ -3977,8 +4052,12 @@ namespace CoverShooter
         private void updateAngles()
         {
             var vector = _bodyTarget - VirtualHead;
-            _horizontalAngle = Util.HorizontalAngle(vector);
-            _verticalAngle = Util.VerticalAngle(vector);
+            return;
+
+            //_horizontalAngle = Util.HorizontalAngle(vector);
+            //_verticalAngle = Util.VerticalAngle(vector);
+            //var newPitchYaw = CalculatePitchAndYaw(transform, _bodyTarget, 5f);
+            //kcc.SetLookRotation(newPitchYaw.x, newPitchYaw.y);
         }
 
         private void loadBullet()
@@ -4317,7 +4396,7 @@ namespace CoverShooter
                 else
 #endif
                 {
-                    _horizontalAngleDiff = Mathf.DeltaAngle(transform.eulerAngles.y, _horizontalAngle);
+                    _horizontalAngleDiff = Mathf.DeltaAngle(kccData.GetLookRotation(true, true).y, _horizontalAngle);
                     turn(TurnSettings.StandingRotationSpeed);
                 }
             }
@@ -4583,13 +4662,54 @@ namespace CoverShooter
             // transform.Rotate(0, angleDiff, 0);
         }
 
+        [SerializeField] protected Vector2 pitchYawtest;
         private void turn(float speed)
         {
+            return;
+
             var angle = Util.Lerp(0, _horizontalAngleDiff, speed * 0.3f);
-            KCC kcc = agent.currentKCC;
-            kcc.AddLookRotation(0, angle);
+            Quaternion targetRotation = Quaternion.LookRotation(_bodyTarget - transform.position, transform.up);
+            Quaternion rotation = Quaternion.Lerp(transform.rotation,
+                targetRotation, 1f/ GetDeltaTime());
+            float rotationAngle = Mathf.Lerp(0f, Quaternion.Angle(transform.rotation, targetRotation), GetDeltaTime() / (1/3f));
+
+            // Calculate the current rotation based on the target rotation and current angle
+            Quaternion currentRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 1);
+
+            // Calculate direction vectors
+            Vector3 currentPosition = transform.position;
+            Vector3 direction1 = Vector3.Normalize(_bodyTarget - currentPosition);
+            Vector3 direction2 = Vector3.Normalize(transform.forward);
+
+
+            Vector3 direction = _bodyTarget - transform.position;
+
+            // Calculate the pitch (up and down rotation) and yaw (left and right rotation) angles using trigonometry
+            float pitch = Mathf.Lerp(AngleDirection.x, Mathf.Atan2(direction.y, direction.magnitude) * Mathf.Rad2Deg, 2 * GetDeltaTime());
+            float yaw = Mathf.Lerp(AngleDirection.y, Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg, 2 * GetDeltaTime());
+
+            var _r = Quaternion.Slerp(transform.rotation, targetRotation, 2 * Time.deltaTime);
+
+            AngleDirection.x = pitch;
+            AngleDirection.y = yaw;
+            // Calculate X angle
+            //AngleDirection.x = Mathf.Lerp(AngleDirection.x, Mathf.Atan2(direction1.x, direction1.z) * Mathf.Rad2Deg, 1f);
+
+            //// Calculate Y angle
+            //AngleDirection.y = Mathf.Lerp(AngleDirection.y, Mathf.Atan2(direction2.z, direction2.x) * Mathf.Rad2Deg, 1f);
+
+            // AngleDirection = (Vector2)(Vector3.Angle(transform.position, _bodyTarget));
+
+            if (angle.IsAlmostZero())
+            {
+                return;
+            }
+            //KCC kcc = agent.currentKCC;
+            //agent.SetRotationDeltaDirect(pitchYawtest.x, pitchYawtest.y + angle);
+            //Debug.LogError(angle);
             // transform.Rotate(0, angle, 0);
             _horizontalAngleDiff -= angle;
+
         }
 
         private void clearPotentialCovers()
@@ -5648,6 +5768,8 @@ namespace CoverShooter
 
         private void updateBodyAngleDiff()
         {
+            return;
+
             if (_isThrowing || _hasThrown)
                 _horizontalAngleDiff = deltaAngleToTurnTo(_throwBodyAngle);
             else if (_isIntendingToJump || _isJumping)

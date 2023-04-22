@@ -2964,7 +2964,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
+  Side: 1
   IsAggressive: 1
   _motor: {fileID: 840214416079072565}
   _health: {fileID: 0}
@@ -3094,6 +3094,7 @@ MonoBehaviour:
   _leftLowerArm: {fileID: 194249568104578805}
   _leftUpperArm: {fileID: 4468914121150112498}
   _aimSnapPower: 0.8
+  _isAI: 1
 --- !u!114 &3727285942377876180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3405,7 +3406,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   agent: {fileID: 5190406139856406184}
   Speed: 1
   CanRun: 1
@@ -3533,8 +3533,18 @@ MonoBehaviour:
   HitResponseSettings:
     Wait: 0.5
     Strength: 20
+  _bodyTarget: {x: 0, y: 0, z: 0}
+  _horizontalAngle: 0
+  _verticalAngle: 0
+  _horizontalAngleDiff: 0
+  _wouldTurnImmediately: 0
   test: {x: 0, y: 0, z: 0}
-  pitchYaw: {x: 0, y: 0}
+  Direction: {x: 0, y: 0, z: 0}
+  NextDirection: {x: 0, y: 0, z: 0}
+  AngleDirection: {x: 0, y: 0}
+  isMove: 1
+  isRotate: 1
+  pitchYawtest: {x: 0, y: 0}
 --- !u!114 &7442139576927040731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3573,7 +3583,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   _LeftSide:
     _value: 0
   _jumpPower: 4
@@ -3608,7 +3617,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   RollTriggerDistance: 2
   CircleDelay: 2
   ObstructionRadius: 1.5
@@ -3627,7 +3635,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   Distance: 300
   ObstacleIgnoreDistance: 1
   FieldOfView: 130
@@ -3646,7 +3653,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   VerifyHeight: 1
   FieldOfView: 180
   WalkDistance: 20
@@ -3665,7 +3671,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   _threat: {fileID: 0}
   AvoidDistance: 4
   AllySpacing: 1.2
@@ -3722,13 +3727,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3828643222564512411}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41236bb6df752ae4fb24ce7289485139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   Speed: 6
   SlowSpeed: 2
   MinScanDuration: 3.5
@@ -4506,7 +4510,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Side: 0
   Type: 0
   Name: Pistol
   Zoom: 0

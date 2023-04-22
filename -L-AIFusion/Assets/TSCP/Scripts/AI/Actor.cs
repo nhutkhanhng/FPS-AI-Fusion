@@ -13,6 +13,21 @@ namespace CoverShooter
     [OrderAfter(typeof(Agent))]
     public class Actor : mNetworkTransform, ICharacterHeightListener, ICharacterCoverListener, ICharacterHealthListener
     {
+        /// <summary>
+        /// Team number used by the AI.
+        /// </summary>
+        [Tooltip("Team number used by the AI.")]
+        public int Side = 0;
+
+        /// <summary>
+        /// Is the object alive.
+        /// </summary>
+        public virtual bool IsAlive
+        {
+            get { return _agent.IsAlive; }
+            set { _agent.IsAlive = value; }
+        }
+
         #region Properties
         /// <summary>
         /// Does the character have a weapon in their hands.

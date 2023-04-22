@@ -26,27 +26,27 @@ namespace Fusion.Animations
 		public float                       StateAlpha        => _stateAlpha;
 		public float                       DeltaTime         => _deltaTime;
 
-		// PRIVATE MEMBERS
+		// protected MEMBERS
 
 		[SerializeField]
-		private Transform                   _root;
+		protected Transform                   _root;
 		[SerializeField]
-		private Animator                    _animator;
+		protected Animator                    _animator;
 
-		private PlayableGraph               _graph;
-		private AnimationLayerMixerPlayable _mixer;
-		private AnimationPlayableOutput     _output;
-		private AnimationLayer[]            _layers;
-		private bool                        _isSpawned;
-		private bool                        _hasManualUpdate;
-		private bool                        _hasInputAuthority;
-		private bool                        _hasStateAuthority;
-		private bool                        _suppressEvaluation;
-		private int                         _evaluationFrame;
-		private int                         _evaluationRate;
-		private int                         _evaluationSeed;
-		private float                       _stateAlpha;
-		private float                       _deltaTime;
+		protected PlayableGraph               _graph;
+		protected AnimationLayerMixerPlayable _mixer;
+		protected AnimationPlayableOutput     _output;
+		protected AnimationLayer[]            _layers;
+		protected bool                        _isSpawned;
+		protected bool                        _hasManualUpdate;
+		protected bool                        _hasInputAuthority;
+		protected bool                        _hasStateAuthority;
+		protected bool                        _suppressEvaluation;
+		protected int                         _evaluationFrame;
+		protected int                         _evaluationRate;
+		protected int                         _evaluationSeed;
+		protected float                       _stateAlpha;
+		protected float                       _deltaTime;
 
 		// PUBLIC METHODS
 
@@ -322,9 +322,9 @@ namespace Fusion.Animations
 			DeinitializeLayers();
 		}
 
-		// PRIVATE METHODS
+		// protected METHODS
 
-		private void InitializeLayers()
+		protected void InitializeLayers()
 		{
 			if (_layers != null)
 				return;
@@ -353,7 +353,7 @@ namespace Fusion.Animations
 			}
 		}
 
-		private void DeinitializeLayers()
+		protected void DeinitializeLayers()
 		{
 			AnimationLayer[] layers = _layers;
 			for (int i = 0, count = layers != null ? layers.Length : 0; i < count; ++i)
@@ -368,7 +368,7 @@ namespace Fusion.Animations
 			_layers = null;
 		}
 
-		private void OnFixedUpdateInternal()
+		protected void OnFixedUpdateInternal()
 		{
 			if (Runner.Stage == default)
 				throw new InvalidOperationException();
@@ -402,7 +402,7 @@ namespace Fusion.Animations
 			}
 		}
 
-		private void OnRenderUpdateInternal()
+		protected void OnRenderUpdateInternal()
 		{
 			if (Runner.Stage != default)
 				throw new InvalidOperationException();
@@ -430,7 +430,7 @@ namespace Fusion.Animations
 			Evaluate(false);
 		}
 
-		private void Evaluate(bool checkEvaluationRate)
+		protected void Evaluate(bool checkEvaluationRate)
 		{
 			if (_suppressEvaluation == true)
 				return;
@@ -453,7 +453,7 @@ namespace Fusion.Animations
 			Profiler.EndSample();
 		}
 
-		private void SetDefaults()
+		protected void SetDefaults()
 		{
 			_hasManualUpdate    = default;
 			_hasInputAuthority  = default;
