@@ -117,53 +117,6 @@ namespace CoverShooter
         }
 
         /// <summary>
-        /// Equips a specific tool if possible. Prefers items without gun scripts.
-        /// </summary>
-        protected bool Equip(CharacterMotor motor, ToolType tool)
-        {
-            if (!isActiveAndEnabled)
-                return false;
-
-            if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
-            {
-                motor.Weapon = _inventory.Weapons[InventoryIndex];
-                motor.IsEquipped = true;
-                return true;
-            }
-
-            if (InventoryUsage == InventoryUsage.autoFind && _inventory != null)
-            {
-                for (int i = 0; i < _inventory.Weapons.Length; i++)
-                    if (!_inventory.Weapons[i].IsNull && _inventory.Weapons[i].Gun == null && _inventory.Weapons[i].ToolType == tool)
-                    {
-                        InventoryIndex = i;
-                        motor.Weapon = _inventory.Weapons[InventoryIndex];
-                        motor.IsEquipped = true;
-                        return true;
-                    }
-
-                for (int i = 0; i < _inventory.Weapons.Length; i++)
-                    if (!_inventory.Weapons[i].IsNull && _inventory.Weapons[i].ToolType == tool)
-                    {
-                        InventoryIndex = i;
-                        motor.Weapon = _inventory.Weapons[InventoryIndex];
-                        motor.IsEquipped = true;
-                        return true;
-                    }
-            }
-
-            if (motor.Weapon.IsNull)
-                return false;
-
-            if (motor.Weapon.ToolType != tool)
-                return false;
-
-            motor.IsEquipped = true;
-            return true;
-        }
-
-        /// <summary>
         /// Unequips the item if it is currently used.
         /// </summary>
         protected bool UnequipWeapon(CharacterMotor motor)
@@ -220,36 +173,7 @@ namespace CoverShooter
             return true;
         }
 
-        /// <summary>
-        /// Unequips the item if it is currently used.
-        /// </summary>
-        protected bool Unequip(CharacterMotor motor, ToolType tool)
-        {
-            if (!isActiveAndEnabled)
-                return false;
-
-            if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
-            {
-                if (_inventory.Weapons[InventoryIndex].IsTheSame(ref motor.Weapon))
-                {
-                    motor.IsEquipped = false;
-                    return true;
-                }
-                else
-                    return false;
-            }
-
-            if (motor.Weapon.IsNull)
-                return false;
-
-            if (motor.Weapon.ToolType != tool)
-                return false;
-
-            motor.IsEquipped = false;
-            return true;
-        }
-
+    
         /// <summary>
         /// Finds an item index of a weapon. Prefers the given type. Returns true if a weapon was found.
         /// </summary>
@@ -267,31 +191,6 @@ namespace CoverShooter
 
             for (int i = 0; i < _inventory.Weapons.Length; i++)
                 if (_inventory.Weapons[i].Gun != null)
-                {
-                    InventoryIndex = i;
-                    return true;
-                }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Finds an item index of a tool. Prefers items without gun scripts.
-        /// </summary>
-        private bool autoFind(CharacterMotor motor, ToolType tool)
-        {
-            if (_inventory == null)
-                return false;
-
-            for (int i = 0; i < _inventory.Weapons.Length; i++)
-                if (_inventory.Weapons[i].Gun == null && _inventory.Weapons[i].ToolType == tool)
-                {
-                    InventoryIndex = i;
-                    return true;
-                }
-
-            for (int i = 0; i < _inventory.Weapons.Length; i++)
-                if (_inventory.Weapons[i].ToolType == tool)
                 {
                     InventoryIndex = i;
                     return true;

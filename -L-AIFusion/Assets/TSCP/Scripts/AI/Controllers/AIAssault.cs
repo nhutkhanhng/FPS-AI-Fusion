@@ -265,8 +265,8 @@ namespace CoverShooter
                         var vector = _brain.Threat.transform.position - transform.position;
                         var distance = vector.magnitude;
 
-                        if (distance <= MaxMeleeDistance)
-                            _motor.InputCombo(_brain.Threat.transform.position);
+                        //if (distance <= MaxMeleeDistance)
+                        //    _motor.InputCombo(_brain.Threat.transform.position);
                     }
 
                     _postHitTime = PostHitFreezeDuration;
@@ -312,7 +312,7 @@ namespace CoverShooter
                                     else
                                     {
                                         _isGoingToHit = false;
-                                        _motor.InputMelee(_brain.Threat.transform.position);
+                                        //_motor.InputMelee(_brain.Threat.transform.position);
                                     }
                                 }
                             }
