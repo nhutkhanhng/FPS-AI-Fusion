@@ -799,7 +799,7 @@ namespace CoverShooter
                 if (weapon.IsNull)
                     return false;
 
-                return weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming;
+                return false;
             }
         }
 
@@ -1613,10 +1613,6 @@ namespace CoverShooter
         private bool _isPerformingMelee;
         private bool _useMeleeRootMotion;
         private bool _isWaitingForComboHit;
-        private bool _checkForCombo;
-        private Vector3 _meleeTarget;
-        private int _meleeScan;
-        private int _meleeMoment;
 
         private int _previousLeftFootDirection;
         private int _previousRightFootDirection;
@@ -1816,30 +1812,6 @@ namespace CoverShooter
             var gotHit = true;
             var weapon = EquippedWeapon;
 
-            if (hit.IsMelee && IsBlocking)
-            {
-                if (weapon.Shield != null && weapon.Shield.activeSelf)
-                {
-                    if (Vector3.Dot(transform.forward, hit.Normal) > 0)
-                    {
-                        weapon.Shield.SendMessage("OnHit", hit);
-                        gotHit = false;
-                        return;
-                    }
-                }
-
-                if (Vector3.Dot(transform.forward, hit.Normal) > 0)
-                {
-                    var type = Weapon.RightMelee == null ? Weapon.LeftMelee.Type : Weapon.RightMelee.Type;
-
-                    switch (type)
-                    {
-                        case WeaponType.Fist: gotHit = hit.Type == HitType.Machete; break;
-                        default: gotHit = false; break;
-                    }
-                }
-            }
-
             if (!gotHit)
             {
 #if USE_ANIMATOR
@@ -1871,26 +1843,7 @@ namespace CoverShooter
             }
             else
             {
-                if (_isPerformingMelee)
-                {
-                    _useMeleeRootMotion = false;
-#if USE_ANIMATOR
-                    _animator.SetTrigger("EndMelee");
-#endif
-                    {
-                        var melee = weapon.RightMelee;
-
-                        if (melee != null)
-                            melee.End();
-                    }
-
-                    {
-                        var melee = weapon.LeftMelee;
-
-                        if (melee != null)
-                            melee.End();
-                    }
-                }
+                
 #if USE_ANIMATOR
                 _animator.SetFloat("GetHitAngle", Mathf.DeltaAngle(transform.eulerAngles.y, Util.HorizontalAngle(hit.Normal)));
 #endif
@@ -2044,34 +1997,10 @@ namespace CoverShooter
         /// </summary>
         public void InputUseWeapon()
         {
+            return;
+
             if (!_isUsingWeapon)
                 return;
-
-            var weapon = EquippedWeapon;
-            _wasWeaponUsed = true;
-
-            if (weapon.Tool != null)
-                weapon.Tool.Use(this, _isUsingWeaponAlternate);
-
-            if (_isUsingWeaponAlternate)
-            {
-                for (int i = 0; i < _toolListeners.Length; i++)
-                    _toolListeners[i].OnToolUsed(true);
-
-                if (UsedToolAlternate != null) UsedToolAlternate.Invoke();
-            }
-            else
-            {
-                for (int i = 0; i < _toolListeners.Length; i++)
-                    _toolListeners[i].OnToolUsed(false);
-
-                if (UsedTool != null) UsedTool.Invoke();
-            }
-
-            if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.IsAlternateContinuous : weapon.Tool.IsContinuous)
-                _isUsingWeapon = _keepUsingWeapon;
-            else
-                _isUsingWeapon = false;
         }
 
         /// <summary>
@@ -2860,192 +2789,6 @@ namespace CoverShooter
             _keepUsingWeapon = true;
             _wasWeaponUsed = false;
         }
-
-        /// <summary>
-        /// Sets the character to use the weapon in melee and face in a certain direction.
-        /// </summary>
-        public void InputMelee()
-        {
-            InputMelee(transform.position + transform.forward * 1000);
-        }
-
-        /// <summary>
-        /// Sets the character to face in a certain direction during a melee.
-        /// </summary>
-        public void InputMeleeTarget(Vector3 target)
-        {
-            _meleeTarget = target;
-        }
-
-        /// <summary>
-        /// Sets the character to use the weapon in melee and face in a certain direction.
-        /// </summary>
-        public void InputMelee(Vector3 target)
-        {
-            var weapon = EquippedWeapon;
-
-            if (!weapon.HasMelee)
-                return;
-
-            _wantsToHit = true;
-            _meleeTarget = target;
-        }
-
-        /// <summary>
-        /// Make the character continue a melee attack with a combo, if possible.
-        /// </summary>
-        public void InputCombo(Vector3 target)
-        {
-            _meleeTarget = target;
-            _wantsToCombo = true;
-        }
-
-        /// <summary>
-        /// Tell the motor to scan for melee collisions.
-        /// </summary>
-        public void InputBeginMeleeScan(int id, Limb limb)
-        {
-            var weapon = EquippedWeapon;
-
-            if (_meleeScan != id)
-            {
-                _meleeScan = id;
-
-                var right = weapon.RightMelee;
-                var left = weapon.LeftMelee;
-
-                if (limb == Limb.RightHand && right != null)
-                {
-                    right.EndScan();
-                    right.BeginScan();
-                }
-                else if (limb == Limb.LeftHand && left != null)
-                {
-                    left.EndScan();
-                    left.BeginScan();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to stop scanning for melee collisions.
-        /// </summary>
-        public void InputEndMeleeScan(int id, Limb limb)
-        {
-            var weapon = EquippedWeapon;
-
-            if (_meleeScan == id)
-            {
-                _meleeScan = 0;
-
-                if (limb == Limb.RightHand && weapon.RightMelee != null)
-                    weapon.RightMelee.EndScan();
-                else if (limb == Limb.LeftHand && weapon.LeftMelee != null)
-                    weapon.LeftMelee.EndScan();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to play an effect during a melee attack.
-        /// </summary>
-        public void InputMeleeMoment(int id, Limb limb)
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            var weapon = EquippedWeapon;
-
-            if (_meleeId != id || _meleeMoment == id)
-                return;
-
-            if (limb == Limb.RightHand && weapon.RightMelee != null)
-            {
-                _meleeMoment = id;
-                weapon.RightMelee.Moment();
-            }
-            else if (limb == Limb.LeftHand && weapon.LeftMelee != null)
-            {
-                _meleeMoment = id;
-                weapon.LeftMelee.Moment();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to start the melee attack chain.
-        /// </summary>
-        public void InputMeleeAttackStart(int id)
-        {
-            if (_isPerformingMelee)
-                return;
-
-            var right = EquippedWeapon.RightMelee;
-            var left = EquippedWeapon.LeftMelee;
-
-            if (right != null || left != null)
-            {
-                _meleeId = id;
-                _useMeleeRootMotion = true;
-                _isPerformingMelee = true;
-
-                if (right != null) right.Begin();
-                if (left != null) left.Begin();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor that next attack in a combo sequence has started.
-        /// </summary>
-        public void InputMeleeComboStart(int id)
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            if (!_isWaitingForComboHit)
-                return;
-
-            _meleeId = id;
-            _isWaitingForComboHit = false;
-        }
-
-        /// <summary>
-        /// Tell the motor to stop the melee attack chain.
-        /// </summary>
-        public void InputMeleeAttackEnd()
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            _meleeScan = 0;
-            _meleeMoment = 0;
-            _isPerformingMelee = false;
-
-            var melee = EquippedWeapon.RightMelee;
-
-            if (melee != null)
-                melee.End();
-
-            melee = EquippedWeapon.LeftMelee;
-
-            if (melee != null)
-                melee.End();
-        }
-
-        /// <summary>
-        /// Check for the melee input to chain the combo.
-        /// </summary>
-        public void InputMeleeComboCheck()
-        {
-            _checkForCombo = true;
-        }
-
-        /// <summary>
-        /// No longer use the animator root motion during melee.
-        /// </summary>
-        public void StopMeleeRootMotion()
-        {
-            _useMeleeRootMotion = false;
-        }
-
         /// <summary>
         /// Sets the character state of firing for the next update.
         /// </summary>
@@ -3058,11 +2801,6 @@ namespace CoverShooter
 
             if (weapon.Gun == null)
             {
-                if (weapon.HasMelee)
-                    InputMelee();
-                else
-                    InputUseTool();
-
                 return;
             }
 
@@ -3083,11 +2821,6 @@ namespace CoverShooter
 
             if (weapon.Gun == null)
             {
-                if (weapon.HasMelee)
-                    InputMelee();
-                else
-                    InputUseTool();
-
                 return;
             }
 
@@ -3616,7 +3349,7 @@ namespace CoverShooter
             _wantsToMirror = false;
             _wantsToCrouchNearCovers = false;
             _stopAimingWhenEnteringCover = false;
-            _checkForCombo = false;
+
             _isAimingPrecisely = false;
             _needsTarget = false;
             _wantsToBlock = false;
@@ -4155,8 +3888,8 @@ namespace CoverShooter
 
             if (!_isUsingWeapon)
                 _coverAim.Leave();
-            else if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming)
-                _coverAim.CoverAim(_horizontalAngle);
+            //else if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming)
+            //    _coverAim.CoverAim(_horizontalAngle);
         }
 
         private void hideGrenade(ref GameObject instantiated, GameObject grenade)
@@ -4979,52 +4712,6 @@ namespace CoverShooter
             }
         }
 
-        private int meleeType
-        {
-            get
-            {
-                WeaponType type;
-
-                if (_weaponEquipState == WeaponEquipState.unequipped &&
-                    !_equippedWeapon.IsTheSame(ref Weapon))
-                {
-                    if (!IsEquipped)
-                        return 0;
-                    else if (Weapon.RightMelee != null)
-                        type = Weapon.RightMelee.Type;
-                    else if (Weapon.LeftMelee != null)
-                        type = Weapon.LeftMelee.Type;
-                    else
-                        return 0;
-                }
-                else
-                {
-                    var equipped = EquippedWeapon;
-
-                    if (equipped.RightMelee != null)
-                        type = equipped.RightMelee.Type;
-                    else if (equipped.LeftMelee != null)
-                        type = equipped.LeftMelee.Type;
-                    else
-                        return 0;
-                }
-
-                switch (type)
-                {
-                    case WeaponType.Pistol: return 1;
-                    case WeaponType.Rifle: return 2;
-                    case WeaponType.Shotgun: return 2;
-                    case WeaponType.Sniper: return 2;
-                    case WeaponType.Fist: return 3;
-                    case WeaponType.Machete: return 4;
-
-                    default:
-                        Debug.Assert(false, "Invalid melee type!");
-                        return 0;
-                }
-            }
-        }
-
         private void unmirror()
         {
 #if _IK
@@ -5138,24 +4825,6 @@ namespace CoverShooter
 #endif
                     );
             }
-
-            var melee = _equippedWeapon.RightMelee;
-
-            if (melee != null)
-                melee.Character = this;
-
-            melee = _equippedWeapon.LeftMelee;
-
-            if (melee != null)
-                melee.Character = this;
-
-            if (_isUsingWeapon && internalIsToolAnimation)
-            {
-                var tool = _equippedWeapon.Tool;
-
-                if (tool != null)
-                    tool.ContinuousUse(this, _isUsingWeaponAlternate);
-            }
         }
 
         private void updateAim()
@@ -5165,67 +4834,13 @@ namespace CoverShooter
             var wantsToAim = _wantsToAim;
             var weapon = EquippedWeapon;
 
-            if (!weapon.IsNull && weapon.Gun == null && weapon.Tool != null)
-                wantsToAim = _isUsingWeapon && (_isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming);
+            //if (!weapon.IsNull && weapon.Gun == null && weapon.Tool != null)
+            //    wantsToAim = _isUsingWeapon && (_isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming);
 
             if (!_isClimbing && wantsToAim && IsGunScopeReady)
                 _coverAim.IsZoomed = true;
             else
                 _coverAim.IsZoomed = false;
-        }
-
-        private void updateMelee()
-        {
-            if (_isClimbing)
-                return;
-
-            if (HasGrenadeInHand)
-                return;
-
-            if (_isGettingHit)
-                return;
-
-            var weapon = EquippedWeapon;
-
-            if (_isPerformingMelee)
-            {
-                if (_checkForCombo && (_wantsToCombo || _wantsToHit) && !_isWaitingForComboHit)
-                {
-                    _isWaitingForComboHit = true;
-                    _useMeleeRootMotion = true;
-
-#if USE_ANIMATOR
-                    _animator.SetInteger("MeleeType", meleeType);
-                    _animator.SetTrigger("ComboHit");
-                    _animator.ResetTrigger("Hit");
-#endif
-                }
-            }
-            else
-            {
-                if (_wantsToHit && IsMeleeReady)
-                {
-                    _isWaitingForComboHit = false;
-
-                    var right = weapon.RightMelee;
-                    var left = weapon.LeftMelee;
-                    var melee = right == null ? left : right;
-
-                    if (melee.Request())
-                    {
-                        _cover.Clear();
-                        _meleeScan = 0;
-                        _meleeMoment = 0;
-#if USE_ANIMATOR
-                        _animator.SetInteger("MeleeType", meleeType);
-                        _animator.SetTrigger("Hit");
-                        _animator.ResetTrigger("ComboHit");
-#endif
-                    }
-                }
-                else
-                    _isBlocking = _wantsToBlock;
-            }
         }
 
         private void updateFire()
@@ -5395,19 +5010,12 @@ namespace CoverShooter
 
             updateAim();
 
-            if (_isPerformingMelee)
-                updateMelee();
+            if (_isUsingWeapon)
+                updateUse();
             else
             {
-                if (_isUsingWeapon)
-                    updateUse();
-                else
-                {
-                    updateMelee();
-
-                    if (!_isPerformingMelee && !_isGettingHit)
-                        updateFire();
-                }
+                if (!_isPerformingMelee && !_isGettingHit)
+                    updateFire();
             }
 
             if (_isInProcess && !_process.CanMove)
@@ -6116,93 +5724,14 @@ namespace CoverShooter
                         break;
                 }
             }
-            else if (hasMelee)
-            {
-                WeaponType type;
-
-                if (equipped.RightMelee != null)
-                    type = equipped.RightMelee.Type;
-                else
-                    type = equipped.LeftMelee.Type;
-
-                switch (type)
-                {
-                    case WeaponType.Pistol:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 1;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Rifle:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Shotgun:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 2;
-                        }
-                        break;
-
-                    case WeaponType.Sniper:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Fist:
-                        body = 4;
-                        variant = 0;
-                        break;
-
-                    case WeaponType.Machete:
-                        body = 5;
-                        variant = 0;
-                        break;
-
-                    default:
-                        body = 0;
-                        variant = 0;
-                        Debug.Assert(false, "Invalid melee type!");
-                        break;
-                }
-            }
             else
             {
                 body = 0;
                 variant = 0;
             }
 
-            tool = (int)equipped.ToolType;
+            tool = 0;
+            //tool = (int)equipped.ToolType;
 
             if (HasGrenadeInHand)
             {
