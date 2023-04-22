@@ -960,47 +960,6 @@ namespace CoverShooter
         }
 
         /// <summary>
-        /// Grenade that would be potentially displayed in a hand if thrown.
-        /// </summary>
-        public Grenade PotentialGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (IsThrowingLeft)
-                    obj = Grenade.Left;
-                else
-                    obj = Grenade.Right;
-
-                if (obj != null)
-                    return obj.GetComponent<Grenade>();
-                else
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// Returns currently displayed grenade object in a hand.
-        /// </summary>
-        public Grenade CurrentGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (_rightGrenade != null && _rightGrenade.activeSelf)
-                    obj = _rightGrenade;
-                else if (_leftGrenade != null && _leftGrenade.activeSelf)
-                    obj = _leftGrenade;
-                else
-                    return null;
-
-                return obj.GetComponent<Grenade>();
-            }
-        }
-
-        /// <summary>
         /// Returns true if in current situation grenades would be thrown with the left hand.
         /// </summary>
         public bool IsThrowingLeft
@@ -2410,29 +2369,7 @@ namespace CoverShooter
         /// </summary>
         public void InputThrowGrenade(Vector3 target, GameObject grenadeOverride = null)
         {
-            Grenade potentialGrenade;
-
-            if (grenadeOverride != null)
-                potentialGrenade = grenadeOverride.GetComponent<Grenade>();
-            else
-                potentialGrenade = PotentialGrenade;
-
-            if (potentialGrenade == null)
-                return;
-
-            GrenadeDescription desc;
-            desc.Gravity = Grenade.Gravity;
-            desc.Duration = potentialGrenade.Timer;
-            desc.Bounciness = potentialGrenade.Bounciness;
-
-            var length = GrenadePath.Calculate(GrenadePath.Origin(this, Util.HorizontalAngle(target - transform.position)),
-                                               target,
-                                               Grenade.MaxVelocity,
-                                               desc,
-                                               _grenadePath,
-                                               Grenade.Step);
-
-            InputThrowGrenade(_grenadePath, length, Grenade.Step, grenadeOverride);
+       
         }
 
         /// <summary>
@@ -3961,25 +3898,6 @@ namespace CoverShooter
         {
             if (grenade == null)
                 return;
-
-            grenade.transform.SetParent(null, true);
-
-            var body = grenade.GetComponent<Rigidbody>();
-
-            if (body != null)
-            {
-                body.isKinematic = false;
-
-                if (useRigidBody)
-                    body.velocity += (Util.HorizontalVector(_throwBodyAngle) + Vector3.up).normalized * Grenade.MaxVelocity;
-            }
-
-            var component = grenade.GetComponent<Grenade>();
-            if (component != null)
-            {
-                component.Activate(_actor);
-                component.Fly(_throwOrigin, _throwVelocity, Grenade.Gravity);
-            }
         }
 
         private GameObject cloneGrenade(GameObject grenade, GameObject location)

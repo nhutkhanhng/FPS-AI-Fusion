@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TPSBR;
 using UnityEngine;
 
 namespace CoverShooter
@@ -748,19 +749,19 @@ namespace CoverShooter
                             isOk = true;
                         else
                         {
-                            var shield = BulletShield.Get(hit.collider.gameObject);
+                            //var shield = BulletShield.Get(hit.collider.gameObject);
 
-                            if (shield != null)
-                            {
-                                if (Vector3.Dot(shield.transform.forward, hit.normal) >= -0.2f)
-                                {
-                                    isOk = true;
-                                    isShield = true;
-                                }
-                                else
-                                    isOk = false;
-                            }
-                            else
+                            //if (shield != null)
+                            //{
+                            //    if (Vector3.Dot(shield.transform.forward, hit.normal) >= -0.2f)
+                            //    {
+                            //        isOk = true;
+                            //        isShield = true;
+                            //    }
+                            //    else
+                            //        isOk = false;
+                            //}
+                            //else
                                 isOk = false;
                         }
                     }
@@ -988,17 +989,17 @@ namespace CoverShooter
 
                 var damage = Damage * (Character != null ? Character.DamageMultiplier : 1);
 
-                HitType type;
+                EHitType type;
 
                 switch (Type)
                 {
-                    case WeaponType.Pistol: type = HitType.Pistol; break;
-                    case WeaponType.Rifle: type = HitType.Rifle; break;
-                    case WeaponType.Shotgun: type = HitType.Shotgun; break;
-                    case WeaponType.Sniper: type = HitType.Sniper; break;
+                    case WeaponType.Pistol: type = EHitType.Pistol; break;
+                    case WeaponType.Rifle: type = EHitType.Rifle; break;
+                    case WeaponType.Shotgun: type = EHitType.Shotgun; break;
+                    case WeaponType.Sniper: type = EHitType.Sniper; break;
 
                     default:
-                        type = HitType.Pistol;
+                        type = EHitType.Pistol;
                         Debug.Assert(false, "Invalid gun type");
                         break;
                 }
