@@ -407,7 +407,7 @@ namespace CoverShooter
         /// </summary>
         public bool IsScoping
         {
-            get { return IsAimingGun && (_wantsToScope || _wantedToScope) && EquippedWeapon.Gun != null && EquippedWeapon.Gun.Scope != null; }
+            get { return IsAimingGun && (_wantsToScope || _wantedToScope) && EquippedWeapon.Gun != null; }
         }
 
         /// <summary>
@@ -746,22 +746,7 @@ namespace CoverShooter
             }
         }
 
-        /// <summary>
-        /// Position of the currently held gun where bullets would appear. 
-        /// </summary>
-        public Vector3 GunOrigin
-        {
-            get { return EquippedWeapon.Gun == null ? transform.position : EquippedWeapon.Gun.Origin; }
-        }
-
-        /// <summary>
-        /// Direction of the gun affected by recoil.
-        /// </summary>
-        public Vector3 GunDirection
-        {
-            get { return EquippedWeapon.Gun == null ? transform.forward : EquippedWeapon.Gun.Direction; }
-        }
-
+        
         /// <summary>
         /// Position of the top of the capsule.
         /// </summary>
@@ -799,7 +784,7 @@ namespace CoverShooter
                 if (weapon.IsNull)
                     return false;
 
-                return weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming;
+                return false;
             }
         }
 
@@ -959,50 +944,7 @@ namespace CoverShooter
             get { return _isThrowing || _hasThrown; }
         }
 
-        /// <summary>
-        /// Grenade that would be potentially displayed in a hand if thrown.
-        /// </summary>
-        public Grenade PotentialGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (IsThrowingLeft)
-                    obj = Grenade.Left;
-                else
-                    obj = Grenade.Right;
-
-                if (obj != null)
-                    return obj.GetComponent<Grenade>();
-                else
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// Returns currently displayed grenade object in a hand.
-        /// </summary>
-        public Grenade CurrentGrenade
-        {
-            get
-            {
-                GameObject obj = null;
-
-                if (_rightGrenade != null && _rightGrenade.activeSelf)
-                    obj = _rightGrenade;
-                else if (_leftGrenade != null && _leftGrenade.activeSelf)
-                    obj = _leftGrenade;
-                else
-                    return null;
-
-                return obj.GetComponent<Grenade>();
-            }
-        }
-
-        /// <summary>
-        /// Returns true if in current situation grenades would be thrown with the left hand.
-        /// </summary>
+    
         public bool IsThrowingLeft
         {
             get
@@ -1489,8 +1431,8 @@ namespace CoverShooter
         private bool _hasAimTarget;
         private float _bodyTurnSpeed = 10;
         [SerializeField] private Vector3 _bodyTarget;
-        private Vector3 _aimTarget;
-        private Vector3 _currentBodyTarget;
+        [SerializeField] private Vector3 _aimTarget;
+        [SerializeField] private Vector3 _currentBodyTarget;
 
         [SerializeField] private float _horizontalAngle;
         [SerializeField] private float _verticalAngle;
@@ -1613,10 +1555,6 @@ namespace CoverShooter
         private bool _isPerformingMelee;
         private bool _useMeleeRootMotion;
         private bool _isWaitingForComboHit;
-        private bool _checkForCombo;
-        private Vector3 _meleeTarget;
-        private int _meleeScan;
-        private int _meleeMoment;
 
         private int _previousLeftFootDirection;
         private int _previousRightFootDirection;
@@ -1816,30 +1754,6 @@ namespace CoverShooter
             var gotHit = true;
             var weapon = EquippedWeapon;
 
-            if (hit.IsMelee && IsBlocking)
-            {
-                if (weapon.Shield != null && weapon.Shield.activeSelf)
-                {
-                    if (Vector3.Dot(transform.forward, hit.Normal) > 0)
-                    {
-                        weapon.Shield.SendMessage("OnHit", hit);
-                        gotHit = false;
-                        return;
-                    }
-                }
-
-                if (Vector3.Dot(transform.forward, hit.Normal) > 0)
-                {
-                    var type = Weapon.RightMelee == null ? Weapon.LeftMelee.Type : Weapon.RightMelee.Type;
-
-                    switch (type)
-                    {
-                        case WeaponType.Fist: gotHit = hit.Type == HitType.Machete; break;
-                        default: gotHit = false; break;
-                    }
-                }
-            }
-
             if (!gotHit)
             {
 #if USE_ANIMATOR
@@ -1871,26 +1785,7 @@ namespace CoverShooter
             }
             else
             {
-                if (_isPerformingMelee)
-                {
-                    _useMeleeRootMotion = false;
-#if USE_ANIMATOR
-                    _animator.SetTrigger("EndMelee");
-#endif
-                    {
-                        var melee = weapon.RightMelee;
-
-                        if (melee != null)
-                            melee.End();
-                    }
-
-                    {
-                        var melee = weapon.LeftMelee;
-
-                        if (melee != null)
-                            melee.End();
-                    }
-                }
+                
 #if USE_ANIMATOR
                 _animator.SetFloat("GetHitAngle", Mathf.DeltaAngle(transform.eulerAngles.y, Util.HorizontalAngle(hit.Normal)));
 #endif
@@ -2044,34 +1939,10 @@ namespace CoverShooter
         /// </summary>
         public void InputUseWeapon()
         {
+            return;
+
             if (!_isUsingWeapon)
                 return;
-
-            var weapon = EquippedWeapon;
-            _wasWeaponUsed = true;
-
-            if (weapon.Tool != null)
-                weapon.Tool.Use(this, _isUsingWeaponAlternate);
-
-            if (_isUsingWeaponAlternate)
-            {
-                for (int i = 0; i < _toolListeners.Length; i++)
-                    _toolListeners[i].OnToolUsed(true);
-
-                if (UsedToolAlternate != null) UsedToolAlternate.Invoke();
-            }
-            else
-            {
-                for (int i = 0; i < _toolListeners.Length; i++)
-                    _toolListeners[i].OnToolUsed(false);
-
-                if (UsedTool != null) UsedTool.Invoke();
-            }
-
-            if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.IsAlternateContinuous : weapon.Tool.IsContinuous)
-                _isUsingWeapon = _keepUsingWeapon;
-            else
-                _isUsingWeapon = false;
         }
 
         /// <summary>
@@ -2171,93 +2042,6 @@ namespace CoverShooter
         }
 
         /// <summary>
-        /// Catch the end of a bullet load animation.
-        /// </summary>
-        public void InputEndBulletLoad()
-        {
-            if (!_isLoadingBullet)
-                return;
-
-            _isLoadingBullet = false;
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            if (!gun.LoadBullet())
-                return;
-
-            if (BulletLoaded != null)
-                BulletLoaded.Invoke();
-
-            if (gun.IsFullyLoaded)
-            {
-                if (FullyLoaded != null)
-                    FullyLoaded.Invoke();
-
-                if (gun.PumpAfterFinalLoad)
-                    InputEndPump();
-            }
-            else if (gun.PumpAfterBulletLoad)
-                InputEndPump();
-            else
-                loadBullet();
-        }
-
-        /// <summary>
-        /// Catch the end of a magazine load animation or the load of a final bullet.
-        /// </summary>
-        public void InputEndMagazineLoad()
-        {
-            if (!_isLoadingMagazine)
-                return;
-
-            _isLoadingMagazine = false;
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            if (gun.LoadMagazine())
-                if (FullyLoaded != null)
-                    FullyLoaded.Invoke();
-
-            if (gun.PumpAfterFinalLoad)
-                InputEndPump();
-        }
-
-        /// <summary>
-        /// Catch the end of a weapon pump animation.
-        /// </summary>
-        public void InputEndPump()
-        {
-            if (!_isPumping)
-                return;
-
-            _postPumpDelay = 0.2f;
-            _isPumping = false;
-            if (Pumped != null) Pumped.Invoke();
-
-            var gun = EquippedWeapon.Gun;
-
-            if (gun == null)
-                return;
-
-            gun.NotifyPump();
-
-            if (!gun.IsFullyLoaded && !gun.ReloadWithMagazines && gun.PumpAfterBulletLoad)
-            {
-                _willReloadAfterPump = false;
-                loadBullet();
-            }
-            else if (_willReloadAfterPump)
-            {
-                _willReloadAfterPump = false;
-                InputReload();
-            }
-        }
-
-        /// <summary>
         /// Tell the motor to look up or down during a melee.
         /// </summary>
         public void InputVerticalMeleeAngle(float value)
@@ -2280,26 +2064,6 @@ namespace CoverShooter
                 _weaponChangeListeners[i].OnWeaponChange();
 
             if (WeaponChanged != null) WeaponChanged.Invoke();
-        }
-
-        /// <summary>
-        /// Catch the moment in the equip animation when the character has grabbed the weapon.
-        /// </summary>
-        public void InputGrabWeapon()
-        {
-            if (_weaponEquipState != WeaponEquipState.unequipped)
-                return;
-
-            _equippedWeapon = _equippingWeapon;
-            _weaponEquipState = WeaponEquipState.equipping;
-            _isUnequippedButGoingToGrab = false;
-
-            _weaponGrabTimer = 0.35f;
-
-            showEquippedWeapon(false);
-
-            if (_equippedWeapon.Gun != null)
-                _equippedWeapon.Gun.CancelFire();
         }
 
         /// <summary>
@@ -2475,78 +2239,6 @@ namespace CoverShooter
         {
             _isGrenadeTakenOut = false;
         }
-
-        /// <summary>
-        /// Inputs a command to throw a grenade to the given target location.
-        /// </summary>
-        public void InputThrowGrenade(Vector3 target, GameObject grenadeOverride = null)
-        {
-            Grenade potentialGrenade;
-
-            if (grenadeOverride != null)
-                potentialGrenade = grenadeOverride.GetComponent<Grenade>();
-            else
-                potentialGrenade = PotentialGrenade;
-
-            if (potentialGrenade == null)
-                return;
-
-            GrenadeDescription desc;
-            desc.Gravity = Grenade.Gravity;
-            desc.Duration = potentialGrenade.Timer;
-            desc.Bounciness = potentialGrenade.Bounciness;
-
-            var length = GrenadePath.Calculate(GrenadePath.Origin(this, Util.HorizontalAngle(target - transform.position)),
-                                               target,
-                                               Grenade.MaxVelocity,
-                                               desc,
-                                               _grenadePath,
-                                               Grenade.Step);
-
-            InputThrowGrenade(_grenadePath, length, Grenade.Step, grenadeOverride);
-        }
-
-        /// <summary>
-        /// Calculates flight parameters given a path and launches the grenade.
-        /// </summary>
-        public void InputThrowGrenade(Vector3[] predictedPath, int predictedPathLength, float step, GameObject grenadeOverride = null)
-        {
-            if (predictedPathLength < 2)
-                return;
-
-            InputThrowGrenade(predictedPath[0], (predictedPath[1] - predictedPath[0]) / step, predictedPath[predictedPathLength - 1], grenadeOverride);
-        }
-
-        /// <summary>
-        /// Tells the character to throw a grenade in the given path.
-        /// </summary>
-        public void InputThrowGrenade(Vector3 origin, Vector3 velocity, Vector3 target, GameObject grenadeOverride = null)
-        {
-            if (!_isThrowing)
-            {
-                _isGoingToThrowLeft = IsThrowingLeft;
-
-                _wouldTurnImmediately = true;
-                _isThrowing = true;
-                _hasThrown = false;
-                _isGrenadeTakenOut = false;
-                _throwOrigin = origin;
-                _throwVelocity = velocity;
-                _throwTarget = target;
-                _hasBeganThrowAnimation = false;
-
-                _throwAngle = Util.HorizontalAngle(velocity);
-
-                if (_cover.In && _cover.Main.IsFrontField(_throwAngle, 180))
-                    _throwBodyAngle = _cover.FaceAngle(_isCrouching);
-                else
-                    _throwBodyAngle = _throwAngle;
-
-                recreateGrenades(grenadeOverride);
-            }
-        }
-
-        /// <summary>
         /// Inputs a command to roll in a specific direction.
         /// </summary>
         public void InputRoll(float angle)
@@ -2860,192 +2552,6 @@ namespace CoverShooter
             _keepUsingWeapon = true;
             _wasWeaponUsed = false;
         }
-
-        /// <summary>
-        /// Sets the character to use the weapon in melee and face in a certain direction.
-        /// </summary>
-        public void InputMelee()
-        {
-            InputMelee(transform.position + transform.forward * 1000);
-        }
-
-        /// <summary>
-        /// Sets the character to face in a certain direction during a melee.
-        /// </summary>
-        public void InputMeleeTarget(Vector3 target)
-        {
-            _meleeTarget = target;
-        }
-
-        /// <summary>
-        /// Sets the character to use the weapon in melee and face in a certain direction.
-        /// </summary>
-        public void InputMelee(Vector3 target)
-        {
-            var weapon = EquippedWeapon;
-
-            if (!weapon.HasMelee)
-                return;
-
-            _wantsToHit = true;
-            _meleeTarget = target;
-        }
-
-        /// <summary>
-        /// Make the character continue a melee attack with a combo, if possible.
-        /// </summary>
-        public void InputCombo(Vector3 target)
-        {
-            _meleeTarget = target;
-            _wantsToCombo = true;
-        }
-
-        /// <summary>
-        /// Tell the motor to scan for melee collisions.
-        /// </summary>
-        public void InputBeginMeleeScan(int id, Limb limb)
-        {
-            var weapon = EquippedWeapon;
-
-            if (_meleeScan != id)
-            {
-                _meleeScan = id;
-
-                var right = weapon.RightMelee;
-                var left = weapon.LeftMelee;
-
-                if (limb == Limb.RightHand && right != null)
-                {
-                    right.EndScan();
-                    right.BeginScan();
-                }
-                else if (limb == Limb.LeftHand && left != null)
-                {
-                    left.EndScan();
-                    left.BeginScan();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to stop scanning for melee collisions.
-        /// </summary>
-        public void InputEndMeleeScan(int id, Limb limb)
-        {
-            var weapon = EquippedWeapon;
-
-            if (_meleeScan == id)
-            {
-                _meleeScan = 0;
-
-                if (limb == Limb.RightHand && weapon.RightMelee != null)
-                    weapon.RightMelee.EndScan();
-                else if (limb == Limb.LeftHand && weapon.LeftMelee != null)
-                    weapon.LeftMelee.EndScan();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to play an effect during a melee attack.
-        /// </summary>
-        public void InputMeleeMoment(int id, Limb limb)
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            var weapon = EquippedWeapon;
-
-            if (_meleeId != id || _meleeMoment == id)
-                return;
-
-            if (limb == Limb.RightHand && weapon.RightMelee != null)
-            {
-                _meleeMoment = id;
-                weapon.RightMelee.Moment();
-            }
-            else if (limb == Limb.LeftHand && weapon.LeftMelee != null)
-            {
-                _meleeMoment = id;
-                weapon.LeftMelee.Moment();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor to start the melee attack chain.
-        /// </summary>
-        public void InputMeleeAttackStart(int id)
-        {
-            if (_isPerformingMelee)
-                return;
-
-            var right = EquippedWeapon.RightMelee;
-            var left = EquippedWeapon.LeftMelee;
-
-            if (right != null || left != null)
-            {
-                _meleeId = id;
-                _useMeleeRootMotion = true;
-                _isPerformingMelee = true;
-
-                if (right != null) right.Begin();
-                if (left != null) left.Begin();
-            }
-        }
-
-        /// <summary>
-        /// Tell the motor that next attack in a combo sequence has started.
-        /// </summary>
-        public void InputMeleeComboStart(int id)
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            if (!_isWaitingForComboHit)
-                return;
-
-            _meleeId = id;
-            _isWaitingForComboHit = false;
-        }
-
-        /// <summary>
-        /// Tell the motor to stop the melee attack chain.
-        /// </summary>
-        public void InputMeleeAttackEnd()
-        {
-            if (!_isPerformingMelee)
-                return;
-
-            _meleeScan = 0;
-            _meleeMoment = 0;
-            _isPerformingMelee = false;
-
-            var melee = EquippedWeapon.RightMelee;
-
-            if (melee != null)
-                melee.End();
-
-            melee = EquippedWeapon.LeftMelee;
-
-            if (melee != null)
-                melee.End();
-        }
-
-        /// <summary>
-        /// Check for the melee input to chain the combo.
-        /// </summary>
-        public void InputMeleeComboCheck()
-        {
-            _checkForCombo = true;
-        }
-
-        /// <summary>
-        /// No longer use the animator root motion during melee.
-        /// </summary>
-        public void StopMeleeRootMotion()
-        {
-            _useMeleeRootMotion = false;
-        }
-
         /// <summary>
         /// Sets the character state of firing for the next update.
         /// </summary>
@@ -3058,11 +2564,6 @@ namespace CoverShooter
 
             if (weapon.Gun == null)
             {
-                if (weapon.HasMelee)
-                    InputMelee();
-                else
-                    InputUseTool();
-
                 return;
             }
 
@@ -3083,11 +2584,6 @@ namespace CoverShooter
 
             if (weapon.Gun == null)
             {
-                if (weapon.HasMelee)
-                    InputMelee();
-                else
-                    InputUseTool();
-
                 return;
             }
 
@@ -3115,7 +2611,7 @@ namespace CoverShooter
 
             _willPerformPump = false;
 
-            if (gun.ReloadWithMagazines || gun.Type == WeaponType.Pistol)
+            if (gun || gun.Type == TPSBR.EHitType.Pistol)
             {
                 _isLoadingMagazine = true;
 #if USE_ANIMATOR
@@ -3466,12 +2962,6 @@ namespace CoverShooter
                         break;
                     }
 
-                if (anyVisibility || _targetLayer == Layers.Scope)
-                    updateIK();
-
-                if (EquippedWeapon.Gun != null)
-                    EquippedWeapon.Gun.UpdateManually();
-
                 if (Mathf.Abs(_movementInput) > float.Epsilon)
                     _noMovementTimer = 0;
                 else if (_noMovementTimer < 1)
@@ -3616,7 +3106,7 @@ namespace CoverShooter
             _wantsToMirror = false;
             _wantsToCrouchNearCovers = false;
             _stopAimingWhenEnteringCover = false;
-            _checkForCombo = false;
+
             _isAimingPrecisely = false;
             _needsTarget = false;
             _wantsToBlock = false;
@@ -3673,33 +3163,34 @@ namespace CoverShooter
                         }
                     }
 
-                    if (IsInLowCover)
-                    {
-                        if (_isAimingThroughCoverPlane || (gun.HasRaycastSetup && Vector3.Dot(_cover.Main.Forward, gun.RaycastOrigin - _cover.Main.transform.position - _coverOffset) > 0))
-                        {
-                            if ((_verticalAngle < -5 && wasAimingThroughCoverPlane) || (_verticalAngle < -8 && gun != null && gun.HasRaycastSetup && (gun.RaycastOrigin.y < _cover.Main.Top + 0.1f)))
-                            {
-                                isAimingHigh = true;
-                                _isAimingThroughCoverPlane = true;
-                                _hasCoverPlaneAngle = false;
-                            }
-                            else if (_cover.Main.IsFrontField(_horizontalAngle, 190 + Mathf.Clamp(_verticalAngle * 2, 0, 70)))
-                            {
-                                _isAimingThroughCoverPlane = true;
+                    //if (IsInLowCover)
+                    //{
+                    //    if (_isAimingThroughCoverPlane 
+                    //        || (gun.HasRaycastSetup && Vector3.Dot(_cover.Main.Forward, gun.RaycastOrigin - _cover.Main.transform.position - _coverOffset) > 0))
+                    //    {
+                    //        if ((_verticalAngle < -5 && wasAimingThroughCoverPlane) || (_verticalAngle < -8 && gun != null && gun.HasRaycastSetup && (gun.RaycastOrigin.y < _cover.Main.Top + 0.1f)))
+                    //        {
+                    //            isAimingHigh = true;
+                    //            _isAimingThroughCoverPlane = true;
+                    //            _hasCoverPlaneAngle = false;
+                    //        }
+                    //        else if (_cover.Main.IsFrontField(_horizontalAngle, 190 + Mathf.Clamp(_verticalAngle * 2, 0, 70)))
+                    //        {
+                    //            _isAimingThroughCoverPlane = true;
 
-                                if (_backOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Entering)
-                                    isAimingLowInLowCover = _verticalAngle > 20;
-                                else
-                                    isAimingLowInLowCover = _verticalAngle > 25;
+                    //            if (_backOffset == CoverOffsetState.Using || _backOffset == CoverOffsetState.Entering)
+                    //                isAimingLowInLowCover = _verticalAngle > 20;
+                    //            else
+                    //                isAimingLowInLowCover = _verticalAngle > 25;
 
-                                if (!isAimingLowInLowCover)
-                                {
-                                    _hasCoverPlaneAngle = true;
-                                    _coverPlaneAngle = _horizontalAngle;
-                                }
-                            }
-                        }
-                    }
+                    //            if (!isAimingLowInLowCover)
+                    //            {
+                    //                _hasCoverPlaneAngle = true;
+                    //                _coverPlaneAngle = _horizontalAngle;
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
 
                 if (!_isAimingThroughCoverPlane)
@@ -4086,8 +3577,8 @@ namespace CoverShooter
             if (_equippedWeapon.LeftHolster != null && !_equippedWeapon.LeftHolster.activeSelf) _equippedWeapon.LeftHolster.SetActive(true);
             if (_equippedWeapon.Shield != null && _equippedWeapon.Shield.activeSelf) _equippedWeapon.Shield.SetActive(false);
 
-            if (_equippedWeapon.Gun != null)
-                _equippedWeapon.Gun.CancelFire();
+            //if (_equippedWeapon.Gun != null)
+            //    _equippedWeapon.Gun.CancelFire();
         }
 
         private void updateCapsule()
@@ -4155,8 +3646,8 @@ namespace CoverShooter
 
             if (!_isUsingWeapon)
                 _coverAim.Leave();
-            else if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming)
-                _coverAim.CoverAim(_horizontalAngle);
+            //else if (weapon.Tool != null && _isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming)
+            //    _coverAim.CoverAim(_horizontalAngle);
         }
 
         private void hideGrenade(ref GameObject instantiated, GameObject grenade)
@@ -4241,12 +3732,12 @@ namespace CoverShooter
                     body.velocity += (Util.HorizontalVector(_throwBodyAngle) + Vector3.up).normalized * Grenade.MaxVelocity;
             }
 
-            var component = grenade.GetComponent<Grenade>();
-            if (component != null)
-            {
-                component.Activate(_actor);
-                component.Fly(_throwOrigin, _throwVelocity, Grenade.Gravity);
-            }
+            //var component = grenade.GetComponent<Grenade>();
+            //if (component != null)
+            //{
+            //    component.Activate(_actor);
+            //    component.Fly(_throwOrigin, _throwVelocity, Grenade.Gravity);
+            //}
         }
 
         private GameObject cloneGrenade(GameObject grenade, GameObject location)
@@ -4719,7 +4210,7 @@ namespace CoverShooter
         {
             get
             {
-                return !IsReloading && !IsChangingWeapon && IsGunReady && EquippedWeapon.Gun.LoadedBulletsLeft > 0;
+                return !IsReloading && !IsChangingWeapon && IsGunReady && EquippedWeapon.Gun.CanFire(true);
             }
         }
 
@@ -4943,7 +4434,7 @@ namespace CoverShooter
         {
             get
             {
-                WeaponType type;
+                TPSBR.EHitType type;
 
                 if (_weaponEquipState == WeaponEquipState.unequipped &&
                     !_equippedWeapon.IsTheSame(ref Weapon))
@@ -4967,59 +4458,13 @@ namespace CoverShooter
 
                 switch (type)
                 {
-                    case WeaponType.Pistol: return 1;
-                    case WeaponType.Rifle: return 2;
-                    case WeaponType.Shotgun: return 2;
-                    case WeaponType.Sniper: return 2;
+                    case TPSBR.EHitType.Pistol: return 1;
+                    case TPSBR.EHitType.Rifle: return 2;
+                    case EHitType.Shotgun: return 2;
+                    case EHitType.Sniper: return 2;
 
                     default:
                         Debug.Assert(false, "Invalid gun type!");
-                        return 0;
-                }
-            }
-        }
-
-        private int meleeType
-        {
-            get
-            {
-                WeaponType type;
-
-                if (_weaponEquipState == WeaponEquipState.unequipped &&
-                    !_equippedWeapon.IsTheSame(ref Weapon))
-                {
-                    if (!IsEquipped)
-                        return 0;
-                    else if (Weapon.RightMelee != null)
-                        type = Weapon.RightMelee.Type;
-                    else if (Weapon.LeftMelee != null)
-                        type = Weapon.LeftMelee.Type;
-                    else
-                        return 0;
-                }
-                else
-                {
-                    var equipped = EquippedWeapon;
-
-                    if (equipped.RightMelee != null)
-                        type = equipped.RightMelee.Type;
-                    else if (equipped.LeftMelee != null)
-                        type = equipped.LeftMelee.Type;
-                    else
-                        return 0;
-                }
-
-                switch (type)
-                {
-                    case WeaponType.Pistol: return 1;
-                    case WeaponType.Rifle: return 2;
-                    case WeaponType.Shotgun: return 2;
-                    case WeaponType.Sniper: return 2;
-                    case WeaponType.Fist: return 3;
-                    case WeaponType.Machete: return 4;
-
-                    default:
-                        Debug.Assert(false, "Invalid melee type!");
                         return 0;
                 }
             }
@@ -5122,14 +4567,11 @@ namespace CoverShooter
 
             if (gun != null)
             {
-                gun.Character = this;
-
+                gun.Owner = this.agent;
                 var vector = _aimTarget - transform.position;
                 vector.y = 0;
                 vector.Normalize();
 
-                gun.AddErrorThisFrame(MovementError);
-                gun.SetBaseErrorMultiplierThisFrame(IsZooming ? ZoomErrorMultiplier : 1);
                 gun.Allow(IsGunReady && !_isFalling && (!_cover.In || _coverAim.Step == AimStep.Aiming) && Vector3.Dot(vector, transform.forward) > 0.5f &&
 #if _IK
                     _ik.IsAimingArms
@@ -5137,24 +4579,6 @@ namespace CoverShooter
                     true
 #endif
                     );
-            }
-
-            var melee = _equippedWeapon.RightMelee;
-
-            if (melee != null)
-                melee.Character = this;
-
-            melee = _equippedWeapon.LeftMelee;
-
-            if (melee != null)
-                melee.Character = this;
-
-            if (_isUsingWeapon && internalIsToolAnimation)
-            {
-                var tool = _equippedWeapon.Tool;
-
-                if (tool != null)
-                    tool.ContinuousUse(this, _isUsingWeaponAlternate);
             }
         }
 
@@ -5165,67 +4589,13 @@ namespace CoverShooter
             var wantsToAim = _wantsToAim;
             var weapon = EquippedWeapon;
 
-            if (!weapon.IsNull && weapon.Gun == null && weapon.Tool != null)
-                wantsToAim = _isUsingWeapon && (_isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming);
+            //if (!weapon.IsNull && weapon.Gun == null && weapon.Tool != null)
+            //    wantsToAim = _isUsingWeapon && (_isUsingWeaponAlternate ? weapon.Tool.HasAlternateAiming : weapon.Tool.HasAiming);
 
             if (!_isClimbing && wantsToAim && IsGunScopeReady)
                 _coverAim.IsZoomed = true;
             else
                 _coverAim.IsZoomed = false;
-        }
-
-        private void updateMelee()
-        {
-            if (_isClimbing)
-                return;
-
-            if (HasGrenadeInHand)
-                return;
-
-            if (_isGettingHit)
-                return;
-
-            var weapon = EquippedWeapon;
-
-            if (_isPerformingMelee)
-            {
-                if (_checkForCombo && (_wantsToCombo || _wantsToHit) && !_isWaitingForComboHit)
-                {
-                    _isWaitingForComboHit = true;
-                    _useMeleeRootMotion = true;
-
-#if USE_ANIMATOR
-                    _animator.SetInteger("MeleeType", meleeType);
-                    _animator.SetTrigger("ComboHit");
-                    _animator.ResetTrigger("Hit");
-#endif
-                }
-            }
-            else
-            {
-                if (_wantsToHit && IsMeleeReady)
-                {
-                    _isWaitingForComboHit = false;
-
-                    var right = weapon.RightMelee;
-                    var left = weapon.LeftMelee;
-                    var melee = right == null ? left : right;
-
-                    if (melee.Request())
-                    {
-                        _cover.Clear();
-                        _meleeScan = 0;
-                        _meleeMoment = 0;
-#if USE_ANIMATOR
-                        _animator.SetInteger("MeleeType", meleeType);
-                        _animator.SetTrigger("Hit");
-                        _animator.ResetTrigger("ComboHit");
-#endif
-                    }
-                }
-                else
-                    _isBlocking = _wantsToBlock;
-            }
         }
 
         private void updateFire()
@@ -5243,7 +4613,7 @@ namespace CoverShooter
                     var canFire = !_isWeaponBlocked && !_isPumping && _postPumpDelay < float.Epsilon;
                     var gun = EquippedWeapon.Gun;
 
-                    if (gun == null || gun.LoadedBulletsLeft == 0)
+                    if (gun == null || gun.CanFire(true) == false)
                         canFire = false;
 
                     if (canFire)
@@ -5395,19 +4765,12 @@ namespace CoverShooter
 
             updateAim();
 
-            if (_isPerformingMelee)
-                updateMelee();
+            if (_isUsingWeapon)
+                updateUse();
             else
             {
-                if (_isUsingWeapon)
-                    updateUse();
-                else
-                {
-                    updateMelee();
-
-                    if (!_isPerformingMelee && !_isGettingHit)
-                        updateFire();
-                }
+                if (!_isPerformingMelee && !_isGettingHit)
+                    updateFire();
             }
 
             if (_isInProcess && !_process.CanMove)
@@ -6057,7 +5420,7 @@ namespace CoverShooter
 
                 switch (type)
                 {
-                    case WeaponType.Pistol:
+                    case EHitType.Pistol:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -6070,7 +5433,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Rifle:
+                    case EHitType.Rifle:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -6083,7 +5446,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Shotgun:
+                    case EHitType.Shotgun:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -6096,7 +5459,7 @@ namespace CoverShooter
                         }
                         break;
 
-                    case WeaponType.Sniper:
+                    case EHitType.Sniper:
                         if (EquippedWeapon.Shield != null)
                         {
                             body = 3;
@@ -6116,93 +5479,14 @@ namespace CoverShooter
                         break;
                 }
             }
-            else if (hasMelee)
-            {
-                WeaponType type;
-
-                if (equipped.RightMelee != null)
-                    type = equipped.RightMelee.Type;
-                else
-                    type = equipped.LeftMelee.Type;
-
-                switch (type)
-                {
-                    case WeaponType.Pistol:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 1;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Rifle:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Shotgun:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 2;
-                        }
-                        break;
-
-                    case WeaponType.Sniper:
-                        if (EquippedWeapon.Shield != null)
-                        {
-                            body = 3;
-                            variant = 1;
-                        }
-                        else
-                        {
-                            body = 2;
-                            variant = 0;
-                        }
-                        break;
-
-                    case WeaponType.Fist:
-                        body = 4;
-                        variant = 0;
-                        break;
-
-                    case WeaponType.Machete:
-                        body = 5;
-                        variant = 0;
-                        break;
-
-                    default:
-                        body = 0;
-                        variant = 0;
-                        Debug.Assert(false, "Invalid melee type!");
-                        break;
-                }
-            }
             else
             {
                 body = 0;
                 variant = 0;
             }
 
-            tool = (int)equipped.ToolType;
+            tool = 0;
+            //tool = (int)equipped.ToolType;
 
             if (HasGrenadeInHand)
             {

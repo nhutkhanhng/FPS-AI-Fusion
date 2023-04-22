@@ -1,23 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using TPSBR;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace CoverShooter
 {
-    /// <summary>
-    /// Defines character animations used with a weapon.
-    /// </summary>
-    public enum WeaponType
-    {
-        Pistol,
-        Rifle,
-        Shotgun,
-        Sniper,
-        Fist,
-        Machete
-    }
-
     /// <summary>
     /// Weapon aiming setting.
     /// </summary>
@@ -80,26 +68,9 @@ namespace CoverShooter
         public GameObject LeftHolster;
 
         /// <summary>
-        /// Link to the flashlight attached to the weapon.
-        /// </summary>
-        public Flashlight Flashlight
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedFlashlight;
-                else
-                {
-                    cache();
-                    return _cachedFlashlight;
-                }
-            }
-        }
-
-        /// <summary>
         /// Shortcut for getting the gun component of the Item.
         /// </summary>
-        public BaseGun Gun
+        public ConvertWeapon Gun
         {
             get
             {
@@ -112,125 +83,10 @@ namespace CoverShooter
                 }
             }
         }
-
-        /// <summary>
-        /// Shortcut for getting the melee component of the Item.
-        /// </summary>
-        public BaseMelee RightMelee
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedRightMelee;
-                else
-                {
-                    cache();
-                    return _cachedRightMelee;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Shortcut for getting the melee component of the Item.
-        /// </summary>
-        public BaseMelee LeftMelee
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedLeftMelee;
-                else
-                {
-                    cache();
-                    return _cachedLeftMelee;
-                }
-            }
-        }
-
         /// <summary>
         /// Does the weapon have a melee component on either left or right hand.
         /// </summary>
-        public bool HasMelee
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedRightMelee != null || _cachedLeftMelee != null;
-                else
-                {
-                    cache();
-                    return _cachedRightMelee != null || _cachedLeftMelee != null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Shortcut for getting the Phone component of the Item.
-        /// </summary>
-        public Phone Phone
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedPhone;
-                else
-                {
-                    cache();
-                    return _cachedPhone;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Shortcut for getting the Radio component of the Item.
-        /// </summary>
-        public Radio Radio
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedRadio;
-                else
-                {
-                    cache();
-                    return _cachedRadio;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Logical type of the tool attached.
-        /// </summary>
-        public ToolType ToolType
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedToolType;
-                else
-                {
-                    cache();
-                    return _cachedToolType;
-                }
-            }
-        }
-
-        /// <summary>
-        /// First attached tool to the object.
-        /// </summary>
-        public Tool Tool
-        {
-            get
-            {
-                if (_cacheItem == RightItem)
-                    return _cachedTool;
-                else
-                {
-                    cache();
-                    return _cachedTool;
-                }
-            }
-        }
+        public bool HasMelee => false;
 
         /// <summary>
         /// Shortcut for getting a custom component attached to the item. The value is cached for efficiency.
@@ -297,16 +153,8 @@ namespace CoverShooter
         [Tooltip("Is the character always aiming while the weapon is equipped.")]
         public WeaponAiming Aiming;
 
-        private BaseGun _cachedGun;
-        private BaseMelee _cachedRightMelee;
-        private BaseMelee _cachedLeftMelee;
+        private ConvertWeapon _cachedGun;
         private MonoBehaviour _cachedComponent;
-
-        private Phone _cachedPhone;
-        private Radio _cachedRadio;
-        private Flashlight _cachedFlashlight;
-        private Tool _cachedTool;
-        private ToolType _cachedToolType;
 
         private GameObject _cacheItem;
 
@@ -314,26 +162,7 @@ namespace CoverShooter
         {
             _cacheItem = RightItem;
             _cachedComponent = null;
-            _cachedGun = RightItem == null ? null : RightItem.GetComponent<BaseGun>();
-            _cachedRightMelee = RightItem == null ? null : RightItem.GetComponent<BaseMelee>();
-            _cachedLeftMelee = LeftItem == null ? null : LeftItem.GetComponent<BaseMelee>();
-
-            _cachedTool = RightItem == null ? null : RightItem.GetComponent<Tool>();
-            _cachedPhone = RightItem == null ? null : RightItem.GetComponent<Phone>();
-            _cachedRadio = RightItem == null ? null : RightItem.GetComponent<Radio>();
-            _cachedFlashlight = RightItem == null ? null : RightItem.GetComponent<Flashlight>();
-
-            if (_cachedFlashlight == null && RightItem != null)
-                _cachedFlashlight = RightItem.GetComponentInChildren<Flashlight>();
-
-            if (_cachedPhone != null)
-                _cachedToolType = ToolType.phone;
-            else if (_cachedRadio != null)
-                _cachedToolType = ToolType.radio;
-            else if (_cachedFlashlight != null)
-                _cachedToolType = ToolType.flashlight;
-            else
-                _cachedToolType = ToolType.none;
+            _cachedGun = RightItem == null ? null : RightItem.GetComponent<ConvertWeapon>();
         }
 
         public bool IsTheSame(ref WeaponDescription other)
