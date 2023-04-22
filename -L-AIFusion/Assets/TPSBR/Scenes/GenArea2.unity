@@ -527,6 +527,10 @@ PrefabInstance:
       value: Gameplay
       objectReference: {fileID: 0}
     - target: {fileID: 8889212205540581364, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: PTemplate
+      value: 
+      objectReference: {fileID: 4057157150735386999, guid: 3e4cc8c6fe845fc4bace44ecc39dfdd3, type: 3}
+    - target: {fileID: 8889212205540581364, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
       propertyPath: enemyTemplate
       value: 
       objectReference: {fileID: 4057157150735386999, guid: 3e4cc8c6fe845fc4bace44ecc39dfdd3, type: 3}

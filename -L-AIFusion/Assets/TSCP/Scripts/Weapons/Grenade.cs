@@ -204,7 +204,7 @@ namespace CoverShooter
             if (_hasExploded || !_isActivated)
                 return;
 
-            ThirdPersonCamera.Shake(transform.position, ShakeIntensity, ShakeDuration);
+            //ThirdPersonCamera.Shake(transform.position, ShakeIntensity, ShakeDuration);
 
             _hasExploded = true;
 

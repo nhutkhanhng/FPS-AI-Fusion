@@ -1409,8 +1409,6 @@ namespace CoverShooter
         private Visibility[] _visibility;
         private Actor _actor;
 
-        private CharacterCamera _cameraToLateUpdate;
-
         // private CharacterIK _ik;
 
         private CoverState _cover;
@@ -2377,13 +2375,6 @@ namespace CoverShooter
             _stopAimingWhenEnteringCover = true;
         }
 
-        /// <summary>
-        /// Tells the motor to update the given camera after it's own LateUpdate finishes.
-        /// </summary>
-        public void AskForLateUpdate(CharacterCamera camera)
-        {
-            _cameraToLateUpdate = camera;
-        }
 
         /// <summary>
         /// Should the character crouch near covers in the next frame.
@@ -3640,12 +3631,6 @@ namespace CoverShooter
                     if (Died != null) Died.Invoke();
 
                 _wasAlive = isAlive;
-            }
-
-            if (_cameraToLateUpdate != null)
-            {
-                _cameraToLateUpdate.UpdateForCharacterMotor();
-                _cameraToLateUpdate = null;
             }
         }
 

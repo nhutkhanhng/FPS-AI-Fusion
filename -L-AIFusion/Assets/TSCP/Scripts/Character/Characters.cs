@@ -113,9 +113,9 @@ namespace CoverShooter
             var build = Build(motor);
             _dictionary[motor.gameObject] = build;
 
-            if (MainPlayer.Object == null)
-                if (motor.GetComponent<ThirdPersonController>() || motor.GetComponent<MobileController>())
-                    MainPlayer = build;
+            //if (MainPlayer.Object == null)
+            //    if (motor.GetComponent<ThirdPersonController>() || motor.GetComponent<MobileController>())
+            //        MainPlayer = build;
 
             var isContained = false;
 

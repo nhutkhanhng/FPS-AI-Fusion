@@ -564,7 +564,7 @@ namespace CoverShooter
                                 Character.InputPump(0.1f);
 
                             Character.InputRecoil(Recoil.Vertical, Recoil.Horizontal);
-                            ThirdPersonCamera.Shake(Character, Recoil.ShakeIntensity, Recoil.ShakeTime);
+                            //ThirdPersonCamera.Shake(Character, Recoil.ShakeIntensity, Recoil.ShakeTime);
                         }
                     }
                     else
