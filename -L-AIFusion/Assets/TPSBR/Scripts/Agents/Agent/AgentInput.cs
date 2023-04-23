@@ -42,6 +42,7 @@ namespace TPSBR
 		// We need to store last known input to compare current input against (to track actions activation/deactivation). It is also used if an input for current frame is lost.
 		// This is not needed on proxies, only input authority is registered to nameof(AgentInput) interest group.
 
+        [Networked]
         protected virtual GameplayInput _lastKnownInput { get => __lastKnow; set { __lastKnow = value; } }
 
         protected GameplayInput __lastKnow;

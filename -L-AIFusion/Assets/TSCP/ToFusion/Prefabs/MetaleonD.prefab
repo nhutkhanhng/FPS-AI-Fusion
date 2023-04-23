@@ -2834,7 +2834,6 @@ GameObject:
   - component: {fileID: 5134572285306411939}
   - component: {fileID: 8149446342677491575}
   - component: {fileID: 4371376507030965249}
-  - component: {fileID: 5801180166602187607}
   - component: {fileID: 840214416079072565}
   - component: {fileID: 7442139576927040731}
   - component: {fileID: 5190406139856406184}
@@ -2845,6 +2844,7 @@ GameObject:
   - component: {fileID: 4937224285930459434}
   - component: {fileID: 3552086965671037920}
   - component: {fileID: 5616777356204066332}
+  - component: {fileID: -1136506813467571162}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2919,6 +2919,7 @@ MonoBehaviour:
   - {fileID: 4937224285930459434}
   - {fileID: 3552086965671037920}
   - {fileID: 5616777356204066332}
+  - {fileID: -1136506813467571162}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
   - {fileID: 3696077712570884254}
@@ -3344,29 +3345,6 @@ MonoBehaviour:
   _fullThrustPitch: 1.5
   _idleThrustVolume: 0.5
   _fullThrustVolume: 1
---- !u!136 &5801180166602187607
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3828643222564512411}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.1
-  m_Height: 1.2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!114 &840214416079072565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3593,7 +3571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  Distance: 300
+  Distance: 15
   ObstacleIgnoreDistance: 1
   FieldOfView: 130
   UpdateDelay: 0.1
@@ -3745,6 +3723,25 @@ MonoBehaviour:
   _grenadesCycleDuration: 2
   _lookResponsivity: 0
   _logMissingInputs: 0
+--- !u!114 &-1136506813467571162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 508351e8d6c690d49806162dedc1c98a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  VerifyDistance: 30
+  VerifyHeight: 2
+  VerifyRadius: 1
+  FieldOfView: 180
+  CoverOffset: 2
+  CoverSearchDistance: 3
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0

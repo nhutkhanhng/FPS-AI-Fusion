@@ -14,8 +14,6 @@ namespace TPSBR
 
         public override void SetInputAttack()
         {
-            Debug.LogError("Attack");
-
             var input = this.AIInput.GetInput();
             AIInput.GetInput().Attack = true;
         }

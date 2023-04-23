@@ -29,9 +29,6 @@ namespace CoverShooter
         unequipping
     }
 
-
-    [RequireComponent(typeof(CapsuleCollider))]
-    [RequireComponent(typeof(Rigidbody))]
     public class CharacterMotor : mNetworkTransform
     {
         [SerializeField] Agent agent;
