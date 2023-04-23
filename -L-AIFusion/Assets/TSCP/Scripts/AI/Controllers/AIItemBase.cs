@@ -51,7 +51,7 @@ namespace CoverShooter
                 _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
                 _inventory.SwitchWeapon(InventoryIndex);
-                motor.IsEquipped = true;
+                
                 return true;
             }
 
@@ -61,7 +61,7 @@ namespace CoverShooter
                     {
                         InventoryIndex = i;
                         _inventory.SwitchWeapon(InventoryIndex);
-                        motor.IsEquipped = true;
+                        
                         return true;
                     }
 
@@ -71,7 +71,7 @@ namespace CoverShooter
             if (motor.Weapon.Gun == null)
                 return false;
 
-            motor.IsEquipped = true;
+            
             return true;
         }
 
@@ -87,7 +87,7 @@ namespace CoverShooter
                 _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
                 _inventory.SwitchWeapon(InventoryIndex);
-                motor.IsEquipped = true;
+                
                 return true;
             }
 
@@ -98,7 +98,7 @@ namespace CoverShooter
                     {
                         InventoryIndex = i;
                         _inventory.SwitchWeapon(InventoryIndex);
-                        motor.IsEquipped = true;
+                        
                         return true;
                     }
 
@@ -107,7 +107,7 @@ namespace CoverShooter
                     {
                         InventoryIndex = i;
                         _inventory.SwitchWeapon(InventoryIndex);
-                        motor.IsEquipped = true;
+                        
                         return true;
                     }
             }
@@ -118,7 +118,7 @@ namespace CoverShooter
             if (motor.Weapon.Gun == null)
                 return false;
 
-            motor.IsEquipped = true;
+            
             return true;
         }
 
@@ -135,7 +135,7 @@ namespace CoverShooter
             {
                 if (_inventory.AllWeapons[InventoryIndex].Equals(motor.Weapon))
                 {
-                    motor.IsEquipped = false;
+                    motor.Weapon.DisarmWeapon();
                     return true;
                 }
                 else
@@ -145,7 +145,7 @@ namespace CoverShooter
             if (motor.Weapon.Gun == null)
                 return false;
 
-            motor.IsEquipped = false;
+            
             return true;
         }
 
@@ -162,7 +162,7 @@ namespace CoverShooter
             {
                 if (_inventory.AllWeapons[InventoryIndex].Equals(motor.Weapon))
                 {
-                    motor.IsEquipped = false;
+                    
                     return true;
                 }
                 else
@@ -175,7 +175,7 @@ namespace CoverShooter
             if (motor.Weapon.Gun.Type != type)
                 return false;
 
-            motor.IsEquipped = false;
+            
             return true;
         }
 

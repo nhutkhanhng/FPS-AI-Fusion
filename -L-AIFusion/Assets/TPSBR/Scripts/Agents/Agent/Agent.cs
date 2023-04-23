@@ -280,6 +280,10 @@ namespace TPSBR
 
         }
 
+        public virtual void SetInputAttack()
+        {
+            
+        }
         public virtual void SetInputDirection(Vector3 direction)
         {
 
@@ -442,6 +446,7 @@ namespace TPSBR
 
 			if (hold == false)
 				return;
+
 			if (_weapons.CanFireWeapon(attack) == false)
 				return;
 

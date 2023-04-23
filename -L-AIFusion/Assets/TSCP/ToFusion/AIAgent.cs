@@ -35,7 +35,14 @@ namespace TPSBR
             _baseFixedInput = default;
             _baseRenderInput = default;
         }
+        public override void SetInputAttack()
+        {
+            _lastKnownInput.Attack = true;
+            _fixedInput.Attack = true;
+            // _baseFixedInput = _fixedInput;
 
+            Debug.LogError("Set Inout Attack:: " + _fixedInput.Attack);
+        }
         public override void SetRotationDeltaDirect(float pitch, float yaw)
         {
             _lastKnownInput.LookRotationDelta += new Vector2(pitch, yaw);
@@ -45,13 +52,13 @@ namespace TPSBR
         {
             _lastKnownInput.MoveDirection = direction;
             _fixedInput.MoveDirection = direction;
-
         }
         public override void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
         {
             CheckFixedAccess(true);
 
             _fixedInput = fixedInput;
+            Debug.LogError("SetFixedInput " + _fixedInput.Attack);
 
             if (updateBaseInputs == true)
             {
@@ -99,11 +106,54 @@ namespace TPSBR
                 return action.WasActivated(customInput, _baseRenderInput);
             }
         }
+        public void SetLastKnownInput(GameplayInput fixedInput, bool updateBaseInputs)
+        {
+            Debug.LogError(fixedInput.Attack);
 
+            _lastKnownInput = fixedInput;
+
+            if (updateBaseInputs == true)
+            {
+                _baseFixedInput = fixedInput;
+                _baseRenderInput = fixedInput;
+            }
+        }
         protected override GameplayInput GetFixedInput()
         {
             return _fixedInput;
         }
+
+        protected override void OnLateFixedUpdate()
+        {
+            if (_networkCulling.IsCulled == true)
+                return;
+
+            if (Object.IsProxy == false
+                && _health.IsAlive == true)
+            {
+
+                bool attackWasActivated = WasActivated(EGameplayInputAction.Attack);
+                bool reloadWasActivated = WasActivated(EGameplayInputAction.Reload);
+                bool interactWasActivated = WasActivated(EGameplayInputAction.Interact);
+                var fixedInputData = GetFixedInput();
+
+                Debug.LogError(
+                    "BaseAttack  " + attackWasActivated
+                     + "GetInputAttack  " + fixedInputData.Attack);
+                TryFire(attackWasActivated, fixedInputData.Attack);
+                TryReload(reloadWasActivated == false);
+                _weapons.TryInteract(interactWasActivated, fixedInputData.Interact);
+            }
+
+            _weapons.OnLateFixedUpdate();
+            _health.OnFixedUpdate();
+
+            if (Object.IsProxy == false)
+            {
+                SetLastKnownInput(GetFixedInput(), true);
+            }
+        }
+
         protected override void ProcessFixedInput()
         {
             KCC kcc = _character.CharacterController;
@@ -114,6 +164,8 @@ namespace TPSBR
             if (_health.IsAlive == true)
             {
                 input = GetFixedInput();
+                Debug.LogError("Reapply" + _fixedInput.Attack);
+
             }
 
             if (input.Aim == true)
@@ -158,11 +210,15 @@ namespace TPSBR
                 }
             }
 
-            if (input.Weapon > 0 && _character.AnimationController.CanSwitchWeapons(true) == true && _weapons.SwitchWeapon(input.Weapon - 1) == true)
+            if (input.Weapon > 0 && 
+                _character.AnimationController.CanSwitchWeapons(true) == true 
+                && _weapons.SwitchWeapon(input.Weapon - 1) == true)
             {
                 _character.AnimationController.SwitchWeapons();
             }
-            else if (input.Weapon <= 0 && _weapons.PendingWeaponSlot != _weapons.CurrentWeaponSlot && _character.AnimationController.CanSwitchWeapons(false) == true)
+            else if (input.Weapon <= 0 && 
+                _weapons.PendingWeaponSlot != _weapons.CurrentWeaponSlot 
+                && _character.AnimationController.CanSwitchWeapons(false) == true)
             {
                 _character.AnimationController.SwitchWeapons();
             }
@@ -332,6 +388,18 @@ namespace TPSBR
         /// </summary>
         void IBeforeTick.BeforeTick()
         {
+            if (Object.IsProxy == true || Context == null || Context.GameplayMode == null || Context.GameplayMode.State != GameplayMode.EState.Active)
+            {
+                _fixedInput = default;
+                _renderInput = default;
+                _cachedInput = default;
+                _lastKnownInput = default;
+                _baseFixedInput = default;
+                _baseRenderInput = default;
+
+                return;
+            }
+
             // Store last known fixed input. This will be compared agaisnt new fixed input.
             _baseFixedInput = _lastKnownInput;
 

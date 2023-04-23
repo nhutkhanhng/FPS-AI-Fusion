@@ -30,37 +30,37 @@ namespace TPSBR
 
 		public bool          IsCyclingGrenades => Time.time < _grenadesCyclingStartTime + _grenadesCycleDuration;
 
-		// PRIVATE MEMBERS
+		// protected MEMBERS
 
 		[SerializeField]
-		private float         _grenadesCycleDuration = 2f;
+		protected float         _grenadesCycleDuration = 2f;
 		[SerializeField][Range(0.0f, 0.1f)][Tooltip("Look rotation delta for a render frame is calculated as average from all frames within responsivity time.")]
-		private float         _lookResponsivity = 0.0f;
+		protected float         _lookResponsivity = 0.0f;
 		[SerializeField]
-		private bool          _logMissingInputs;
+		protected bool          _logMissingInputs;
 
 		// We need to store last known input to compare current input against (to track actions activation/deactivation). It is also used if an input for current frame is lost.
 		// This is not needed on proxies, only input authority is registered to nameof(AgentInput) interest group.
 		[Networked(nameof(AgentInput))]
-		private GameplayInput _lastKnownInput { get; set; }
+		protected GameplayInput _lastKnownInput { get; set; }
 
-		private Agent          _agent;
-		private NetworkCulling _networkCulling;
-		private GameplayInput  _fixedInput;
-		private GameplayInput  _renderInput;
-		private GameplayInput  _cachedInput;
-		private GameplayInput  _baseFixedInput;
-		private GameplayInput  _baseRenderInput;
-		private Vector2        _cachedMoveDirection;
-		private float          _cachedMoveDirectionSize;
-		private bool           _resetCachedInput;
-		private int            _missingInputsTotal;
-		private int            _missingInputsInRow;
-		private int            _logMissingInputFromTick;
-		private FrameRecord[]  _frameRecords = new FrameRecord[128];
+		protected Agent          _agent;
+		protected NetworkCulling _networkCulling;
+		protected GameplayInput  _fixedInput;
+		protected GameplayInput  _renderInput;
+		protected GameplayInput  _cachedInput;
+		protected GameplayInput  _baseFixedInput;
+		protected GameplayInput  _baseRenderInput;
+		protected Vector2        _cachedMoveDirection;
+		protected float          _cachedMoveDirectionSize;
+		protected bool           _resetCachedInput;
+		protected int            _missingInputsTotal;
+		protected int            _missingInputsInRow;
+		protected int            _logMissingInputFromTick;
+		protected FrameRecord[]  _frameRecords = new FrameRecord[128];
 
-		private float             _grenadesCyclingStartTime;
-		private UIMobileInputView _mobileInputView;
+		protected float             _grenadesCyclingStartTime;
+		protected UIMobileInputView _mobileInputView;
 
 		// PUBLIC METHODS
 
@@ -264,7 +264,7 @@ namespace TPSBR
 		/// <summary>
 		/// 1. Collect input from devices, can be executed multiple times between FixedUpdateNetwork() calls because of faster rendering speed.
 		/// </summary>
-		void IBeforeUpdate.BeforeUpdate()
+		public virtual void BeforeUpdate()
 		{
 			if (Object.HasInputAuthority == false)
 				return;
@@ -399,7 +399,7 @@ namespace TPSBR
 		/// <summary>
 		/// 3. Read input from Fusion. On input authority the FixedInput will match CachedInput.
 		/// </summary>
-		void IBeforeTick.BeforeTick()
+		public virtual void BeforeTick()
 		{
 			if (Object.IsProxy == true || Context == null || Context.GameplayMode == null || Context.GameplayMode.State != GameplayMode.EState.Active)
 			{
@@ -463,9 +463,9 @@ namespace TPSBR
 			_baseRenderInput = _fixedInput;
 		}
 
-		// PRIVATE METHODS
+		// protected METHODS
 
-		private void Awake()
+		protected void Awake()
 		{
 			_agent          = GetComponent<Agent>();
 			_networkCulling = GetComponent<NetworkCulling>();
@@ -474,7 +474,7 @@ namespace TPSBR
 		/// <summary>
 		/// 2. Push cached input and reset properties, can be executed multiple times within single Unity frame if the rendering speed is slower than Fusion simulation (or there is a performance spike).
 		/// </summary>
-		private void OnInput(NetworkRunner runner, NetworkInput networkInput)
+		protected virtual void OnInput(NetworkRunner runner, NetworkInput networkInput)
 		{
 			if (_agent.IsLocal == false || Context.HasInput == false)
 			{
@@ -504,7 +504,7 @@ namespace TPSBR
 			networkInput.Set(gameplayInput);
 		}
 
-		private byte GetWeaponInput(Keyboard keyboard)
+		protected virtual byte GetWeaponInput(Keyboard keyboard)
 		{
 			if (keyboard.qKey.wasPressedThisFrame == true)
 				return (byte)(_agent.Weapons.PreviousWeaponSlot + 1); // Fast switch
@@ -564,7 +564,7 @@ namespace TPSBR
 
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		[System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
-		private void CheckRenderAccess(bool checkStage)
+		protected void CheckRenderAccess(bool checkStage)
 		{
 			if (checkStage == true && Runner.Stage != default)
 			{

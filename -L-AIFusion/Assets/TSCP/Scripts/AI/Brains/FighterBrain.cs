@@ -2501,6 +2501,7 @@ namespace CoverShooter
                 _isInAggressiveMode = true;
 
             _hasCheckedIfTheLastKnownPositionIsNearCover = false;
+            Debug.LogError(State);
 
             SetThreat(isVisible, isHeard, isActual, threat, position, threatCover, time);
 

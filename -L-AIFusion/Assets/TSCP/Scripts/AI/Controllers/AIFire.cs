@@ -124,6 +124,8 @@ namespace CoverShooter
         /// </summary>
         public void ToOpenFire()
         {
+            Debug.LogError("ToOpenFire");
+
             ToArm();
             _isFiring = true;
             _isAiming = true;

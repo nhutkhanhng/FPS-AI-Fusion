@@ -6,6 +6,7 @@ namespace TPSBR
 {
     public abstract class ConvertWeapon : Weapon
     {
+        public bool HasMelee => this as MeleeWeapon;
         public bool PreventCovers => true;
         public bool PreventArmLowering => true;
         public bool PreventClimbing => true;

@@ -71,7 +71,7 @@ namespace TPSBR
 		private float _weaponDropTime;
 
 		[Networked(OnChanged = nameof(OnWeaponsChanged), OnChangedTargets = OnChangedTargets.All), Capacity(8)]
-		[SerializeField] private NetworkArray<ConvertWeapon> _weapons { get; }
+		private NetworkArray<ConvertWeapon> _weapons { get; }
 
         public NetworkArray<ConvertWeapon> AllWeapons => _weapons;
 
@@ -192,7 +192,9 @@ namespace TPSBR
 
 		public bool CanFireWeapon(bool keyDown)
 		{
-			return IsSwitchingWeapon() == false && CurrentWeapon != null && CurrentWeapon.CanFire(keyDown) == true;
+			return IsSwitchingWeapon() == false 
+                && CurrentWeapon != null 
+                && CurrentWeapon.CanFire(keyDown) == true;
 		}
 
 		public bool CanReloadWeapon(bool autoReload)
@@ -400,6 +402,7 @@ namespace TPSBR
 
 			var targetPoint = GetTargetPoint(false);
 
+            Debug.LogError("Fire");
 			CurrentWeapon.Fire(fireTransform.Position, targetPoint, _hitMask);
 
 			return true;
