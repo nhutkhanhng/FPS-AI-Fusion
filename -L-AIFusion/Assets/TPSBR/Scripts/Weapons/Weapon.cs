@@ -1,9 +1,110 @@
+using CoverShooter;
 using Fusion;
 using UnityEngine;
 
 namespace TPSBR
 {
-	public abstract class Weapon : ContextBehaviour, IDynamicPickupProvider
+    public abstract class ConvertWeapon : Weapon
+    {
+        public bool PreventCovers => true;
+        public bool PreventArmLowering => true;
+        public bool PreventClimbing => true;
+        public bool IsHeavy => false;
+        public ConvertWeapon Gun => this as FirearmWeapon;
+        public ConvertWeapon Shield => null;
+        public bool IsNull => false;
+        private bool _hasJustFired;
+        public bool HasJustFired
+        {
+            get { return _hasJustFired; }
+        }
+
+        private bool _isGoingToFire;
+        private bool _isFiringOnNextUpdate;
+        private bool _isAllowed;
+        private bool _wasAllowedAndFiring;
+        private bool _hasFireCondition;
+        private int _fireConditionSide;
+
+        public void TryFireNow()
+        {
+            _isFiringOnNextUpdate = true;
+        }
+
+        public void FireWhenReady()
+        {
+            _isGoingToFire = true;
+        }
+        public void SetFireCondition(int side)
+        {
+            _hasFireCondition = true;
+            _fireConditionSide = side;
+        }
+
+        /// <summary>
+        /// Sets the gun to fire in any condition.
+        /// </summary>
+        public void CancelFireCondition()
+        {
+            _hasFireCondition = false;
+        }
+
+        public void Allow(bool value)
+        {
+            _isAllowed = value;
+        }
+        public bool IsAllowed
+        {
+            get { return _isAllowed; }
+        }
+        public void CancelFire() { }
+        public TPSBR.EHitType Type => _hitType;
+        public bool CanLoad => CanReload(true) == true;
+        private IGunListener[] _listeners;
+        #region Notify methods
+
+        public void NotifyRechamber()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnRechamber();
+        }
+
+        public void NotifyEject()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnEject();
+        }
+
+        public void NotifyPumpStart()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnPumpStart();
+        }
+
+        public void NotifyPump()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnPump();
+        }
+
+        public void NotifyMagazineLoadStart()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnMagazineLoadStart();
+        }
+
+        public void NotifyBulletLoadStart()
+        {
+            for (int i = 0; i < _listeners.Length; i++)
+                _listeners[i].OnBulletLoadStart();
+        }
+
+        #endregion
+
+
+    }
+
+    public abstract class Weapon : ContextBehaviour, IDynamicPickupProvider
 	{
 		// PUBLIC MEMBERS
 
@@ -18,43 +119,43 @@ namespace TPSBR
 		public Sprite        Icon               => _icon;
 		public bool          ValidOnlyWithAmmo  => _validOnlyWithAmmo;
 
-		public bool          NeedsParentRefresh { get; private set; }
+		public bool          NeedsParentRefresh { get; protected set; }
 
 		[Networked(OnChanged = nameof(OnIsArmedChanged), OnChangedTargets = OnChangedTargets.Proxies | OnChangedTargets.InputAuthority), HideInInspector]
 		public bool          IsArmed           { get; set; }
 		[Networked, HideInInspector]
 		public Agent         Owner             { get; set; }
 
-		// PRIVATE MEMBERS
+		// protected MEMBERS
 
 		[SerializeField]
-		private string _weaponID;
+		protected string _weaponID;
 		[SerializeField]
-		private int _weaponSlot;
+		protected int _weaponSlot;
 		[SerializeField]
-		private bool _validOnlyWithAmmo;
+		protected bool _validOnlyWithAmmo;
 		[SerializeField]
-		private Transform _leftHandTarget;
+		protected Transform _leftHandTarget;
 		[SerializeField]
-		private EHitType _hitType;
+		protected EHitType _hitType;
 		[SerializeField]
-		private float _aimFOV;
+		protected float _aimFOV;
 
 		[Header("Pickup")]
 		[SerializeField]
-		private string _displayName;
+		protected string _displayName;
 		[SerializeField, Tooltip("Up to 4 letter name shown in thumbnail")]
-		private string _nameShortcut;
+		protected string _nameShortcut;
 		[SerializeField]
-		private Sprite _icon;
+		protected Sprite _icon;
 		[SerializeField]
-		private Collider _pickupCollider;
+		protected Collider _pickupCollider;
 		[SerializeField]
-		private Transform _pickupInterpolationTarget;
+		protected Transform _pickupInterpolationTarget;
 		[SerializeField]
-		private DynamicPickup _pickupPrefab;
+		protected DynamicPickup _pickupPrefab;
 
-		private AudioEffect[] _audioEffects;
+		protected AudioEffect[] _audioEffects;
 
 		// PUBLIC METHODS
 
@@ -177,5 +278,7 @@ namespace TPSBR
 
 			changed.Behaviour.NeedsParentRefresh = true;
 		}
+
+
 	}
 }

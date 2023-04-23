@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using Fusion;
+using TPSBR;
+using UnityEngine;
 
 namespace CoverShooter
 {
     [RequireComponent(typeof(CharacterMotor))]
-    public class CharacterInventory : MonoBehaviour
+    public class CharacterInventory : NetworkBehaviour
     {
         /// <summary>
         /// All the weapons belonging in the inventory.
@@ -11,21 +13,14 @@ namespace CoverShooter
         [Tooltip("All the weapons belonging in the inventory.")]
         public WeaponDescription[] Weapons;
 
-        private void Awake()
+        protected Weapons weapons;
+
+        public void OnSpawned()
         {
-            var motor = GetComponent<CharacterMotor>();
-
-            for (int i = 0; i < Weapons.Length; i++)
+            Weapons = new WeaponDescription[weapons.ALlInitWeapons.Length];
+            for(int i =0; i < Weapons.Length; i++)
             {
-                var weapon = Weapons[i];
-
-                if (weapon.RightItem != null && (!motor.IsEquipped || motor.Weapon.RightItem != weapon.RightItem)) weapon.RightItem.SetActive(false);
-                if (weapon.RightHolster != null && (!motor.IsEquipped || motor.Weapon.RightHolster != weapon.RightHolster)) weapon.RightHolster.SetActive(true);
-
-                if (weapon.LeftItem != null && (!motor.IsEquipped || motor.Weapon.LeftItem != weapon.LeftItem)) weapon.LeftItem.SetActive(false);
-                if (weapon.LeftHolster != null && (!motor.IsEquipped || motor.Weapon.LeftHolster != weapon.LeftHolster)) weapon.LeftHolster.SetActive(true);
-
-                if (weapon.Shield != null && (!motor.IsEquipped || motor.Weapon.Shield != weapon.Shield)) weapon.Shield.SetActive(false);
+                Weapons[i].RightItem = weapons.AllWeapons[i].gameObject;
             }
         }
     }

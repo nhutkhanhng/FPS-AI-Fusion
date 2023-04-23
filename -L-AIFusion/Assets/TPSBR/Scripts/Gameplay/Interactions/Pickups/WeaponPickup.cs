@@ -6,12 +6,12 @@ namespace TPSBR
 	{
 		// PUBLIC MEMBERS
 
-		public Weapon WeaponPrefab => _weaponPrefab;
+		public ConvertWeapon WeaponPrefab => _weaponPrefab;
 
 		// PRIVATE MEMBERS
 
 		[SerializeField]
-		private Weapon _weaponPrefab;
+		private ConvertWeapon _weaponPrefab;
 
 		// StaticPickup INTERFACE
 

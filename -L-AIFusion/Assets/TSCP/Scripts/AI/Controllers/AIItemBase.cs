@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TPSBR;
+using UnityEngine;
 
 namespace CoverShooter
 {
@@ -26,13 +27,18 @@ namespace CoverShooter
         [Tooltip("Weapon index inside the inventory to use when usage is set to 'index'.")]
         public int InventoryIndex = 0;
 
-        private CharacterInventory _inventory;
+        private Weapons _inventory;
 
         protected virtual void Awake()
         {
-            _inventory = GetComponent<CharacterInventory>();
+            _inventory = GetComponent<Weapons>();
         }
 
+        public override void Spawned()
+        {
+            base.Spawned();
+            TryGetBehaviour<Weapons>(out _inventory);
+        }
         /// <summary>
         /// Equips any weapon if possible.
         /// </summary>
@@ -42,19 +48,19 @@ namespace CoverShooter
                 return false;
 
             if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
+                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
-                motor.Weapon = _inventory.Weapons[InventoryIndex];
+                _inventory.SwitchWeapon(InventoryIndex);
                 motor.IsEquipped = true;
                 return true;
             }
 
             if (InventoryUsage == InventoryUsage.autoFind && _inventory != null)
-                for (int i = 0; i < _inventory.Weapons.Length; i++)
-                    if (_inventory.Weapons[i].Gun != null)
+                for (int i = 0; i < _inventory.AllWeapons.Length; i++)
+                    if (_inventory.AllWeapons[i] != null)
                     {
                         InventoryIndex = i;
-                        motor.Weapon = _inventory.Weapons[InventoryIndex];
+                        _inventory.SwitchWeapon(InventoryIndex);
                         motor.IsEquipped = true;
                         return true;
                     }
@@ -72,35 +78,35 @@ namespace CoverShooter
         /// <summary>
         /// Equips a weapon of specific kind if possible.
         /// </summary>
-        protected bool Equip(CharacterMotor motor, WeaponType type)
+        protected bool Equip(CharacterMotor motor, EHitType type)
         {
             if (!isActiveAndEnabled)
                 return false;
 
             if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
+                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
-                motor.Weapon = _inventory.Weapons[InventoryIndex];
+                _inventory.SwitchWeapon(InventoryIndex);
                 motor.IsEquipped = true;
                 return true;
             }
 
             if (InventoryUsage == InventoryUsage.autoFind && _inventory != null)
             {
-                for (int i = 0; i < _inventory.Weapons.Length; i++)
-                    if (_inventory.Weapons[i].Gun != null && _inventory.Weapons[i].Gun.Type == type)
+                for (int i = 0; i < _inventory.AllWeapons.Length; i++)
+                    if (_inventory.AllWeapons[i] != null && _inventory.AllWeapons[i].Type == type)
                     {
                         InventoryIndex = i;
-                        motor.Weapon = _inventory.Weapons[InventoryIndex];
+                        _inventory.SwitchWeapon(InventoryIndex);
                         motor.IsEquipped = true;
                         return true;
                     }
 
-                for (int i = 0; i < _inventory.Weapons.Length; i++)
-                    if (_inventory.Weapons[i].Gun != null)
+                for (int i = 0; i < _inventory.AllWeapons.Length; i++)
+                    if (_inventory.AllWeapons[i] != null)
                     {
                         InventoryIndex = i;
-                        motor.Weapon = _inventory.Weapons[InventoryIndex];
+                        _inventory.SwitchWeapon(InventoryIndex);
                         motor.IsEquipped = true;
                         return true;
                     }
@@ -125,9 +131,9 @@ namespace CoverShooter
                 return false;
 
             if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
+                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
-                if (_inventory.Weapons[InventoryIndex].IsTheSame(ref motor.Weapon))
+                if (_inventory.AllWeapons[InventoryIndex].Equals(motor.Weapon))
                 {
                     motor.IsEquipped = false;
                     return true;
@@ -146,15 +152,15 @@ namespace CoverShooter
         /// <summary>
         /// Unequips the item if it is currently used.
         /// </summary>
-        protected bool Unequip(CharacterMotor motor, WeaponType type)
+        protected bool Unequip(CharacterMotor motor, EHitType type)
         {
             if (!isActiveAndEnabled)
                 return false;
 
             if (InventoryUsage == InventoryUsage.index &&
-                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.Weapons.Length)
+                _inventory != null && InventoryIndex >= 0 && InventoryIndex < _inventory.AllWeapons.Length)
             {
-                if (_inventory.Weapons[InventoryIndex].IsTheSame(ref motor.Weapon))
+                if (_inventory.AllWeapons[InventoryIndex].Equals(motor.Weapon))
                 {
                     motor.IsEquipped = false;
                     return true;
@@ -177,20 +183,20 @@ namespace CoverShooter
         /// <summary>
         /// Finds an item index of a weapon. Prefers the given type. Returns true if a weapon was found.
         /// </summary>
-        private bool autoFind(CharacterMotor motor, WeaponType type)
+        private bool autoFind(CharacterMotor motor, EHitType type)
         {
             if (_inventory == null)
                 return false;
 
-            for (int i = 0; i < _inventory.Weapons.Length; i++)
-                if (_inventory.Weapons[i].Gun != null && _inventory.Weapons[i].Gun.Type == type)
+            for (int i = 0; i < _inventory.AllWeapons.Length; i++)
+                if (_inventory.AllWeapons[i] != null && _inventory.AllWeapons[i].Type == type)
                 {
                     InventoryIndex = i;
                     return true;
                 }
 
-            for (int i = 0; i < _inventory.Weapons.Length; i++)
-                if (_inventory.Weapons[i].Gun != null)
+            for (int i = 0; i < _inventory.AllWeapons.Length; i++)
+                if (_inventory.AllWeapons[i] != null)
                 {
                     InventoryIndex = i;
                     return true;

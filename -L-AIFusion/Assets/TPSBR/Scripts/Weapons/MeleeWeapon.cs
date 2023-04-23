@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace TPSBR
 {
-	public class MeleeWeapon : Weapon
-	{
+	public class MeleeWeapon : ConvertWeapon
+    {
 		// Weapon INTERFACE
 
 		public override bool CanFire(bool keyDown)

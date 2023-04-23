@@ -18,8 +18,8 @@ namespace TPSBR
 	{
 		// PUBLIC MEMBERS
 
-		public Weapon       CurrentWeapon           => _weapons[CurrentWeaponSlot];
-		public Weapon       PendingWeapon           => _weapons[PendingWeaponSlot];
+		public ConvertWeapon       CurrentWeapon           => _weapons[CurrentWeaponSlot];
+		public ConvertWeapon       PendingWeapon           => _weapons[PendingWeaponSlot];
 		public IInteraction InteractionTarget       => _interactionTarget;
 		public float        WeaponDropTime          => _weaponDropTime;
 		public Transform    WeaponHandle            => _slots[CurrentWeaponSlot].Active;
@@ -45,8 +45,9 @@ namespace TPSBR
 		[SerializeField]
 		private LayerMask _hitMask;
 
-		[SerializeField]
-		private Weapon[] _initialWeapons;
+		[SerializeField] private ConvertWeapon[] _initialWeapons;
+        public ConvertWeapon[] ALlInitWeapons;
+
 		[SerializeField]
 		private WeaponSlot[] _slots;
 
@@ -70,7 +71,9 @@ namespace TPSBR
 		private float _weaponDropTime;
 
 		[Networked(OnChanged = nameof(OnWeaponsChanged), OnChangedTargets = OnChangedTargets.All), Capacity(8)]
-		private NetworkArray<Weapon> _weapons { get; }
+		[SerializeField] private NetworkArray<ConvertWeapon> _weapons { get; }
+
+        public NetworkArray<ConvertWeapon> AllWeapons => _weapons;
 
 		private bool _forceWeaponsRefresh;
 
@@ -81,9 +84,11 @@ namespace TPSBR
 
 		private AudioEffect[] _fireAudioEffects;
 
-		// PUBLIC METHODS
+        public bool IsNull => CurrentWeapon == null;
+        // PUBLIC METHODS
+        protected TransformData fireTransform => _agent.Character.GetFireTransform();
 
-		public void DisarmCurrentWeapon()
+        public void DisarmCurrentWeapon()
 		{
 			CurrentWeaponSlot = 0;
 		}
@@ -147,7 +152,8 @@ namespace TPSBR
 			}
 
 			// Autoswitch to valid weapon if current is invalid
-			if (CurrentWeapon != null && CurrentWeaponSlot == PendingWeaponSlot && CurrentWeapon.ValidOnlyWithAmmo == true && CurrentWeapon.HasAmmo() == false)
+			if (CurrentWeapon != null && CurrentWeaponSlot == PendingWeaponSlot 
+                && CurrentWeapon.ValidOnlyWithAmmo == true && CurrentWeapon.HasAmmo() == false)
 			{
 				if (PreviousWeaponSlot == 0)
 				{
@@ -260,7 +266,7 @@ namespace TPSBR
 			if (interact == false)
 				return;
 
-			if (_interactionTarget is DynamicPickup dynamicPickup && dynamicPickup.Provider is Weapon pickupWeapon)
+			if (_interactionTarget is DynamicPickup dynamicPickup && dynamicPickup.Provider is ConvertWeapon pickupWeapon)
 			{
 				var ownedWeapon = _weapons[pickupWeapon.WeaponSlot];
 				if (ownedWeapon != null && ownedWeapon.WeaponID == pickupWeapon.WeaponID)
@@ -357,7 +363,7 @@ namespace TPSBR
 			return weapon != null && (checkAmmo == false || (weapon.Object != null && weapon.HasAmmo() == true));
 		}
 
-		public Weapon GetWeapon(int slot)
+		public ConvertWeapon GetWeapon(int slot)
 		{
 			return _weapons[slot];
 		}
@@ -393,7 +399,6 @@ namespace TPSBR
 				return false;
 
 			var targetPoint = GetTargetPoint(false);
-			var fireTransform = _agent.Character.GetFireTransform();
 
 			CurrentWeapon.Fire(fireTransform.Position, targetPoint, _hitMask);
 
@@ -562,7 +567,7 @@ namespace TPSBR
 			}
 		}
 
-		private void PickupWeapon(Weapon weapon)
+		private void PickupWeapon(ConvertWeapon weapon)
 		{
 			if (weapon == null)
 				return;
@@ -673,7 +678,7 @@ namespace TPSBR
 			//Debug.Log($"Current {CurrentWeaponSlot}, Pending {PendingWeaponSlot}, Previous {PreviousWeaponSlot}");
 		}
 
-		private void AddWeapon(Weapon weapon)
+		private void AddWeapon(ConvertWeapon weapon)
 		{
 			if (weapon == null)
 				return;
