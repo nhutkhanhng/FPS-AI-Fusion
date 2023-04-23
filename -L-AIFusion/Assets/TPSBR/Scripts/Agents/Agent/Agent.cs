@@ -298,10 +298,6 @@ namespace TPSBR
         }
         protected virtual void ProcessFixedInput()
 		{
-            Debug.LogError("Proxy is " +
-                Object.IsProxy + "  " + this.transform.name
-                + " -- " + (this._agentInput!= null).ToString());
-
             if (Object.IsProxy == true)
 				return;
 
@@ -457,7 +453,7 @@ namespace TPSBR
 
 			if (_weapons.CanFireWeapon(attack) == false)
 				return;
-            Debug.Break();
+
             if (_character.AnimationController.StartFire() == true)
 			{
 				if (_weapons.Fire() == true)

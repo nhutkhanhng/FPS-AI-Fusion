@@ -2216,7 +2216,7 @@ namespace CoverShooter
         public Vector2 CalculatePitchAndYaw(Transform currentTransform, Vector3 targetPosition, float rotationSpeed)
         {
             // Calculate the direction from the object's position to the target position
-            Vector3 direction = targetPosition - VirtualHead;
+            Vector3 direction = targetPosition - kcc.Data.BasePosition;
 
             // Calculate the pitch and yaw angles using trigonometry
             float pitch = Mathf.Asin(direction.y / direction.magnitude) * Mathf.Rad2Deg;
@@ -4078,8 +4078,6 @@ namespace CoverShooter
 
                     if (gun == null || gun.CanFire(true) == false)
                         canFire = false;
-
-                    Debug.LogError(canFire + " -- " + _wantsToFire + " --- " + _isLoadingBullet);
 
                     if (canFire)
                     {

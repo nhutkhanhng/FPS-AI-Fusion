@@ -9,12 +9,31 @@ namespace TPSBR
     {
         protected GameplayInput _AIInput;
         public ref GameplayInput GetInput() => ref _AIInput;
+
+        public override void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
+        {
+            base.SetFixedInput(fixedInput, updateBaseInputs);
+            if (updateBaseInputs)
+            {
+                _AIInput = fixedInput;
+            }
+        }
+
+        public override void SetLastKnownInput(GameplayInput fixedInput, bool updateBaseInputs)
+        {
+            base.SetLastKnownInput(fixedInput, updateBaseInputs);
+            if (updateBaseInputs)
+            {
+                _AIInput = fixedInput;
+            }
+        }
         protected override void OnInput(NetworkRunner runner, NetworkInput networkInput)
         {
             if (_agent.IsLocal == false || Context.HasInput == false)
             {
-                _cachedInput = default;
-                _renderInput = default;
+                _cachedInput    = default;
+                _renderInput    = default;
+                _AIInput        = default;
                 return;
             }
 
@@ -101,6 +120,11 @@ namespace TPSBR
             }
         }
 
+        public override void Render()
+        {
+            base.Render();
+            _AIInput = default;
+        }
         public override void BeforeTick()
         {
             if (Object.IsProxy == true || Context == null || Context.GameplayMode == null || Context.GameplayMode.State != GameplayMode.EState.Active)

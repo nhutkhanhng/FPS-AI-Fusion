@@ -159,12 +159,12 @@ namespace TPSBR
 			}
 		}
 
-		/// <summary>
-		/// Updates fixed input. Use after manipulating with fixed input outside.
-		/// </summary>
-		/// <param name="fixedInput">Input used in fixed update.</param>
-		/// <param name="updateBaseInputs">Updates base fixed input and base render input.</param>
-		public void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
+        /// <summary>
+        /// Updates fixed input. Use after manipulating with fixed input outside.
+        /// </summary>
+        /// <param name="fixedInput">Input used in fixed update.</param>
+        /// <param name="updateBaseInputs">Updates base fixed input and base render input.</param>
+        public virtual void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
 		{
 			CheckFixedAccess(true);
 
@@ -177,12 +177,12 @@ namespace TPSBR
 			}
 		}
 
-		/// <summary>
-		/// Updates render input. Use after manipulating with render input outside.
-		/// </summary>
-		/// <param name="renderInput">Input used in render update.</param>
-		/// <param name="updateBaseInput">Updates base render input.</param>
-		public void SetRenderInput(GameplayInput renderInput, bool updateBaseInput)
+        /// <summary>
+        /// Updates render input. Use after manipulating with render input outside.
+        /// </summary>
+        /// <param name="renderInput">Input used in render update.</param>
+        /// <param name="updateBaseInput">Updates base render input.</param>
+        public virtual void SetRenderInput(GameplayInput renderInput, bool updateBaseInput)
 		{
 			CheckRenderAccess(false);
 
@@ -199,7 +199,7 @@ namespace TPSBR
 		/// </summary>
 		/// <param name="fixedInput">Input used as last known input.</param>
 		/// <param name="updateBaseInputs">Updates base fixed input and base render input.</param>
-		public void SetLastKnownInput(GameplayInput fixedInput, bool updateBaseInputs)
+		public virtual void SetLastKnownInput(GameplayInput fixedInput, bool updateBaseInputs)
 		{
 			CheckFixedAccess(true);
 

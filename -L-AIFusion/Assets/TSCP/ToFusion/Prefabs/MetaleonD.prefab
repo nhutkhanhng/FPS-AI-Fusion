@@ -3722,8 +3722,8 @@ MonoBehaviour:
   AutoFindType: 1
   AlwaysAim: 0
   Bursts:
-    Wait: 0.25
-    Duration: 1
+    Wait: 0.5
+    Duration: 5
   CoverBursts:
     Wait: 1
     Duration: 0.9
