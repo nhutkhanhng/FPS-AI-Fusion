@@ -456,11 +456,11 @@ namespace CoverShooter
                 }
             }
 
-            _motor.SetBodyTarget(transform.position + Util.HorizontalVector(angle) * 10, speed);
+            _motor.SetBodyTarget(transform.position + Util.HorizontalVector(angle) * 10 + (position.y - transform.position.y - 1.5f) * Vector3.up, speed);
         }
 
         private float[] _snapWork = new float[_snaps.Length];
-        private static float[] _snaps = new float[] { 0,-90, 90, 180 };
+        private static float[] _snaps = new float[] { 0, -90, 90, 180 };
 
         private void scanAtWalkDirection()
         {

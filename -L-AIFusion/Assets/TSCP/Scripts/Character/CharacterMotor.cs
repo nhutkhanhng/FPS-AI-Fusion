@@ -2220,15 +2220,6 @@ namespace CoverShooter
             float pitch = Mathf.Asin(direction.y / direction.magnitude) * Mathf.Rad2Deg;
             float yaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
 
-            // Calculate the starting and ending rotations
-            Quaternion startRotation = kcc.Data.LookRotation;
-            Quaternion endRotation = Quaternion.Euler(pitch, yaw, 0f);
-            var r = Quaternion.Slerp(startRotation, endRotation, rotationSpeed);
-
-            Debug.LogError(pitch);
-
-            // Interpolate between the starting and ending rotations over the specified duration
-
             // KCCUtility.GetLookRotationAngles(r, out pitch, out yaw);
             return new Vector2(-pitch, yaw);
         }
@@ -2236,11 +2227,13 @@ namespace CoverShooter
         public override void _FixedUpdateNetwork()
         {
             Vector3 direction = _bodyTarget - transform.position;
-            var newPitchYaw = CalculatePitchAndYaw(transform.position + Vector3.up, _aimTarget - Vector3.up, 5f * GetDeltaTime());
+            var newPitchYaw = CalculatePitchAndYaw(transform.position, _bodyTarget, 5f * GetDeltaTime());
             var oldPitchYaw = kcc.RenderData.GetLookRotation(true, true);
 
             if (isRotate)
-                agent.SetRotationDeltaDirect(newPitchYaw.x - oldPitchYaw.x + pitchYawtest.x, newPitchYaw.y - oldPitchYaw.y + pitchYawtest.y);
+                agent.SetRotationDeltaDirect(
+                    Mathf.Lerp( oldPitchYaw.x, newPitchYaw.x, 5 * GetDeltaTime()) - oldPitchYaw.x + pitchYawtest.x, 
+                    Mathf.Lerp(oldPitchYaw.y, newPitchYaw.y , 5 * GetDeltaTime()) - oldPitchYaw.y + pitchYawtest.y);
 
             AngleDirection =   new Vector2(oldPitchYaw.x - newPitchYaw.x, newPitchYaw.y - oldPitchYaw.y);
 
