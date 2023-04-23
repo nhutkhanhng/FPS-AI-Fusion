@@ -31,71 +31,30 @@ namespace TPSBR
         {
             var input = this.AIInput.GetInput();
             this.AIInput.GetInput().MoveDirection = direction;
-            // Debug.LogError(input.MoveDirection);
-            // AIInput.SetLastKnownInput(input, false);
-            //_lastKnownInput.MoveDirection = direction;
-            //_fixedInput.MoveDirection = direction;
         }
         public override void SetFixedInput(GameplayInput fixedInput, bool updateBaseInputs)
         {
             CheckFixedAccess(true);
             AIInput.SetFixedInput(fixedInput, updateBaseInputs);
-
-            //_fixedInput = fixedInput;
-            //Debug.LogError("SetFixedInput " + _fixedInput.Attack);
-
-            //if (updateBaseInputs == true)
-            //{
-            //    _baseFixedInput = fixedInput;
-            //    _baseRenderInput = fixedInput;
-            //}
         }
 
         public bool WasActivated(EGameplayInputAction action)
         {
             return AIInput.WasActivated(action);
-
-            //if (Runner.Stage != default)
-            //{
-            //    CheckFixedAccess(false);
-            //    return action.WasActivated(_fixedInput, _baseFixedInput);
-            //}
-            //else
-            //{
-            //    CheckRenderAccess(false);
-            //    return action.WasActivated(_renderInput, _baseRenderInput);
-            //}
         }
 
         public bool WasActivated(EGameplayInputAction action, GameplayInput customInput)
         {
             return AIInput.WasActivated(action, customInput);
-            //if (Runner.Stage != default)
-            //{
-            //    CheckFixedAccess(false);
-            //    return action.WasActivated(customInput, _baseFixedInput);
-            //}
-            //else
-            //{
-            //    CheckRenderAccess(false);
-            //    return action.WasActivated(customInput, _baseRenderInput);
-            //}
         }
         public void SetLastKnownInput(GameplayInput fixedInput, bool updateBaseInputs)
         {
             AIInput.SetLastKnownInput(fixedInput, updateBaseInputs);
-            //_lastKnownInput = fixedInput;
-
-            //if (updateBaseInputs == true)
-            //{
-            //    _baseFixedInput = fixedInput;
-            //    _baseRenderInput = fixedInput;
-            //}
         }
-        //protected override GameplayInput GetFixedInput()
-        //{
-        //    return AIInput.FixedInput;
-        //}
+        protected override GameplayInput GetFixedInput()
+        {
+            return AIInput.GetInput();
+        }
 
         //protected override void OnLateFixedUpdate()
         //{
