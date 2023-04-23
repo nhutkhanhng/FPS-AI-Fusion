@@ -298,7 +298,11 @@ namespace TPSBR
         }
         protected virtual void ProcessFixedInput()
 		{
-			if (Object.IsProxy == true)
+            Debug.LogError("Proxy is " +
+                Object.IsProxy + "  " + this.transform.name
+                + " -- " + (this._agentInput!= null).ToString());
+
+            if (Object.IsProxy == true)
 				return;
 
 			KCC     kcc          = _character.CharacterController;
@@ -447,10 +451,14 @@ namespace TPSBR
 			if (hold == false)
 				return;
 
+            Debug.LogError(_weapons.CanFireWeapon(attack)
+                 + " -- " + attack
+                 + " -- " + this.transform.name);
+
 			if (_weapons.CanFireWeapon(attack) == false)
 				return;
-
-			if (_character.AnimationController.StartFire() == true)
+            Debug.Break();
+            if (_character.AnimationController.StartFire() == true)
 			{
 				if (_weapons.Fire() == true)
 				{

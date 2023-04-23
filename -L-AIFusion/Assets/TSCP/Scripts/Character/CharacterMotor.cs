@@ -2263,7 +2263,11 @@ namespace CoverShooter
             NextDirection = rotation * targetPositionLocal;
 
             if (isMove)
+            {
                 agent.SetInputDirection(Direction + test);
+                // kcc.SetInputDirection(Direction + test);
+            }
+                //agent.SetInputDirection(Direction + test);
         }
         
         /// <summary>
@@ -4074,6 +4078,8 @@ namespace CoverShooter
 
                     if (gun == null || gun.CanFire(true) == false)
                         canFire = false;
+
+                    Debug.LogError(canFire + " -- " + _wantsToFire + " --- " + _isLoadingBullet);
 
                     if (canFire)
                     {

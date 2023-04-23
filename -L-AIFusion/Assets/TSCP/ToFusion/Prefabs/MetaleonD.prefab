@@ -2844,6 +2844,7 @@ GameObject:
   - component: {fileID: 4781680799286194420}
   - component: {fileID: 4937224285930459434}
   - component: {fileID: 3552086965671037920}
+  - component: {fileID: 5616777356204066332}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2917,6 +2918,7 @@ MonoBehaviour:
   - {fileID: 4781680799286194420}
   - {fileID: 4937224285930459434}
   - {fileID: 3552086965671037920}
+  - {fileID: 5616777356204066332}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
   - {fileID: 3696077712570884254}
@@ -3126,7 +3128,6 @@ MonoBehaviour:
   _interactionDistance: 5
   _interactionPrecisionRadius: 0.3
   _weaponDropTime: 0.8
-  __weapons: []
 --- !u!114 &5968297049153330442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3387,28 +3388,9 @@ MonoBehaviour:
   GroundThreshold: 0.25
   FallThreshold: 1.2
   ObstacleDistance: 0.05
-  RecoilRecovery: 17
-  IsFiringFromCamera: 0
-  ZoomErrorMultiplier: 0.75
   CrouchHeight: 1.5
-  AccelerationDamp: 1
-  DeccelerationDamp: 3
   MaxSlope: 60
   DamageMultiplier: 1
-  IsEquipped: 1
-  Weapon:
-    RightItem: {fileID: 0}
-    LeftItem: {fileID: 0}
-    RightHolster: {fileID: 0}
-    LeftHolster: {fileID: 0}
-    Shield: {fileID: 0}
-    PreferSwapping: 1
-    IsDualWielding: 1
-    IsHeavy: 0
-    PreventCovers: 0
-    PreventClimbing: 0
-    PreventArmLowering: 0
-    Aiming: 0
   Grenade:
     Left: {fileID: 0}
     Right: {fileID: 0}
@@ -3570,14 +3552,14 @@ MonoBehaviour:
   _maxFallDamage: 200
   _maxFallDamageVelocity: 20
   _minFallDamageVelocity: 5
-  _agentInput: {fileID: 0}
-  _character: {fileID: 0}
-  _weapons: {fileID: 0}
-  _jetpack: {fileID: 0}
-  _senses: {fileID: 0}
-  _health: {fileID: 0}
-  _agentVFX: {fileID: 0}
-  _networkCulling: {fileID: 0}
+  _agentInput: {fileID: 5616777356204066332}
+  _character: {fileID: 6646728065183178268}
+  _weapons: {fileID: 3727285942377876180}
+  _jetpack: {fileID: 4371376507030965249}
+  _senses: {fileID: 8149446342677491575}
+  _health: {fileID: 2526558572597844940}
+  _agentVFX: {fileID: 2412322444017344386}
+  _networkCulling: {fileID: 828455360360197660}
   _cachedLookRotation: {x: 0, y: 0, z: 0, w: 0}
   _cachedPitchRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &-4769217903060999524
@@ -3747,6 +3729,22 @@ MonoBehaviour:
     Duration: 0.9
     IntroDuration: 0.35
     OutroDuration: 0.35
+--- !u!114 &5616777356204066332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fd96f5cae375aa48abd628364ee12df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _grenadesCycleDuration: 2
+  _lookResponsivity: 0
+  _logMissingInputs: 0
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0

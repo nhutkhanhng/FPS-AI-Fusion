@@ -41,8 +41,10 @@ namespace TPSBR
 
 		// We need to store last known input to compare current input against (to track actions activation/deactivation). It is also used if an input for current frame is lost.
 		// This is not needed on proxies, only input authority is registered to nameof(AgentInput) interest group.
-		[Networked(nameof(AgentInput))]
-		protected GameplayInput _lastKnownInput { get; set; }
+
+        protected virtual GameplayInput _lastKnownInput { get => __lastKnow; set { __lastKnow = value; } }
+
+        protected GameplayInput __lastKnow;
 
 		protected Agent          _agent;
 		protected NetworkCulling _networkCulling;
@@ -210,7 +212,8 @@ namespace TPSBR
 			}
 		}
 
-		// NetworkBehaviour INTERFACE
+        // NetworkBehaviour INTERFACE
+        protected virtual bool IsLocal => _agent.IsLocal;
 
 		public override void Spawned()
 		{
@@ -233,7 +236,7 @@ namespace TPSBR
 				Object.SetInterestGroup(Object.InputAuthority, nameof(AgentInput), true);
 			}
 
-			if (_agent.IsLocal == false)
+			if (IsLocal == false)
 				return;
 
 			// Register local player input polling.
