@@ -99,7 +99,6 @@ namespace CoverShooter
         public bool IsInDarkness(Actor actor)
         {
             var viewDistance = actor.GetViewDistance(Distance, _isAlerted);
-
             return viewDistance < Distance && Vector3.Distance(actor.TopPosition, _actor.TopPosition) > viewDistance;
         }
 

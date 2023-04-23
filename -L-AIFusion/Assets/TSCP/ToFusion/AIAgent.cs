@@ -20,7 +20,7 @@ namespace TPSBR
         public override void SetRotationDeltaDirect(float pitch, float yaw)
         {
             var input = this.AIInput.GetInput();
-            this.AIInput.GetInput().LookRotationDelta += new Vector2(pitch, yaw);
+            this.AIInput.GetInput().LookRotationDelta = new Vector2(pitch, yaw);
             // AIInput.SetLastKnownInput(input, false);
             //_lastKnownInput.LookRotationDelta +=
             //_fixedInput.LookRotationDelta += new Vector2(pitch, yaw);

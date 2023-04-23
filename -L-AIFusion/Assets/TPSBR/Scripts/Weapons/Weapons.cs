@@ -400,9 +400,8 @@ namespace TPSBR
 			if (CurrentWeapon == null)
 				return false;
 
-			var targetPoint = GetTargetPoint(false);
-
             Debug.LogError("Fire");
+            var targetPoint = GetTargetPoint(false);
 			CurrentWeapon.Fire(fireTransform.Position, targetPoint, _hitMask);
 
 			return true;

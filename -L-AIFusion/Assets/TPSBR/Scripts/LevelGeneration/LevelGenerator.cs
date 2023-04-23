@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using Unity.AI.Navigation;
 
 namespace TPSBR
 {
@@ -86,6 +87,7 @@ namespace TPSBR
 		[SerializeField]
 		private GameObject[] _connectorPrefabs;
 
+        protected List<NavMeshSurface> allSf = new List<NavMeshSurface>();
 		[Header("Object Spawn")]
 		[SerializeField]
 		private ItemBox _itemBoxPrefab;
@@ -124,13 +126,26 @@ namespace TPSBR
 
 			_water.position = new Vector3(Center.x, _water.position.y, Center.z);
 			_water.localScale = new Vector3(Dimensions.x, 1f, Dimensions.y);
+
+            //allSf.ForEach(x =>
+            //{
+            //    x.BuildNavMesh();
+            //});
 		}
 
 		// PRIVATE METHODS
 
 		private LevelBlock GenerateRandomBlock(Vector3 position, BlockSpawn blockSpawn)
 		{
-			return GenerateBlock(blockSpawn.GetBlockPrefab(), position);
+			var block = GenerateBlock(blockSpawn.GetBlockPrefab(), position);
+            //var sf = block.GetComponent<NavMeshSurface>();
+
+            //if (sf == null)
+            //    sf = block.gameObject.AddComponent<NavMeshSurface>();
+
+            //allSf.Add(sf);
+            //sf.BuildNavMesh();
+            return block;
 		}
 
 		private LevelBlock GenerateBlock(LevelBlock blockPrefab, Vector3 position)
@@ -142,8 +157,14 @@ namespace TPSBR
 			{
 				block.transform.localScale = new Vector3(-1f, 1f, 1f);
 			}
+            var sf = block.GetComponent<NavMeshSurface>();
 
-			return block;
+            if (sf == null)
+                sf = block.gameObject.AddComponent<NavMeshSurface>();
+
+            allSf.Add(sf);
+            sf.BuildNavMesh();
+            return block;
 		}
 
 		private void GenerateAreas()

@@ -65,8 +65,6 @@ namespace TPSBR
 
 		public void Initialize(EGameplayType gameplayType)
 		{
-            Physics.autoSimulation = true;
-
 			if (Object.HasStateAuthority == true)
 			{
 				var prefab = _modePrefabs.Find(t => t.Type == gameplayType);

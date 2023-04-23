@@ -2837,14 +2837,17 @@ GameObject:
   - component: {fileID: 840214416079072565}
   - component: {fileID: 7442139576927040731}
   - component: {fileID: 5190406139856406184}
-  - component: {fileID: -4769217903060999524}
-  - component: {fileID: -7303928161082234650}
-  - component: {fileID: -1627987507071704022}
-  - component: {fileID: 4781680799286194420}
-  - component: {fileID: 4937224285930459434}
-  - component: {fileID: 3552086965671037920}
   - component: {fileID: 5616777356204066332}
-  - component: {fileID: -1136506813467571162}
+  - component: {fileID: 4781680799286194420}
+  - component: {fileID: 8812879157160894214}
+  - component: {fileID: 2968022533272522244}
+  - component: {fileID: 6511536362269480816}
+  - component: {fileID: 5388352442937660109}
+  - component: {fileID: 3710384095631067301}
+  - component: {fileID: 4630012592473523987}
+  - component: {fileID: 6605876612687380087}
+  - component: {fileID: 7574016400924695846}
+  - component: {fileID: -6953039971299277934}
   m_Layer: 8
   m_Name: MetaleonD
   m_TagString: Untagged
@@ -2876,7 +2879,7 @@ Transform:
   - {fileID: 7022980826097297295}
   - {fileID: 3009359942269706523}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1140557501186260959
 MonoBehaviour:
@@ -2912,14 +2915,16 @@ MonoBehaviour:
   - {fileID: 840214416079072565}
   - {fileID: 7442139576927040731}
   - {fileID: 5190406139856406184}
-  - {fileID: -4769217903060999524}
-  - {fileID: -7303928161082234650}
-  - {fileID: -1627987507071704022}
-  - {fileID: 4781680799286194420}
-  - {fileID: 4937224285930459434}
-  - {fileID: 3552086965671037920}
   - {fileID: 5616777356204066332}
-  - {fileID: -1136506813467571162}
+  - {fileID: 4781680799286194420}
+  - {fileID: 8812879157160894214}
+  - {fileID: 6511536362269480816}
+  - {fileID: 5388352442937660109}
+  - {fileID: 3710384095631067301}
+  - {fileID: 4630012592473523987}
+  - {fileID: 6605876612687380087}
+  - {fileID: 7574016400924695846}
+  - {fileID: -6953039971299277934}
   SimulationBehaviours:
   - {fileID: 6646728065183178268}
   - {fileID: 3696077712570884254}
@@ -3527,9 +3532,9 @@ MonoBehaviour:
   _fastMovementProcessor: {fileID: -2977180128878109980, guid: 6259acf20feed5147afc6f8d81edb8b6, type: 3}
   _visualRoot: {fileID: 1518040596595097668}
   _minFallDamage: 5
-  _maxFallDamage: 200
-  _maxFallDamageVelocity: 20
-  _minFallDamageVelocity: 5
+  _maxFallDamage: 150
+  _maxFallDamageVelocity: 90
+  _minFallDamageVelocity: 20
   _agentInput: {fileID: 5616777356204066332}
   _character: {fileID: 6646728065183178268}
   _weapons: {fileID: 3727285942377876180}
@@ -3540,7 +3545,7 @@ MonoBehaviour:
   _networkCulling: {fileID: 828455360360197660}
   _cachedLookRotation: {x: 0, y: 0, z: 0, w: 0}
   _cachedPitchRotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &-4769217903060999524
+--- !u!114 &5616777356204066332
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3549,51 +3554,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3828643222564512411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac41d31ca7a910941b5794adab391b53, type: 3}
+  m_Script: {fileID: 11500000, guid: 0fd96f5cae375aa48abd628364ee12df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  RollTriggerDistance: 2
-  CircleDelay: 2
-  ObstructionRadius: 1.5
-  DebugDestination: 0
-  DebugPath: 0
---- !u!114 &-7303928161082234650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3828643222564512411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b64b9fb81c458b44c80544b0e7374659, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  Distance: 15
-  ObstacleIgnoreDistance: 1
-  FieldOfView: 130
-  UpdateDelay: 0.1
-  DebugFOV: 0
---- !u!114 &-1627987507071704022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3828643222564512411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 037c567b5563c764b826878fa050bf6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  VerifyHeight: 1
-  FieldOfView: 180
-  WalkDistance: 20
-  DebugTarget: 0
-  DebugPoints: 0
+  _grenadesCycleDuration: 2
+  _lookResponsivity: 0
+  _logMissingInputs: 0
 --- !u!114 &4781680799286194420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3620,7 +3587,7 @@ MonoBehaviour:
   AttackAggressors: 1
   Start:
     ReturnOnIdle: 0
-    Mode: 1
+    Mode: 5
     Position: {x: 0, y: 0, z: 0}
   Speed:
     Enabled: 0
@@ -3655,8 +3622,8 @@ MonoBehaviour:
     Interval: 10
     MaxRadius: 5
     AvoidDistance: 8
-  DebugThreat: 0
---- !u!114 &4937224285930459434
+  DebugThreat: 1
+--- !u!114 &8812879157160894214
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3682,7 +3649,36 @@ MonoBehaviour:
     Min: 0.5
     Max: 0.8
   DebugAim: 0
---- !u!114 &3552086965671037920
+--- !u!114 &2968022533272522244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f9efe1058faa104388c0d7ab48d303e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hearing: 1
+--- !u!114 &6511536362269480816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bb5c3fc7275d4146a1144785ce2c8c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Distance: 12
+  UpdateDelay: 0.2
+  DebugFriends: 0
+--- !u!114 &5388352442937660109
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3700,30 +3696,14 @@ MonoBehaviour:
   AutoFindType: 1
   AlwaysAim: 0
   Bursts:
-    Wait: 0.5
-    Duration: 5
+    Wait: 0.25
+    Duration: 1
   CoverBursts:
     Wait: 1
     Duration: 0.9
     IntroDuration: 0.35
     OutroDuration: 0.35
---- !u!114 &5616777356204066332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3828643222564512411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd96f5cae375aa48abd628364ee12df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  _grenadesCycleDuration: 2
-  _lookResponsivity: 0
-  _logMissingInputs: 0
---- !u!114 &-1136506813467571162
+--- !u!114 &3710384095631067301
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3736,12 +3716,86 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  VerifyDistance: 30
-  VerifyHeight: 2
+  VerifyDistance: 10
+  VerifyHeight: 0.3
   VerifyRadius: 1
-  FieldOfView: 180
+  FieldOfView: 90
   CoverOffset: 2
   CoverSearchDistance: 3
+--- !u!114 &4630012592473523987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac41d31ca7a910941b5794adab391b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  RollTriggerDistance: 2
+  CircleDelay: 2
+  ObstructionRadius: 1.5
+  DebugDestination: 0
+  DebugPath: 0
+--- !u!114 &6605876612687380087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 037c567b5563c764b826878fa050bf6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  VerifyHeight: 0.7
+  FieldOfView: 90
+  WalkDistance: 8
+  DebugTarget: 0
+  DebugPoints: 0
+--- !u!114 &7574016400924695846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64b9fb81c458b44c80544b0e7374659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Distance: 25
+  ObstacleIgnoreDistance: 1
+  FieldOfView: 160
+  UpdateDelay: 0.1
+  DebugFOV: 0
+--- !u!114 &-6953039971299277934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828643222564512411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3702f398fb150428abe864e42d827a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  MaxLowCoverThreatAngle: 60
+  MaxTallCoverThreatAngle: 40
+  MaxDefenseAngle: 85
+  MinDefenselessDistance: 30
+  MaxCoverDistance: 30
+  MinSwitchDistance: 6
+  AvoidDistance: 6
 --- !u!1 &3842181841884428721
 GameObject:
   m_ObjectHideFlags: 0

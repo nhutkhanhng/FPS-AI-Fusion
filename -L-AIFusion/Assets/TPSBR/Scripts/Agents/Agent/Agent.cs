@@ -447,10 +447,6 @@ namespace TPSBR
 			if (hold == false)
 				return;
 
-            Debug.LogError(_weapons.CanFireWeapon(attack)
-                 + " -- " + attack
-                 + " -- " + this.transform.name);
-
 			if (_weapons.CanFireWeapon(attack) == false)
 				return;
 

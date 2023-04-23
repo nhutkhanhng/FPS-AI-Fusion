@@ -794,7 +794,6 @@ namespace CoverShooter
         private void moveTo(Vector3 destination, float speed)
         {
             _mode = Mode.toPosition;
-            Debug.LogError(destination);
 
             if (Vector3.Distance(_target, destination) > 0.3f)
             {

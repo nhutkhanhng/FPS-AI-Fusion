@@ -1558,6 +1558,7 @@ namespace CoverShooter
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
+            Gizmos.color = Color.black;
             Gizmos.DrawCube(_bodyTarget, Vector3.one);
 
             Gizmos.color = Color.black;
@@ -1573,7 +1574,7 @@ namespace CoverShooter
         {
             _bodyTarget = target;
 #if UNITY_EDITOR
-            Debug.DrawLine(transform.position, target, Color.yellow);
+            Debug.DrawLine(transform.position, target, Color.green);
 #endif
 
             if (!_hasAimTarget)
@@ -2210,10 +2211,10 @@ namespace CoverShooter
         [SerializeField] protected Vector2 AngleDirection;
 
         [SerializeField] bool isMove = false, isRotate = false;
-        public Vector2 CalculatePitchAndYaw(Transform currentTransform, Vector3 targetPosition, float rotationSpeed)
+        public Vector2 CalculatePitchAndYaw(Vector3 currentTransform, Vector3 targetPosition, float rotationSpeed)
         {
             // Calculate the direction from the object's position to the target position
-            Vector3 direction = targetPosition - kcc.Data.BasePosition;
+            Vector3 direction = targetPosition - currentTransform;
 
             // Calculate the pitch and yaw angles using trigonometry
             float pitch = Mathf.Asin(direction.y / direction.magnitude) * Mathf.Rad2Deg;
@@ -2223,45 +2224,38 @@ namespace CoverShooter
             Quaternion startRotation = kcc.Data.LookRotation;
             Quaternion endRotation = Quaternion.Euler(pitch, yaw, 0f);
             var r = Quaternion.Slerp(startRotation, endRotation, rotationSpeed);
+
+            Debug.LogError(pitch);
+
             // Interpolate between the starting and ending rotations over the specified duration
 
             // KCCUtility.GetLookRotationAngles(r, out pitch, out yaw);
-            return new Vector2(pitch, yaw);
+            return new Vector2(-pitch, yaw);
         }
 
-        //public override void kRender()
-        //{
-        //    base.kRender();
-        //    var newPitchYaw = CalculatePitchAndYaw(transform, _bodyTarget, 5f);
-        //    kcc.SetLookRotation(newPitchYaw.x, newPitchYaw.y);
-        //}
         public override void _FixedUpdateNetwork()
         {
             Vector3 direction = _bodyTarget - transform.position;
-            float pitch = Mathf.Asin(direction.normalized.y) * Mathf.Rad2Deg;
-            float yaw = Mathf.Atan2(direction.normalized.x, direction.normalized.z) * Mathf.Rad2Deg;
-            // AngleDirection = kcc.RenderData.GetLookRotation(true, true);
-            // Calculate the pitch (up and down rotation) and yaw (left and right rotation) angles using trigonometry
+            var newPitchYaw = CalculatePitchAndYaw(transform.position + Vector3.up, _aimTarget - Vector3.up, 5f * GetDeltaTime());
+            var oldPitchYaw = kcc.RenderData.GetLookRotation(true, true);
 
-            var newPitchYaw = CalculatePitchAndYaw(transform, _bodyTarget, 5f * Time.deltaTime);
-            var oldPitchYaw = kcc.Data.GetLookRotation(true, true);
-            float lpitch = Mathf.Lerp(AngleDirection.x, pitch, 10 * Time.deltaTime);
-            float lyaw = Mathf.Lerp(AngleDirection.y, yaw * Mathf.Rad2Deg, 10 * Time.deltaTime);
+            if (isRotate)
+                agent.SetRotationDeltaDirect(newPitchYaw.x - oldPitchYaw.x + pitchYawtest.x, newPitchYaw.y - oldPitchYaw.y + pitchYawtest.y);
 
-            // if (isRotate)
-                kcc.SetLookRotation(newPitchYaw.x, newPitchYaw.y);
             AngleDirection =   new Vector2(oldPitchYaw.x - newPitchYaw.x, newPitchYaw.y - oldPitchYaw.y);
-            //if (isRotate)
-            //    agent.SetRotationDeltaDirect(AngleDirection.x, AngleDirection.y);
 
-            Direction.y = 0;
-            Vector3 targetPositionLocal = Quaternion.Inverse(transform.rotation) * (Direction * 2);
-            var rotation = Quaternion.LookRotation(direction);
-            NextDirection = rotation * targetPositionLocal;
+            if (Direction.IsAlmostZero() == false)
+            {
+                Vector3 targetPositionLocal = Quaternion.Inverse(transform.rotation) * (Direction);
+                var rotation = Quaternion.LookRotation(direction);
+                NextDirection = rotation * targetPositionLocal;
+            }
+            else
+                NextDirection = Vector3.zero;
 
             if (isMove)
             {
-                agent.SetInputDirection(Direction + test);
+                agent.SetInputDirection(NextDirection + test);
                 // kcc.SetInputDirection(Direction + test);
             }
                 //agent.SetInputDirection(Direction + test);
@@ -2960,6 +2954,9 @@ namespace CoverShooter
             _needsTarget = false;
             _wantsToBlock = false;
 
+
+            Direction = default;
+            NextDirection = default;
             {
                 var isAlive = IsAlive;
 
@@ -3702,74 +3699,6 @@ namespace CoverShooter
                     turn(TurnSettings.StandingRotationSpeed);
                 }
             }
-#if Climb && Rolling
-            else 
-            if (_isClimbing)
-            {
-                var y = animatorMovement.y;
-                animatorMovement *= (_isClimbingAVault ? VaultSettings.HorizontalScale : ClimbSettings.HorizontalScale);
-
-                if (_isClimbingAVault)
-                {
-                    if (_normalizedClimbTime >= VaultSettings.PushOn && _normalizedClimbTime < VaultSettings.PushOff)
-                        animatorMovement += _climbDirection * VaultSettings.Push;
-                }
-                else
-                {
-                    if (_normalizedClimbTime >= ClimbSettings.PushOn && _normalizedClimbTime < ClimbSettings.PushOff)
-                        animatorMovement += _climbDirection * ClimbSettings.Push;
-                }
-
-                if (_isClimbingAVault)
-                {
-                    if (_normalizedClimbTime >= 0.5f && y < 0)
-                        animatorMovement.y = _body.velocity.y - Gravity * GetDeltaTime();
-                    else
-                        animatorMovement.y = y * VaultSettings.VerticalScale;
-                }
-                else
-                    animatorMovement.y = y * ClimbSettings.VerticalScale;
-
-                _body.velocity = animatorMovement;
-
-                const float turnStart = 0.3f;
-                const float turnEnd = 0.9f;
-
-                var scale = Mathf.Abs(Mathf.DeltaAngle(_climbAngle, _horizontalAngle)) / 180f;
-                scale = Mathf.Clamp01((scale - 0.5f) * 2);
-
-                var turnIntensity = (1 - scale * scale) * Mathf.Clamp01((_normalizedClimbTime - turnStart) / (turnEnd - turnStart));
-                var angle = Mathf.LerpAngle(_climbAngle, _horizontalAngle, turnIntensity);
-
-                transform.rotation = Util.Lerp(transform.rotation, Quaternion.Euler(0, angle, 0), 20);
-            }
-            else 
-            if (_isRolling || _isIntendingToRoll)
-            {
-                turn(RollSettings.RotationSpeed);
-
-                if (_isRolling && _isGrounded)
-                {
-                    animatorMovement.y = _body.velocity.y - Gravity * GetDeltaTime();
-
-                    if (_potentialCover == null)
-                        animatorMovement -= transform.right * Vector3.Dot(transform.right, animatorMovement);
-                    else
-                        animatorMovement -= _potentialCover.Forward * Vector3.Dot(_potentialCover.Forward, animatorMovement);
-
-                    applyVelocityToTheGround(animatorMovement);
-                }
-                else if (_isRolling)
-                {
-                    var xz = _body.velocity;
-                    xz.y = 0;
-                    Util.Lerp(ref xz, Vector3.zero, 1);
-
-                    _body.velocity = new Vector3(xz.x, _body.velocity.y, xz.z);
-                }
-            }
-         
-#endif
 
             else if (_isJumping || _isIntendingToJump)
             {
@@ -3781,11 +3710,7 @@ namespace CoverShooter
             }
             else if (_isGettingHit)
             {
-                // kccData.ki.velocity = _animator.deltaPosition / GetDeltaTime();
-                // kcc.SetLookRotation()
-#if USE_ANIMATOR
-                transform.rotation = _animator.deltaRotation * transform.rotation;
-#endif
+
             }
             else if (_isPerformingCustomAction || _useMeleeRootMotion)
             {
@@ -3793,9 +3718,6 @@ namespace CoverShooter
                     turn(TurnSettings.MeleeAttackRotationSpeed);
 
                 applyVelocityToTheGround(animatorMovement);
-#if USE_ANIMATOR
-                transform.rotation = _animator.deltaRotation * transform.rotation;
-#endif
             }
             else
             {
@@ -3829,50 +3751,6 @@ namespace CoverShooter
 
                     turn(manualSpeed);
                 }
-#if Cover
-                if (_cover.In)
-                {
-                    if (animatorSpeed > float.Epsilon)
-                    {
-                        Vector3 direction;
-
-                        if (Vector3.Dot(animatorMovement, _cover.Main.Left) > Vector3.Dot(animatorMovement, _cover.Main.Right))
-                            direction = _cover.Main.Left;
-                        else
-                            direction = _cover.Main.Right;
-
-                        applyVelocityToTheGround(MoveMultiplier * direction * Vector3.Dot(direction, animatorMovement) * Vector3.Dot(_currentMovement.Direction, animatorMovement / animatorSpeed));
-                    }
-                    else
-                        _body.velocity = new Vector3(0, _body.velocity.y, 0);
-                }
-                else 
-#endif
-#if NOT_ACC
-                if (_movementInput > float.Epsilon)
-                {
-                    var speed = animatorMovement.magnitude;
-
-                    if (speed > float.Epsilon)
-                    {
-                        var constraint = 1f;
-
-                        var currentDirection = _currentMovement.Direction;
-                        var magnitude = currentDirection.magnitude;
-
-                        if (magnitude > float.Epsilon)
-                            currentDirection /= magnitude;
-                        else
-                            constraint = 0;
-
-                        var direction = Vector3.Lerp(animatorMovement / speed, currentDirection, constraint);
-
-                        applyVelocityToTheGround(MoveMultiplier * direction * speed * _movementInput);
-                    }
-                }
-                else
-                    _body.velocity = Vector3.zero;
-#endif
             }
 
             {

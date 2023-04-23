@@ -21,6 +21,12 @@ public class mNetworkTransform : CharacterAdapter, kINetworkUpdate
         
     }
 
+    public override void Render()
+    {
+        base.Render();
+        kRender();
+    }
+
     public virtual void _LateUpdate()
     {
 

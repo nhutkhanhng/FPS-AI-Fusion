@@ -149,8 +149,8 @@ namespace CoverShooter
 
         private Vector3 _currentAim;
 
-        private BodyMode _bodyMode;
-        private AimMode _aimMode;
+        [SerializeField] private BodyMode _bodyMode;
+        [SerializeField] private AimMode _aimMode;
 
         private Vector3 _walkDirection;
         private bool _hasWalkDirection;
@@ -422,6 +422,10 @@ namespace CoverShooter
 
         private void aimBodyTo(Vector3 position, float speed)
         {
+            if (DebugAim)
+            {
+                Debug.DrawLine(transform.position, position, Color.black);
+            }
             if (!_hasWalkDirection)
             {
                 _motor.SetBodyTarget(position, speed);
@@ -456,7 +460,7 @@ namespace CoverShooter
         }
 
         private float[] _snapWork = new float[_snaps.Length];
-        private static float[] _snaps = new float[] { 0, -90, 90, 180 };
+        private static float[] _snaps = new float[] { 0,-90, 90, 180 };
 
         private void scanAtWalkDirection()
         {

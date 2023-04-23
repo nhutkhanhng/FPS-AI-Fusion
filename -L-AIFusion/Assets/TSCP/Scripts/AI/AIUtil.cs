@@ -2,6 +2,7 @@
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
+
 namespace CoverShooter
 {
     /// <summary>
@@ -136,7 +137,7 @@ namespace CoverShooter
         {
             NavMeshHit hit;
 
-            if (NavMesh.SamplePosition(position, out hit, 3, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(position, out hit, 5, NavMesh.AllAreas))
             {
                 position = hit.position;
                 return true;
@@ -151,7 +152,7 @@ namespace CoverShooter
         public static bool IsPositionOnNavMesh(Vector3 position)
         {
             NavMeshHit hit;
-            return NavMesh.SamplePosition(position, out hit, 0.2f, NavMesh.AllAreas);
+            return NavMesh.SamplePosition(position, out hit, 0.5f, NavMesh.AllAreas);
         }
 
         /// <summary>
@@ -165,7 +166,7 @@ namespace CoverShooter
             GetClosestStandablePosition(ref source);
             GetClosestStandablePosition(ref target);
 
-            NavMesh.CalculatePath(source, target, NavMesh.AllAreas, path);
+            bool finded = NavMesh.CalculatePath(source, target, NavMesh.AllAreas, path);
         }
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace CoverShooter
         public static bool IsObstructed(Vector3 origin, Vector3 target)
         {
             RaycastHit hit;
-            if (Physics.Raycast(origin, (target - origin).normalized, out hit, Vector3.Distance(origin, target), Layers.Geometry, QueryTriggerInteraction.Ignore))
+            if (GetPhysicsScene().Raycast(origin, (target - origin).normalized, out hit, Vector3.Distance(origin, target), Layers.Geometry, QueryTriggerInteraction.Ignore))
             {
                 if (Vector3.Distance(hit.point, target) < 0.5f)
                     return false;

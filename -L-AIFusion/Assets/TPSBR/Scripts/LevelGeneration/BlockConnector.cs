@@ -1,4 +1,5 @@
 using Fusion;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 namespace TPSBR
@@ -23,9 +24,16 @@ namespace TPSBR
 		[SerializeField]
 		private MeshRenderer[] _renderers;
 
-		// PUBLIC METHODS
+        // PUBLIC METHODS
+        private void Awake()
+        {
+            var sf = GetComponent<NavMeshSurface>();
 
-		public void SetMaterial(int areaID, Material material)
+            if (sf == null)
+                sf = gameObject.AddComponent<NavMeshSurface>();
+            sf.BuildNavMesh();
+        }
+        public void SetMaterial(int areaID, Material material)
 		{
 			if (material == null)
 				return;

@@ -1220,7 +1220,6 @@ namespace CoverShooter
         public void OnSeeActor(Actor actor)
         {
             _visibleActors.Add(actor);
-            Debug.LogError(actor.name);
 
             if (actor.Side == Actor.Side)
             {
@@ -1231,13 +1230,11 @@ namespace CoverShooter
             }
             else if (canChangeTarget && canSetThreat)
             {
-                Debug.LogError("canChangeTarget ????");
                 if (Threat == null ||
                     !Threat.IsAlive ||
                     InvestigationWait < ThreatAge ||
                     Threat == actor)
                 {
-                    Debug.LogError($"set target {actor.name}");
                     setSeenThreat(actor, actor.transform.position, actor.Cover);
                 }
             }
@@ -1406,7 +1403,7 @@ namespace CoverShooter
             if (Actor == null || !Actor.IsAlive)
                 return;
 
-            _stateTime += kINetworkTimer.deltaTime;
+            _stateTime += GetDeltaTime();
 
             if (_futureSetState != FighterState.none)
             {
@@ -1436,10 +1433,10 @@ namespace CoverShooter
                     _invisibleTime = 0;
                 }
                 else
-                    _invisibleTime += kINetworkTimer.deltaTime;
+                    _invisibleTime += GetDeltaTime();
             }
             else
-                _invisibleTime += kINetworkTimer.deltaTime;
+                _invisibleTime += GetDeltaTime();
 
             if (DebugThreat && Threat != null)
                 Debug.DrawLine(transform.position, LastKnownThreatPosition, Color.cyan);
@@ -2173,7 +2170,7 @@ namespace CoverShooter
             }
 
             var isInDarkness = _sight != null && _sight.IsInDarkness(Threat);
-
+            
             if (hasTimedOut || (isInvisibleAndOutsideCover && !isInDarkness))
             {
                 var closestPosition = LastKnownThreatPosition;
@@ -2232,14 +2229,14 @@ namespace CoverShooter
             if (_hasThrowFirstGrenade)
             {
                 if (_grenadeTimer < Grenades.Interval)
-                    _grenadeTimer += kINetworkTimer.deltaTime;
+                    _grenadeTimer += GetDeltaTime();
                 else
                     doThrow = true;
             }
             else
             {
                 if (_grenadeTimer < Grenades.FirstCheckDelay)
-                    _grenadeTimer += kINetworkTimer.deltaTime;
+                    _grenadeTimer += GetDeltaTime();
                 else
                     doThrow = true;
             }
@@ -2304,7 +2301,7 @@ namespace CoverShooter
             //            _grenadeCheckTimer = Grenades.CheckInterval;
             //    }
             //    else
-            //        _grenadeCheckTimer -= kINetworkTimer.deltaTime;
+            //        _grenadeCheckTimer -= GetDeltaTime();
             //}
             //else
             //    _grenadeCheckTimer = 0;
@@ -2318,7 +2315,7 @@ namespace CoverShooter
 
             //    if (Vector3.Distance(grenade.transform.position, transform.position) < grenade.ExplosionRadius)
             //    {
-            //        _grenadeAvoidReaction += kINetworkTimer.deltaTime;
+            //        _grenadeAvoidReaction += GetDeltaTime();
 
             //        if (_grenadeAvoidReaction >= GrenadeAvoidance.ReactionTime + float.Epsilon)
             //        {
@@ -2501,8 +2498,6 @@ namespace CoverShooter
                 _isInAggressiveMode = true;
 
             _hasCheckedIfTheLastKnownPositionIsNearCover = false;
-            Debug.LogError(State);
-
             SetThreat(isVisible, isHeard, isActual, threat, position, threatCover, time);
 
             if (CanSeeTheThreat && Threat != null)

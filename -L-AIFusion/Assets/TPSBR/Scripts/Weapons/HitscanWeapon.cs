@@ -39,7 +39,10 @@ namespace TPSBR
 			int impactTagHash = 0;
 
 			int ownerObjectID = Owner != null ? Owner.gameObject.GetInstanceID() : 0;
-			ProjectileUtility.ProjectileCast(Runner, Object.InputAuthority, ownerObjectID, firePosition, direction, distanceToTarget, _projectile.MaxDistance, hitMask, _validHits);
+
+            Debug.LogError(ownerObjectID);
+
+            ProjectileUtility.ProjectileCast(Runner, Object.InputAuthority, ownerObjectID, firePosition, direction, distanceToTarget, _projectile.MaxDistance, hitMask, _validHits);
 
 			float damagePenalty = 0f;
 			float maxDamage = _projectile.GetDamage(0f);
