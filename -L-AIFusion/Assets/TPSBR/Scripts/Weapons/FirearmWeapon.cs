@@ -345,8 +345,6 @@ namespace TPSBR
 			if (ProjectileUtility.ProjectileCast(Runner, Object.InputAuthority, ownerObjectID, firePosition, direction, distanceToTarget, distanceToTarget + 1, hitMask, _validHits) == true)
 			{
 				var hit = _validHits[0];
-                Debug.LogError(ownerObjectID);
-
                 if (hit.GameObject != null && hit.GameObject.layer == ObjectLayer.Agent)
 				{
 					// Do not show "position not reached" indicator if we accidentally hit Agent,

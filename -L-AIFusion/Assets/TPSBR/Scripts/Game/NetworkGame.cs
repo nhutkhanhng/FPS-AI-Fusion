@@ -48,6 +48,8 @@ namespace TPSBR
 		private int _levelGeneratorSeed { get; set; }
 
 		private PlayerRef                     _localPlayer;
+        public PlayerRef LocalPlayer => _localPlayer;
+
 		private Dictionary<PlayerRef, Player> _pendingPlayers      = new Dictionary<PlayerRef, Player>();
 		private Dictionary<string, Player>    _disconnectedPlayers = new Dictionary<string, Player>();
 		private FusionCallbacksHandler        _fusionCallbacks     = new FusionCallbacksHandler();

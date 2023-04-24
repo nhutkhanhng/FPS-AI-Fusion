@@ -127,7 +127,7 @@ namespace TPSBR
 
 			if (Runner.IsServer == true)
 			{
-				_animationController.SetEvaluationSeed(Object.InputAuthority);
+				_animationController.SetEvaluationSeed(Context.NetworkGame.LocalPlayer);
 			}
 
 			_characterController.SetManualUpdate(true);

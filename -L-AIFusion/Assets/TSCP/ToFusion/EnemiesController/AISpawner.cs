@@ -66,7 +66,7 @@ namespace TPSBR
             enemyTemplate.transform.localRotation = Quaternion.identity;
             PTemplate.transform.localRotation = Quaternion.identity;
 
-            var enemy = Runner.Spawn(template, spawnPoint.position, rotation, Context.LocalPlayerRef, onBeforeSpawned: _OnBeforeSpawned);
+            var enemy = Runner.Spawn(template, spawnPoint.position, rotation, PlayerRef.None, onBeforeSpawned: _OnBeforeSpawned);
 
             //enemy.AddBehaviour<AIMovement>();
             //// enemy.AddBehaviour<AISearch>();
