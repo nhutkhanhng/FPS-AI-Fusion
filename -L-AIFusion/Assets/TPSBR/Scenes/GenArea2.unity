@@ -475,6 +475,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 701041036}
     - target: {fileID: 6612427242272952745, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
+      propertyPath: _AIplayerPrefab
+      value: 
+      objectReference: {fileID: 3634698521145494846, guid: 318ed45d53b762d40a4962e878d6ebc8, type: 3}
+    - target: {fileID: 6612427242272952745, guid: 1432674e7fc1fa646ad8b14ba927a797, type: 3}
       propertyPath: _levelGenerator
       value: 
       objectReference: {fileID: 778164673}

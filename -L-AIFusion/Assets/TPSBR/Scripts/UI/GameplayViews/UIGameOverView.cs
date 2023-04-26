@@ -64,7 +64,7 @@ namespace TPSBR.UI
 
 		private PlayerStatistics GetWinner()
 		{
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;

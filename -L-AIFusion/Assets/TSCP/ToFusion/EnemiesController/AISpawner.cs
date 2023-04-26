@@ -76,8 +76,17 @@ namespace TPSBR
             //// enemy.AddBehaviour<AIInvestigation>();
             //enemy.AddBehaviour<FighterBrain>();
 
-            enemy.transform.name = "Enemy";
+            enemy.transform.name = "Enemy  " + UnityEngine.Random.Range(0, 10);
+            var aiPlayer = Context.NetworkGame.SpawnAIPlayer();
 
+            var statistics = aiPlayer.Statistics;
+            statistics.IsAlive = true;
+            statistics.RespawnTimer = default;
+            statistics.AgentIndex = enemy.gameObject.GetInstanceID();
+
+            aiPlayer.UpdateStatistics(statistics);
+            aiPlayer.SetActiveAgent(enemy.GetComponent<AIAgent>());
+            
             AllEnemies.Add(enemy);
         }
 

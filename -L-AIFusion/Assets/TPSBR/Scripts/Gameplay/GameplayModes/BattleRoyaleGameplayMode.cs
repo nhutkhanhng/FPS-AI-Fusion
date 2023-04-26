@@ -162,7 +162,7 @@ namespace TPSBR
 			var alivePlayers    = 0;
 			var lastAlivePlayer = PlayerRef.None;
 
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;

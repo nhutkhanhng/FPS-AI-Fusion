@@ -10,9 +10,13 @@ namespace TPSBR
 
 	public struct KillData : INetworkStruct
 	{
-		public PlayerRef KillerRef;
-		public PlayerRef VictimRef;
-		public EHitType  HitType;
+        public PlayerRef KillerRef;
+        public PlayerRef VictimRef;
+
+        public int KillerIndex;
+        public int VictimIndex;
+
+        public EHitType  HitType;
 		public bool      Headshot { get { return _flags.IsBitSet(0); } set { _flags.SetBit(0, value); } }
 
 		private byte     _flags;
@@ -97,12 +101,25 @@ namespace TPSBR
 		private DefaultPlayerComparer    _playerComparer        = new DefaultPlayerComparer();
 		private float                    _backfillTimerS;
 
-        protected Dictionary<Player, Agent> _allAgentInGame = new Dictionary<Player, Agent>();
-        public Agent GetAgent(Player player) => _allAgentInGame[player];
-        public Agent[] GetAgents() => _allAgentInGame.Values.ToArray();
-		// PUBLIC METHODS
+        [Networked] private byte CountAgent { get; set; } = 0;
+        [Networked, Capacity(byte.MaxValue)]
+        protected NetworkDictionary<Player, Agent> _allAgentInGame { get; } = default;
 
-		public void Activate()
+        //public Agent GetAgent(Player player) => _allAgentInGame[player];
+        public List<Agent> GetAgents()
+        {
+            List<Agent> AllAgents = new List<Agent>();
+            foreach (var agent in _allAgentInGame)
+            {
+                AllAgents.Add(agent.Value);
+            }
+
+            return AllAgents;
+        }
+
+        // PUBLIC METHODS
+
+        public void Activate()
 		{
 			if (Runner.IsServer == false)
 				return;
@@ -180,7 +197,7 @@ namespace TPSBR
 			victimStatistics.KillsWithoutDeath = 0;
 
 			var killerRef         = hitData.InstigatorRef;
-			var killerPlayer      = killerRef.IsValid == true ? Context.NetworkGame.GetPlayer(killerRef) : default;
+			var killerPlayer      = Context.NetworkGame.GetPlayer(hitData.InstigatorRef);
 			var killerStatistics  = killerPlayer != null ? killerPlayer.Statistics : default;
 
 			if (killerRef == victimRef)
@@ -251,7 +268,7 @@ namespace TPSBR
 					Transform spawnPoint = _availableSpawnPoints.GetRandom().transform;
 					bool      isValid    = true;
 
-					foreach (var player in Context.NetworkGame.Players)
+					foreach (var player in Context.NetworkGame.AllPlayers)
 					{
 						if (player == null)
 							continue;
@@ -397,8 +414,13 @@ namespace TPSBR
 			var spawnRotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
 
 			var _agent =  SpawnAgent(player.Object.InputAuthority, spawnPosition, spawnRotation);
-            _allAgentInGame.TryAdd(player, _agent);
 
+            if (Runner.IsServer && Object.HasStateAuthority)
+            {
+                _agent.AgentIndex = CountAgent;
+                _allAgentInGame.Set(player, _agent);
+                CountAgent++;
+            }
             return _agent;
         }
 
@@ -535,7 +557,7 @@ namespace TPSBR
 		{
 			var allStatistics = ListPool.Get<PlayerStatistics>(MAX_PLAYERS);
 
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;
@@ -554,7 +576,7 @@ namespace TPSBR
 				var statistics = allStatistics[i];
 
 				statistics.Position = (byte)(i + 1);
-				Context.NetworkGame.GetPlayer(statistics.PlayerRef).UpdateStatistics(statistics);
+				Context.NetworkGame.GetPlayer(statistics.PlayerRef)?.UpdateStatistics(statistics);
 			}
 
 			ListPool.Return(allStatistics);

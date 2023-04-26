@@ -68,7 +68,7 @@ namespace TPSBR.UI
 
 			int playersCount = 0;
 
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;
@@ -99,7 +99,7 @@ namespace TPSBR.UI
 				for (; i < count; i++)
 				{
 					var statistics = allStatistics[i];
-					var player     = Context.NetworkGame.GetPlayer(statistics.PlayerRef);
+					var player     = Context.NetworkGame.GetPlayer(statistics);
 
 					if (player != null)
 					{
@@ -118,7 +118,7 @@ namespace TPSBR.UI
 				for (int count = _fixedFirstPlaces; i < count; i++)
 				{
 					var statistics = allStatistics[i];
-					var player     = Context.NetworkGame.GetPlayer(statistics.PlayerRef);
+					var player     = Context.NetworkGame.GetPlayer(statistics);
 
 					_items[i].SetData(statistics, player.Nickname, showLives, Context.LocalPlayerRef == statistics.PlayerRef);
 				}
@@ -137,7 +137,7 @@ namespace TPSBR.UI
 				for (int y = secondsBlockStart; y < secondsBlockStart + aroundPlayer; i++, y++)
 				{
 					var statistics = allStatistics[y];
-					var player     = Context.NetworkGame.GetPlayer(statistics.PlayerRef);
+					var player     = Context.NetworkGame.GetPlayer(statistics);
 
 					_items[i].SetData(statistics, player.Nickname, showLives, Context.LocalPlayerRef == statistics.PlayerRef);
 				}

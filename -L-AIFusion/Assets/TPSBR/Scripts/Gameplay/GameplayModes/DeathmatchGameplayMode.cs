@@ -18,7 +18,7 @@ namespace TPSBR
 		{
 			base.AgentDeath(ref victimStatistics, ref killerStatistics);
 
-			if (killerStatistics.IsValid == true && victimStatistics.PlayerRef != killerStatistics.PlayerRef)
+			if (killerStatistics.IsValid == true && victimStatistics.AgentIndex != killerStatistics.AgentIndex)
 			{
 				if (killerStatistics.Score >= ScoreLimit)
 				{
@@ -34,7 +34,7 @@ namespace TPSBR
 
 		protected override void CheckWinCondition()
 		{
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;

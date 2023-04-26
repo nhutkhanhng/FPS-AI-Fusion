@@ -104,7 +104,7 @@ namespace TPSBR
 			_context.ActivePlayers = 0;
 			_context.BestScore = 0;
 
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;

@@ -13,7 +13,7 @@ namespace TPSBR
 		[SerializeField]
 		private bool _inRowOnly = true;
 
-		private PlayerRef _lastPlayer;
+		private int _lastPlayer;
 		private int _lastKills;
 		
 		// Announcement INTERFACE
@@ -21,9 +21,9 @@ namespace TPSBR
 		protected override bool CheckCondition(AnnouncerContext context)
 		{
 			// Player could change (e.g. when spectating)
-			if (_lastPlayer != context.PlayerStatistics.PlayerRef)
+			if (_lastPlayer != context.PlayerStatistics.AgentIndex)
 			{
-				_lastPlayer = context.PlayerStatistics.PlayerRef;
+				_lastPlayer = context.PlayerStatistics.AgentIndex;
 				_lastKills = context.PlayerStatistics.Kills;
 				return false;
 			}

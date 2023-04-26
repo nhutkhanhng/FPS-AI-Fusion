@@ -5,9 +5,12 @@ namespace TPSBR
 {
 	using System;
 	using System.Collections.Generic;
-	using UnityEngine;
+    using Unity.AI.Navigation;
+    using UnityEngine;
 
 	using Random = UnityEngine.Random;
+
+
 
 	public sealed class NetworkGame : ContextBehaviour, IPlayerJoined, IPlayerLeft
 	{
@@ -22,9 +25,9 @@ namespace TPSBR
 
 		// PRIVATE MEMBERS
 
-		[SerializeField]
-		private Player _playerPrefab;
-		[SerializeField]
+		[SerializeField] private Player _playerPrefab;
+        [SerializeField] private AIPlayer _AIplayerPrefab;
+        [SerializeField]
 		private GameplayMode[] _modePrefabs;
 
 		[Header("Level Generation")]
@@ -49,6 +52,10 @@ namespace TPSBR
 
 		private PlayerRef                     _localPlayer;
         public PlayerRef LocalPlayer => _localPlayer;
+
+        protected int countALlPlayer = 0;
+        [Networked, HideInInspector, Capacity(byte.MaxValue)]
+        public NetworkArray<Player> AllPlayers => default;
 
 		private Dictionary<PlayerRef, Player> _pendingPlayers      = new Dictionary<PlayerRef, Player>();
 		private Dictionary<string, Player>    _disconnectedPlayers = new Dictionary<string, Player>();
@@ -118,6 +125,20 @@ namespace TPSBR
 			}
 		}
 
+        public Player GetPlayer(PlayerStatistics statistics)
+        {
+            foreach(var p in AllPlayers)
+            {
+                if (p.Statistics.AgentIndex == statistics.AgentIndex)
+                    return p;
+            }
+            return null;
+        }
+
+        //public Player GetPlayer(int InstanceID)
+        //{
+
+        //}
 		public Player GetPlayer(PlayerRef playerRef)
 		{
 			if (playerRef.IsValid == false)
@@ -316,8 +337,15 @@ namespace TPSBR
 		}
 
 		// PRIVATE METHODS
+        public AIPlayer SpawnAIPlayer()
+        {
+            var player = Runner.Spawn(this._AIplayerPrefab, Vector3.zero, Quaternion.identity, PlayerRef.None);
+            AllPlayers.Set(countALlPlayer, player);
+            countALlPlayer++;
 
-		private void SpawnPlayer(PlayerRef playerRef)
+            return player;
+        }
+        private void SpawnPlayer(PlayerRef playerRef)
 		{
 			if (Players[playerRef] != null || _pendingPlayers.ContainsKey(playerRef) == true)
 			{
@@ -331,8 +359,11 @@ namespace TPSBR
             
             _pendingPlayers[playerRef] = player;
 
+            AllPlayers.Set(countALlPlayer, player);
+            countALlPlayer++;
+
 #if UNITY_EDITOR
-			player.gameObject.name = $"Player Unknown (Pending)";
+            player.gameObject.name = $"Player Unknown (Pending)";
 #endif
 		}
 
@@ -371,7 +402,7 @@ namespace TPSBR
 				var spawnData = _levelGenerator.ObjectsToSpawn[i];
 				var spawnedObject = Runner.Spawn(spawnData.Prefab, spawnData.Position, spawnData.Rotation);
 
-				if (spawnData.IsConnector == true)
+                if (spawnData.IsConnector == true)
 				{
 					var connector = spawnedObject.GetComponent<IBlockConnector>();
 

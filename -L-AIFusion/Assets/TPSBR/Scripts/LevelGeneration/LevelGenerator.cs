@@ -138,13 +138,13 @@ namespace TPSBR
 		private LevelBlock GenerateRandomBlock(Vector3 position, BlockSpawn blockSpawn)
 		{
 			var block = GenerateBlock(blockSpawn.GetBlockPrefab(), position);
-            //var sf = block.GetComponent<NavMeshSurface>();
+            var sf = block.GetComponent<NavMeshSurface>();
 
-            //if (sf == null)
-            //    sf = block.gameObject.AddComponent<NavMeshSurface>();
+            if (sf == null)
+                sf = block.gameObject.AddComponent<NavMeshSurface>();
 
-            //allSf.Add(sf);
-            //sf.BuildNavMesh();
+            allSf.Add(sf);
+            sf.BuildNavMesh();
             return block;
 		}
 

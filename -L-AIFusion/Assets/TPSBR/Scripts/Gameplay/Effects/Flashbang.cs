@@ -76,7 +76,7 @@ namespace TPSBR
 			var position     = transform.position + Vector3.up * 0.5f; // Take position slightly above
 			var flashFalloff = _innerRadius < _outerRadius && _innerFlashValue != _outerFlashValue;
 
-			foreach (var player in Context.NetworkGame.Players)
+			foreach (var player in Context.NetworkGame.AllPlayers)
 			{
 				if (player == null)
 					continue;

@@ -7,6 +7,7 @@ namespace TPSBR
 	public struct PlayerStatistics : INetworkStruct
 	{
 		public PlayerRef PlayerRef;
+        public int       AgentIndex;
 		public short     ExtraLives;
 		public short     Kills;
 		public short     Deaths;
@@ -29,23 +30,23 @@ namespace TPSBR
 	{
 		// PUBLIC MEMBERS
 
-		public bool             IsInitialized  { get; private set; }
-		public string           UserID         { get; private set; }
-		public string			UnityID        { get; private set; }
+		public bool             IsInitialized  { get; protected set; }
+		public string           UserID         { get; protected set; }
+		public string			UnityID        { get; protected set; }
 
 		[Networked, Capacity(24)]
-		public string           Nickname       { get; private set; }
+		public string           Nickname       { get; protected set; }
 		[Networked]
-		public PlayerStatistics Statistics     { get; private set; }
+		public PlayerStatistics Statistics     { get; protected set; }
 
 		[Networked(OnChanged = nameof(OnActiveAgentChanged), OnChangedTargets = OnChangedTargets.InputAuthority)]
-		public Agent            ActiveAgent    { get; private set; }
+		public Agent            ActiveAgent    { get; protected set; }
 		[Networked]
 		public NetworkPrefabId  AgentPrefabID  { get; set; }
 
-		// PRIVATE METHODS
+		// protected METHODS
 
-		private PlayerRef       _observedPlayer;
+		protected PlayerRef       _observedPlayer;
 
 		// PUBLIC METHODS
 
@@ -53,6 +54,9 @@ namespace TPSBR
 		{
 			ActiveAgent = agent;
 			_observedPlayer = Object.InputAuthority;
+            var n = Statistics;
+            n.AgentIndex = agent.AgentIndex;
+            UpdateStatistics(n);
 		}
 
 		public void DespawnAgent()
@@ -143,7 +147,7 @@ namespace TPSBR
 		// RPCs
 
 		[Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-		private void RPC_Initialize(string userID, string nickname, NetworkPrefabId agentPrefabID, string unityID)
+		protected void RPC_Initialize(string userID, string nickname, NetworkPrefabId agentPrefabID, string unityID)
 		{
 			#if UNITY_EDITOR
 			nickname += $" {Object.InputAuthority}";
@@ -158,7 +162,7 @@ namespace TPSBR
 		}
 
 		[Rpc(RpcSources.StateAuthority | RpcSources.InputAuthority, RpcTargets.StateAuthority | RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
-		private void RPC_SetObservedPlayer(PlayerRef player)
+		protected void RPC_SetObservedPlayer(PlayerRef player)
 		{
 			_observedPlayer = player;
 		}

@@ -10,6 +10,7 @@ namespace TPSBR
 	public class Agent : ChatacterMix
     {
 		// PUBLIC METHODS
+        [Networked] public byte AgentIndex { get; set; }
 
 		public bool        IsLocal    => Object != null && Object.HasInputAuthority == true;
 		public bool        IsObserved => Context != null && Context.ObservedAgent == this;
@@ -63,6 +64,8 @@ namespace TPSBR
 
 		public override void Spawned()
 		{
+            Debug.LogError(this.gameObject.GetInstanceID());
+
 			name = Object.InputAuthority.ToString();
 
 			var earlyAgentController = GetComponent<EarlyAgentController>();

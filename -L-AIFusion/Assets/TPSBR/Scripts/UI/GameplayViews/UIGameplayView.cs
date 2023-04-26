@@ -170,8 +170,8 @@ namespace TPSBR.UI
 
 		private void OnAgentDeath(KillData killData)
 		{
-			var victimPlayer = Context.NetworkGame.GetPlayer(killData.VictimRef);
-			var killerPlayer = Context.NetworkGame.GetPlayer(killData.KillerRef);
+			var victimPlayer = Context.NetworkGame.GetPlayer(killData.VictimIndex);
+			var killerPlayer = Context.NetworkGame.GetPlayer(killData.KillerIndex);
 
 			_killFeed.ShowFeed(new KillFeedData
 			{

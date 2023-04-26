@@ -40,8 +40,6 @@ namespace TPSBR
 
 			int ownerObjectID = Owner != null ? Owner.gameObject.GetInstanceID() : 0;
 
-            Debug.LogError(ownerObjectID);
-
             ProjectileUtility.ProjectileCast(Runner, Object.InputAuthority, ownerObjectID, firePosition, direction, distanceToTarget, _projectile.MaxDistance, hitMask, _validHits);
 
 			float damagePenalty = 0f;
