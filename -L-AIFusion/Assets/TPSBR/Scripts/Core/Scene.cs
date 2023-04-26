@@ -6,6 +6,52 @@ using TPSBR.UI;
 
 namespace TPSBR
 {
+    public static class SceneContextExtensions
+    {
+        public static bool CheckLocal(this SceneContext Context, int agentIndex)
+        {
+            var victimPlayer = Context.NetworkGame.GetPlayer(agentIndex);
+
+            var VictimRef = Context.NetworkGame.GetPlayerRef(victimPlayer);
+            bool isLocalVictim = VictimRef == null ? false : (VictimRef != PlayerRef.None && VictimRef == Context.LocalPlayerRef);
+
+            return isLocalVictim;
+        }
+
+        public static Agent GetAgent(in this HitData hitData, SceneContext Context)
+        {
+            var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
+            return Context.GameplayMode.GetAgent(player);
+        }
+
+        public static bool CheckLocal(this SceneContext Context, in PlayerStatistics statics)
+        {
+            var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(statics.AgentIndex);
+            return Context.NetworkGame.GetPlayerRef(player) == Context.LocalPlayerRef;
+        }
+        public static bool CheckLocalAndRunnerForward(in this HitData hitData, SceneContext Context, NetworkRunner Runner)
+        {
+            // hit.InstigatorRef == Context.LocalPlayerRef && Runner.IsForward == true
+
+            return hitData.CheckLocal(Context) && Runner.IsForward;
+        }
+        public static bool CheckLocal(in this HitData hitData, SceneContext Context)
+        {
+            // hit.InstigatorRef != Context.LocalPlayerRef
+
+            var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
+            return Context.NetworkGame.GetPlayerRef(player) == Context.LocalPlayerRef;
+        }
+
+        public static bool CheckObservedPlayerRef(in this HitData hitData, SceneContext Context)
+        {
+            // hit.InstigatorRef == Context.ObservedPlayerRef
+
+            var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
+            return Context.NetworkGame.GetPlayerRef(player) == Context.ObservedPlayerRef;
+        }
+
+    }
 	[System.Serializable]
 	public class SceneContext
 	{

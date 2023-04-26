@@ -18,7 +18,10 @@ namespace TPSBR
 		{
 			base.AgentDeath(ref victimStatistics, ref killerStatistics);
 
-			if (killerStatistics.IsValid == true && victimStatistics.AgentIndex != killerStatistics.AgentIndex)
+			if (
+                // killerStatistics.IsValid == true 
+                // && 
+                victimStatistics.AgentIndex != killerStatistics.AgentIndex)
 			{
 				if (killerStatistics.Score >= ScoreLimit)
 				{

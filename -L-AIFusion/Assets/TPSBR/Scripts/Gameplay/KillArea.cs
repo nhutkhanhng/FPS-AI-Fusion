@@ -26,7 +26,7 @@ namespace TPSBR
 					hitData.IsFatal          = true;
 					hitData.Position         = kcc.transform.position;
 					hitData.Normal           = Vector3.up;
-					hitData.InstigatorRef    = GetComponent<NetworkObject>().InputAuthority;
+					hitData.InstigatorIndex    = -1;
 					hitData.Target           = hitTarget;
 					hitData.HitType          = EHitType.Suicide;
 

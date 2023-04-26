@@ -20,7 +20,9 @@ namespace TPSBR
 		public Vector3        Position;
 		public Vector3        Normal;
 		public Vector3        Direction;
-		public PlayerRef      InstigatorRef;
+
+        public int InstigatorIndex; // Agent Index
+		// public int            InstigatorRef;
 		public IHitInstigator Instigator;
 		public IHitTarget     Target;
 		public EHitType       HitType;
@@ -69,7 +71,7 @@ namespace TPSBR
 			processedHit.Normal        = hit.Normal;
 			processedHit.Direction     = direction;
 			processedHit.Target        = target;
-			processedHit.InstigatorRef = instigatorRef;
+			// processedHit.InstigatorIndex = instigator.GetComponent<Agent>().AgentIndex;
 			processedHit.HitType       = hitType;
 
 			if (hit.Hitbox is BodyPart bodyPart)
@@ -92,15 +94,15 @@ namespace TPSBR
 			if (hit.Hitbox.Root.gameObject == instigator)
 				return false;
 
-			processedHit.Action        = EHitAction.Damage;
-			processedHit.Amount        = baseDamage;
-			processedHit.Position      = hit.Point;
-			processedHit.Normal        = hit.Normal;
-			processedHit.Direction     = direction;
-			processedHit.Target        = target;
-			processedHit.InstigatorRef = instigator != null ? instigator.Object.InputAuthority : default;
-			processedHit.Instigator    = instigator != null ? instigator.GetComponent<IHitInstigator>() : null;
-			processedHit.HitType       = hitType;
+			processedHit.Action             = EHitAction.Damage;
+			processedHit.Amount             = baseDamage;
+			processedHit.Position           = hit.Point;
+			processedHit.Normal             = hit.Normal;
+			processedHit.Direction          = direction;
+			processedHit.Target             = target;
+			processedHit.InstigatorIndex    = instigator != null ? instigator.GetComponent<Agent>().AgentIndex : -1;
+			processedHit.Instigator         = instigator != null ? instigator.GetComponent<IHitInstigator>() : null;
+			processedHit.HitType            = hitType;
 
 			if (hit.Hitbox is BodyPart bodyPart)
 			{
@@ -121,7 +123,7 @@ namespace TPSBR
 
 			processedHit.Action        = EHitAction.Damage;
 			processedHit.Amount        = damage;
-			processedHit.InstigatorRef = instigator.Object.InputAuthority;
+			processedHit.InstigatorIndex = instigator.GetComponent<Agent>().AgentIndex;
 			processedHit.Instigator    = instigator.GetComponent<IHitInstigator>();
 			processedHit.Position      = collider.transform.position;
 			processedHit.Normal        = (instigator.transform.position - collider.transform.position).normalized;

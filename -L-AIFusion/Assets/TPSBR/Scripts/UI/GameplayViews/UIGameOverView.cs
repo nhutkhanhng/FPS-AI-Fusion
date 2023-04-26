@@ -33,12 +33,8 @@ namespace TPSBR.UI
 			var winnerStatistics = GetWinner();
 			Player winner = null;
 
-			if (winnerStatistics.IsValid == true)
-			{
-				winner = Context.NetworkGame.GetPlayer(winnerStatistics.PlayerRef);
-			}
-
-			if (winner != null)
+            winner = Context.GameplayMode.GetPlayer(winnerStatistics);
+            if (winner != null)
 			{
 				_winner.text = $"Winner is {winner.Nickname}";
 				_winnerGroup.SetActive(true);

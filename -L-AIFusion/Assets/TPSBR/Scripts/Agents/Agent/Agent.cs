@@ -64,8 +64,6 @@ namespace TPSBR
 
 		public override void Spawned()
 		{
-            Debug.LogError(this.gameObject.GetInstanceID());
-
 			name = Object.InputAuthority.ToString();
 
 			var earlyAgentController = GetComponent<EarlyAgentController>();
@@ -563,7 +561,7 @@ namespace TPSBR
 				Position         = transform.position,
 				Normal           = Vector3.up,
 				Direction        = -Vector3.up,
-				InstigatorRef    = Object.InputAuthority,
+				InstigatorIndex  = AgentIndex,
 				Instigator       = _health,
 				Target           = _health,
 				HitType          = EHitType.Suicide,

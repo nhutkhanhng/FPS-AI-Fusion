@@ -10,8 +10,8 @@ namespace TPSBR
 
 	public struct KillData : INetworkStruct
 	{
-        public PlayerRef KillerRef;
-        public PlayerRef VictimRef;
+        //public PlayerRef KillerRef;
+        //public PlayerRef VictimRef;
 
         public int KillerIndex;
         public int VictimIndex;
@@ -24,7 +24,7 @@ namespace TPSBR
 
 	public struct RespawnRequest
 	{
-		public PlayerRef PlayerRef;
+		public int AgentIndex;
 		public TickTimer Timer;
 	}
 
@@ -101,11 +101,12 @@ namespace TPSBR
 		private DefaultPlayerComparer    _playerComparer        = new DefaultPlayerComparer();
 		private float                    _backfillTimerS;
 
+
         [Networked] private byte CountAgent { get; set; } = 0;
         [Networked, Capacity(byte.MaxValue)]
         protected NetworkDictionary<Player, Agent> _allAgentInGame { get; } = default;
 
-        //public Agent GetAgent(Player player) => _allAgentInGame[player];
+        public Agent GetAgent(Player player) => _allAgentInGame[player];
         public List<Agent> GetAgents()
         {
             List<Agent> AllAgents = new List<Agent>();
@@ -115,6 +116,49 @@ namespace TPSBR
             }
 
             return AllAgents;
+        }
+
+        public List<Player> AllPlayers 
+        {
+            get
+            {
+                List<Player> result = new List<Player>();
+                foreach (var p in _allAgentInGame)
+                {
+                    if (p.Key == null)
+                        continue;
+
+                    result.Add(p.Key);
+                }
+
+                return result;
+            }
+        }
+        public Player GetPlayer(PlayerStatistics statistics)
+        {
+            foreach (var p in _allAgentInGame)
+            {
+                if (p.Key == null)
+                    continue;
+
+                if (p.Key.Statistics.AgentIndex == statistics.AgentIndex)
+                    return p.Key;
+            }
+            return null;
+        }
+
+        public Player GetPlayerReplyOnAgentIndex(int AgentIndex)
+        {
+            foreach (var p in _allAgentInGame)
+            {
+                if (p.Key == null)
+                    continue;
+
+                if (p.Key.Statistics.AgentIndex == AgentIndex)
+                    return p.Key;
+            }
+
+            return null;
         }
 
         // PUBLIC METHODS
@@ -171,8 +215,8 @@ namespace TPSBR
 			if (State != EState.Active)
 				return;
 
-			var victimRef        = victim.Object.InputAuthority;
-			var victimPlayer     = Context.NetworkGame.GetPlayer(victimRef);
+			var victimIndex        = victim.AgentIndex;
+			var victimPlayer     = Context.GameplayMode.GetPlayerReplyOnAgentIndex(victimIndex);
 			var victimStatistics = victimPlayer != null ? victimPlayer.Statistics : default;
 
 			var respawnTime = GetRespawnTime(victimStatistics);
@@ -182,7 +226,7 @@ namespace TPSBR
 				victimStatistics.RespawnTimer = respawnTimer;
 				_respawnRequests.Enqueue(new RespawnRequest()
 				{
-					PlayerRef = victimRef,
+					AgentIndex = victimIndex,
 					Timer     = respawnTimer,
 				});
 			}
@@ -196,11 +240,13 @@ namespace TPSBR
 			victimStatistics.Score            += ScorePerDeath;
 			victimStatistics.KillsWithoutDeath = 0;
 
-			var killerRef         = hitData.InstigatorRef;
-			var killerPlayer      = Context.NetworkGame.GetPlayer(hitData.InstigatorRef);
+			var killerIndex         = hitData.InstigatorIndex;
+			var killerPlayer      = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
+            Debug.LogError((killerPlayer == null )+ " -- " + hitData.InstigatorIndex);
+
 			var killerStatistics  = killerPlayer != null ? killerPlayer.Statistics : default;
 
-			if (killerRef == victimRef)
+			if (killerIndex == victimIndex)
 			{
 				victimStatistics.Score += ScorePerSuicide;
 			}
@@ -238,8 +284,8 @@ namespace TPSBR
 
 			var killData = new KillData()
 			{
-				KillerRef = killerStatistics.PlayerRef,
-				VictimRef = victimRef,
+				KillerIndex = killerStatistics.AgentIndex,
+				VictimIndex = victim.AgentIndex,
 				Headshot  = hitData.IsCritical,
 				HitType   = hitData.HitType,
 			};
@@ -248,7 +294,8 @@ namespace TPSBR
 
 			if (victimStatistics.IsEliminated == true)
 			{
-				RPC_PlayerEliminated(victimRef);
+
+				RPC_PlayerEliminated(victim.Object.InputAuthority);
 			}
 
 			CheckWinCondition();
@@ -329,7 +376,7 @@ namespace TPSBR
 		{
 			var statistics = player.Statistics;
 
-			statistics.PlayerRef = player.Object.InputAuthority;
+			// statistics.PlayerRef = player.Object.InputAuthority;
 
 			PreparePlayerStatistics(ref statistics);
 			player.UpdateStatistics(statistics);
@@ -424,6 +471,16 @@ namespace TPSBR
             return _agent;
         }
 
+        public virtual void TryAdd(AIPlayer player, Agent agentSpawned)
+        {
+            if (Runner.IsServer && Object.HasStateAuthority)
+            {
+                agentSpawned.AgentIndex = CountAgent;
+                _allAgentInGame.Set(player, agentSpawned);
+                CountAgent++;
+            }
+        }
+
 		protected virtual void AgentDeath(ref PlayerStatistics victimStatistics, ref PlayerStatistics killerStatistics)
 		{
 		}
@@ -488,28 +545,30 @@ namespace TPSBR
 
 		protected void SetSpectatorTargetToBestPlayer(Player spectatorPlayer)
 		{
-			var bestPlayer = PlayerRef.None;
-			int bestPosition = int.MaxValue;
+            // TODO: Implement later
+            return;
+			//var bestPlayer = PlayerRef.None;
+			//int bestPosition = int.MaxValue;
 
-			foreach (var player in Context.NetworkGame.Players)
-			{
-				if (player == null)
-					continue;
+			//foreach (var player in Context.NetworkGame.Players)
+			//{
+			//	if (player == null)
+			//		continue;
 
-				var statistics = player.Statistics;
-				if (statistics.IsEliminated == true)
-					continue;
+			//	var statistics = player.Statistics;
+			//	if (statistics.IsEliminated == true)
+			//		continue;
 
-				int position = statistics.Position > 0 ? statistics.Position : 1000;
+			//	int position = statistics.Position > 0 ? statistics.Position : 1000;
 
-				if (position < bestPosition)
-				{
-					bestPlayer = statistics.PlayerRef;
-					bestPosition = position;
-				}
-			}
+			//	if (position < bestPosition)
+			//	{
+			//		bestPlayer = statistics.PlayerRef;
+			//		bestPosition = position;
+			//	}
+			//}
 
-			spectatorPlayer.SetObservedPlayer(bestPlayer);
+			//spectatorPlayer.SetObservedPlayer(bestPlayer);
 		}
 
 		// PRIVATE METHODS
@@ -523,7 +582,7 @@ namespace TPSBR
 					break;
 
 				_respawnRequests.Dequeue();
-				Respawn(respawnRequest.PlayerRef);
+				Respawn(respawnRequest.AgentIndex);
 			}
 
 			_backfillTimerS += UnityEngine.Time.deltaTime;
@@ -542,15 +601,23 @@ namespace TPSBR
 		{
 		}
 
-		private void Respawn(PlayerRef playerRef)
+		private void Respawn(int agentIndex)
 		{
-			var player = Context.NetworkGame.GetPlayer(playerRef);
-			if (player == null)
-				return; // Player is not present anymore
+			var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(agentIndex);
+            if (player == null)
+            {
+                Debug.LogError("????????????");
+                return; // Player is not present anymore
+            }
 
 			player.DespawnAgent();
 
-			TrySpawnAgent(player);
+            if (player is AIPlayer)
+            {
+                Context.NetworkGame.GetComponent<AISpawner>().SpawnAI(player as AIPlayer, GetRandomSpawnPoint(1f).position);
+            }
+			else
+                TrySpawnAgent(player);
 		}
 
 		private void RecalculatePositions()
@@ -563,9 +630,6 @@ namespace TPSBR
 					continue;
 
 				var statistics = player.Statistics;
-				if (statistics.IsValid == false)
-					continue;
-
 				allStatistics.Add(statistics);
 			}
 
@@ -576,7 +640,7 @@ namespace TPSBR
 				var statistics = allStatistics[i];
 
 				statistics.Position = (byte)(i + 1);
-				Context.NetworkGame.GetPlayer(statistics.PlayerRef)?.UpdateStatistics(statistics);
+				Context.GameplayMode.GetPlayer(statistics)?.UpdateStatistics(statistics);
 			}
 
 			ListPool.Return(allStatistics);

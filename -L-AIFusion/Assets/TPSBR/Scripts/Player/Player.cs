@@ -6,7 +6,7 @@ namespace TPSBR
 
 	public struct PlayerStatistics : INetworkStruct
 	{
-		public PlayerRef PlayerRef;
+		// public PlayerRef PlayerRef;
         public int       AgentIndex;
 		public short     ExtraLives;
 		public short     Kills;
@@ -19,7 +19,7 @@ namespace TPSBR
 		public TickTimer KillsInRowCooldown;
 		public byte      KillsWithoutDeath;
 
-		public bool      IsValid         => PlayerRef.IsValid;
+		// public bool      IsValid         => PlayerRef.IsValid;
 		public bool      IsAlive         { get { return _flags.IsBitSet(0); } set { _flags.SetBit(0, value); } }
 		public bool      IsEliminated    { get { return _flags.IsBitSet(1); } set { _flags.SetBit(1, value); } }
 
@@ -56,6 +56,7 @@ namespace TPSBR
 			_observedPlayer = Object.InputAuthority;
             var n = Statistics;
             n.AgentIndex = agent.AgentIndex;
+            Debug.LogError((agent is AIAgent).ToString() + "===" + agent.AgentIndex);
             UpdateStatistics(n);
 		}
 
@@ -74,6 +75,7 @@ namespace TPSBR
 		public void UpdateStatistics(PlayerStatistics statistics)
 		{
 			Statistics = statistics;
+            Debug.LogError(statistics.AgentIndex);
 		}
 
 		public void SetObservedPlayer(PlayerRef playerRef)

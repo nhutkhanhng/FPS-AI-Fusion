@@ -71,7 +71,18 @@ namespace TPSBR
             return _pendingPlayers[Runner.LocalPlayer];
         }
 		// PUBLIC METHODS
+        public PlayerRef? GetPlayerRef(Player playerInfo)
+        {
+            foreach(var p in _pendingPlayers)
+            {
+                if (p.Value.Statistics.AgentIndex == playerInfo.Statistics.AgentIndex)
+                {
+                    return p.Key;
+                }
+            }
 
+            return null;
+        }
 		public void Initialize(EGameplayType gameplayType)
 		{
 			if (Object.HasStateAuthority == true)
@@ -125,24 +136,8 @@ namespace TPSBR
 			}
 		}
 
-        public Player GetPlayer(PlayerStatistics statistics)
-        {
-            foreach(var p in AllPlayers)
-            {
-                if (p.Statistics.AgentIndex == statistics.AgentIndex)
-                    return p;
-            }
-            return null;
-        }
-
-        //public Player GetPlayer(int InstanceID)
-        //{
-
-        //}
 		public Player GetPlayer(PlayerRef playerRef)
 		{
-			if (playerRef.IsValid == false)
-				return null;
 			if (Object == null)
 				return null;
 
@@ -159,9 +154,6 @@ namespace TPSBR
 					continue;
 
 				var statistics = player.Statistics;
-				if (statistics.IsValid == false)
-					continue;
-
 				if (statistics.IsEliminated == false)
 				{
 					players++;

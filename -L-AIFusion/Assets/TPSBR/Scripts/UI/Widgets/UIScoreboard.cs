@@ -68,7 +68,7 @@ namespace TPSBR.UI
 
 			int playersCount = 0;
 
-			foreach (var player in Context.NetworkGame.AllPlayers)
+			foreach (var player in Context.GameplayMode.AllPlayers)
 			{
 				if (player == null)
 					continue;
@@ -76,8 +76,7 @@ namespace TPSBR.UI
 				var statistics = player.Statistics;
 
 				allStatistics.Add(statistics);
-
-				if (statistics.PlayerRef == Context.LocalPlayerRef)
+				if (Context.CheckLocal(in statistics))
 				{
 					localPlayerPosition = statistics.Position;
 				}
@@ -99,12 +98,12 @@ namespace TPSBR.UI
 				for (; i < count; i++)
 				{
 					var statistics = allStatistics[i];
-					var player     = Context.NetworkGame.GetPlayer(statistics);
+					var player     = Context.GameplayMode.GetPlayer(statistics);
 
 					if (player != null)
 					{
-						_items[i].SetData(statistics, player.Nickname, showLives, Context.LocalPlayerRef == statistics.PlayerRef);
-					}
+						_items[i].SetData(statistics, player.Nickname, showLives, Context.CheckLocal(in statistics));
+                    }
 				}
 
 				_items.HideAll(i);
@@ -118,9 +117,9 @@ namespace TPSBR.UI
 				for (int count = _fixedFirstPlaces; i < count; i++)
 				{
 					var statistics = allStatistics[i];
-					var player     = Context.NetworkGame.GetPlayer(statistics);
+					var player     = Context.GameplayMode.GetPlayer(statistics);
 
-					_items[i].SetData(statistics, player.Nickname, showLives, Context.LocalPlayerRef == statistics.PlayerRef);
+					_items[i].SetData(statistics, player.Nickname, showLives, Context.CheckLocal(in statistics));
 				}
 
 				_recordsGapSeparator.SetSiblingIndex(i + 2);
@@ -137,10 +136,10 @@ namespace TPSBR.UI
 				for (int y = secondsBlockStart; y < secondsBlockStart + aroundPlayer; i++, y++)
 				{
 					var statistics = allStatistics[y];
-					var player     = Context.NetworkGame.GetPlayer(statistics);
+					var player     = Context.GameplayMode.GetPlayer(statistics);
 
-					_items[i].SetData(statistics, player.Nickname, showLives, Context.LocalPlayerRef == statistics.PlayerRef);
-				}
+					_items[i].SetData(statistics, player.Nickname, showLives, Context.CheckLocal(statistics));
+                }
 
 				_items.HideAll(i);
 			}

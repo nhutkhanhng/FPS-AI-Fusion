@@ -54,6 +54,10 @@ namespace TPSBR
 
 		[Networked(OnChanged = nameof(OnDataChanged), OnChangedTargets = OnChangedTargets.All)]
 		private ProjectileData   _data_Networked { get; set; }
+
+        [Networked]
+        private int agentIndexOwn { get; set; }
+
 		private ProjectileData   _data_Local;
 		private ProjectileData   _data { get { return IsPredicted ? _data_Local : _data_Networked; } set { if (IsPredicted == true) _data_Local = value; else _data_Networked = value; } }
 
@@ -75,8 +79,11 @@ namespace TPSBR
 			if (IsPredicted == true && Runner.IsResimulation == true)
 				return;
 
-			ProjectileData data = default;
+            agentIndexOwn = owner.AgentIndex;
 
+            ProjectileData data = default;
+
+            data.AgentIndex = owner.AgentIndex;
 			data.FirePosition = firePosition;
 			data.InitialVelocity = initialVelocity;
 			data.DespawnCooldown = TickTimer.CreateFromSeconds(Runner, _fireDespawnTime);
@@ -263,7 +270,7 @@ namespace TPSBR
 
 			if (hitDamage > 0f)
 			{
-				var player = Context.NetworkGame.GetPlayer(InputAuthority);
+				var player = Context.NetworkGame.GetPlayer(data.AgentIndex);
 				var owner = player != null ? player.ActiveAgent : null;
 
 				if (owner != null)
@@ -397,6 +404,9 @@ namespace TPSBR
 			public bool        IsFinished         => HasImpacted || HasStopped;
 			public bool        HasStopped         { get { return State.IsBitSet(0); } set { State.SetBit(0, value); } }
 			public bool        HasImpacted        { get { return State.IsBitSet(1); } set { State.SetBit(1, value); } }
+
+            [Networked]
+            public int         AgentIndex { get; set; }
 
 			public byte        State;
 			public int         StartTick;

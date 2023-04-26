@@ -17,11 +17,11 @@ namespace TPSBR
 		{
 			var hitData = new HitData
 			{
-				Action        = _actionType,
-				Amount        = _amount,
-				InstigatorRef = Object.InputAuthority,
-				Target        = agent.Health,
-				HitType       = EHitType.Heal,
+				Action                  = _actionType,
+				Amount                  = _amount,
+				InstigatorIndex         = agent.AgentIndex,
+				Target                  = agent.Health,
+				HitType                 = EHitType.Heal,
 			};
 
 			HitUtility.ProcessHit(ref hitData);

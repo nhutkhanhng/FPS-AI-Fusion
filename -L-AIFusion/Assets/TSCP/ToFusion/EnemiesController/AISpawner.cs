@@ -50,6 +50,30 @@ namespace TPSBR
                 _spawnDelay = TickTimer.CreateFromSeconds(Runner, 3f);
             }
         }
+
+        public AIAgent SpawnAI(AIPlayer aiPlayer, in Vector3 position)
+        {
+            var enemy = Runner.Spawn(enemyTemplate, position, Quaternion.identity, 
+                                                PlayerRef.None, onBeforeSpawned: _OnBeforeSpawned);
+
+            enemy.transform.name = "Enemy  " + UnityEngine.Random.Range(0, 10);
+            var aiAgent = enemy.GetComponent<AIAgent>();
+
+            var statistics = aiPlayer.Statistics;
+            statistics.IsAlive = true;
+            statistics.RespawnTimer = default;
+
+            _currentGameMode.TryAdd(aiPlayer, aiAgent);
+            statistics.AgentIndex = aiAgent.AgentIndex;
+
+            aiPlayer.UpdateStatistics(statistics);
+            aiPlayer.SetActiveAgent(enemy.GetComponent<AIAgent>());
+
+
+            AllEnemies.Add(enemy);
+
+            return aiAgent;
+        }
         private void SpawnEnemies(NetworkBehaviour template)
         {
             // var spawnPoint = _currentGameMode.GetRandomSpawnPoint(1f);
@@ -78,14 +102,18 @@ namespace TPSBR
 
             enemy.transform.name = "Enemy  " + UnityEngine.Random.Range(0, 10);
             var aiPlayer = Context.NetworkGame.SpawnAIPlayer();
+            var aiAgent = enemy.GetComponent<AIAgent>();
 
             var statistics = aiPlayer.Statistics;
             statistics.IsAlive = true;
             statistics.RespawnTimer = default;
-            statistics.AgentIndex = enemy.gameObject.GetInstanceID();
+
+            _currentGameMode.TryAdd(aiPlayer, aiAgent);
+            statistics.AgentIndex = aiAgent.AgentIndex;
 
             aiPlayer.UpdateStatistics(statistics);
             aiPlayer.SetActiveAgent(enemy.GetComponent<AIAgent>());
+
             
             AllEnemies.Add(enemy);
         }

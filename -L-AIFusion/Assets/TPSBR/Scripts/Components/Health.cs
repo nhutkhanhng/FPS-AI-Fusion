@@ -13,7 +13,7 @@ namespace TPSBR
 		public Vector3    RelativePosition { get; set; }
 		[Networked, Accuracy(0.01f)]
 		public Vector3    Direction { get; set; }
-		public PlayerRef  Instigator;
+		public int  InstigatorIndex;
 	}
 
 	public class Health : ContextBehaviour, IHitTarget, IHitInstigator
@@ -184,7 +184,7 @@ namespace TPSBR
 
 			// Hit taken effects (blood) is shown immediately for local player, for other
 			// effects (hit number, crosshair hit effect) we are waiting for server confirmation
-			if (hit.InstigatorRef == Context.LocalPlayerRef && Runner.IsForward == true)
+			if (hit.CheckLocalAndRunnerForward(Context, Runner))
 			{
 				HitTaken?.Invoke(hit);
 			}
@@ -200,7 +200,7 @@ namespace TPSBR
 				Damage           = hit.Amount,
 				Direction        = hit.Direction,
 				RelativePosition = hit.Position != Vector3.zero ? hit.Position - transform.position : Vector3.zero,
-				Instigator       = hit.InstigatorRef,
+                InstigatorIndex  = hit.InstigatorIndex,
 			};
 
 			int hitIndex = _hitCount % _hitData.Length;
@@ -265,7 +265,7 @@ namespace TPSBR
 					Direction     = bodyHitData.Direction,
 					Normal        = -bodyHitData.Direction,
 					Target        = this,
-					InstigatorRef = bodyHitData.Instigator,
+					InstigatorIndex = bodyHitData.InstigatorIndex,
 					IsFatal       = i == _hitCount && CurrentHealth <= 0f,
 				};
 
@@ -277,22 +277,22 @@ namespace TPSBR
 
 		private void OnHitTaken(HitData hit)
 		{
-			// For local player, HitTaken was already called when applying hit
-			if (hit.InstigatorRef != Context.LocalPlayerRef)
+            // For local player, HitTaken was already called when applying hit
+            if (hit.CheckLocal(Context) == false)
 			{
 				HitTaken?.Invoke(hit);
-			}
+			}            
 
 			// We use _hitData buffer to inform instigator about successful hit as this needs
 			// to be synchronized over network as well (e.g. when spectating other players)
-			if (hit.InstigatorRef.IsValid == true && hit.InstigatorRef == Context.ObservedPlayerRef)
+			if (hit.CheckObservedPlayerRef(Context))
 			{
 				var instigator = hit.Instigator;
 
 				if (instigator == null)
 				{
-					var player = Context.NetworkGame.GetPlayer(hit.InstigatorRef);
-					instigator = player != null ? player.ActiveAgent.Health as IHitInstigator : null;
+					var agent = hit.GetAgent(Context);
+					instigator = agent != null ? agent.Health as IHitInstigator : null;
 				}
 
 				if (instigator != null)

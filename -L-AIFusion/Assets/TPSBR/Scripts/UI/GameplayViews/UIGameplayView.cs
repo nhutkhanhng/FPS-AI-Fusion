@@ -170,20 +170,26 @@ namespace TPSBR.UI
 
 		private void OnAgentDeath(KillData killData)
 		{
-			var victimPlayer = Context.NetworkGame.GetPlayer(killData.VictimIndex);
-			var killerPlayer = Context.NetworkGame.GetPlayer(killData.KillerIndex);
+			var victimPlayer = Context.GameplayMode.GetPlayerReplyOnAgentIndex(killData.VictimIndex);
+			var killerPlayer = Context.GameplayMode.GetPlayerReplyOnAgentIndex(killData.KillerIndex);
 
-			_killFeed.ShowFeed(new KillFeedData
+            var VictimRef = Context.NetworkGame.GetPlayerRef(victimPlayer);
+            bool isLocalVictim = VictimRef == null ? false : (VictimRef != PlayerRef.None && VictimRef == Context.LocalPlayerRef);
+
+            var KillerRef = Context.NetworkGame.GetPlayerRef(victimPlayer);
+            bool isLocalKiller = KillerRef == null ? false : (KillerRef != PlayerRef.None && KillerRef == Context.LocalPlayerRef);
+
+            _killFeed.ShowFeed(new KillFeedData
 			{
 				Killer        = killerPlayer != null ? killerPlayer.Nickname : "",
 				Victim        = victimPlayer != null ? victimPlayer.Nickname : "",
 				IsHeadshot    = killData.Headshot,
 				DamageType    = killData.HitType,
-				VictimIsLocal = killData.VictimRef != PlayerRef.None && killData.VictimRef == Context.LocalPlayerRef,
-				KillerIsLocal = killData.KillerRef != PlayerRef.None && killData.KillerRef == Context.LocalPlayerRef,
+				VictimIsLocal = isLocalVictim,
+				KillerIsLocal = isLocalKiller,
 			});
 
-			if (killData.VictimRef == Context.ObservedPlayerRef)
+			if (VictimRef == Context.ObservedPlayerRef)
 			{
 				bool eliminated = victimPlayer != null ? victimPlayer.Statistics.IsEliminated : false;
 
@@ -195,7 +201,7 @@ namespace TPSBR.UI
 					Sound       = _playerDeathSound,
 				});
 			}
-			else if (killData.KillerRef == Context.ObservedPlayerRef)
+			else if (KillerRef == Context.ObservedPlayerRef)
 			{
 				bool eliminated = killerPlayer != null ? killerPlayer.Statistics.IsEliminated : false;
 

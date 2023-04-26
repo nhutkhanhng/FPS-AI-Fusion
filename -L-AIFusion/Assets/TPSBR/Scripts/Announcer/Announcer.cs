@@ -110,8 +110,6 @@ namespace TPSBR
 					continue;
 
 				var statistics = player.Statistics;
-				if (statistics.IsValid == false)
-					continue;
 				if (statistics.IsEliminated == true)
 					continue;
 

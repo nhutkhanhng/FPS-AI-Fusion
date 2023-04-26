@@ -81,7 +81,7 @@ namespace TPSBR
 				hitData.Action           = EHitAction.Damage;
 				hitData.Amount           = damage;
 				hitData.Position         = targetPosition;
-				hitData.InstigatorRef    = Object.InputAuthority;
+				hitData.InstigatorIndex  = -1;
 				hitData.Direction        = (targetPosition - transform.position).normalized;
 				hitData.Normal           = Vector3.up;
 				hitData.Target           = target;
