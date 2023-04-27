@@ -118,6 +118,25 @@ namespace TPSBR
             return AllAgents;
         }
 
+        public Agent FindAgentNearestPoint(Vector3 Position, Agent exclude)
+        {
+            Agent result = null;
+            float min = int.MaxValue;
+
+            foreach(var p in _allAgentInGame)
+            {
+                if (p.Value != null && p.Value.Equals(exclude) == false)
+                {
+                    if (Vector3.Distance(p.Value.transform.position, Position) < min)
+                    {
+                        min = Vector3.Distance(p.Value.transform.position, Position);
+                        result = p.Value;
+                    }
+                }
+            }
+
+            return result;
+        }
         public List<Player> AllPlayers 
         {
             get
@@ -218,6 +237,8 @@ namespace TPSBR
 			var victimIndex        = victim.AgentIndex;
 			var victimPlayer     = Context.GameplayMode.GetPlayerReplyOnAgentIndex(victimIndex);
 			var victimStatistics = victimPlayer != null ? victimPlayer.Statistics : default;
+
+            Debug.LogError(victimIndex);
 
 			var respawnTime = GetRespawnTime(victimStatistics);
 			if (respawnTime >= 0f)

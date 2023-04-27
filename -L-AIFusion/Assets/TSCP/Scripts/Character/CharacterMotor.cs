@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using TPSBR;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 namespace CoverShooter
@@ -2210,6 +2211,12 @@ namespace CoverShooter
         [SerializeField] protected Vector3 NextDirection;
         [SerializeField] protected Vector2 AngleDirection;
 
+        private NavMeshPath _path;
+        private Vector3[] _pathPoints = new Vector3[64];
+        private int _pathLength;
+        private int _currentPathIndex;
+
+
         [SerializeField] bool isMove = false, isRotate = false;
         public Vector2 CalculatePitchAndYaw(Vector3 currentTransform, Vector3 targetPosition, float rotationSpeed)
         {
@@ -2231,9 +2238,7 @@ namespace CoverShooter
             var oldPitchYaw = kcc.RenderData.GetLookRotation(true, true);
 
             if (isRotate)
-                agent.SetRotationDeltaDirect(
-                    Mathf.Lerp( oldPitchYaw.x, newPitchYaw.x, 5 * GetDeltaTime()) - oldPitchYaw.x + pitchYawtest.x, 
-                    Mathf.Lerp(oldPitchYaw.y, newPitchYaw.y , 5 * GetDeltaTime()) - oldPitchYaw.y + pitchYawtest.y);
+                agent.SetRotationDeltaDirect(newPitchYaw.x - oldPitchYaw.x + pitchYawtest.x, newPitchYaw.y - oldPitchYaw.y + pitchYawtest.y);
 
             AngleDirection =   new Vector2(oldPitchYaw.x - newPitchYaw.x, newPitchYaw.y - oldPitchYaw.y);
 
@@ -2242,6 +2247,17 @@ namespace CoverShooter
                 Vector3 targetPositionLocal = Quaternion.Inverse(transform.rotation) * (Direction);
                 var rotation = Quaternion.LookRotation(direction);
                 NextDirection = rotation * targetPositionLocal;
+
+                AIUtil.Path(ref _path, transform.position, NextDirection);
+                _pathLength = _path.GetCornersNonAlloc(_pathPoints);
+                if (_pathLength > 1)
+                {
+                    var vector = _pathPoints[1] - _pathPoints[0];
+                    var distance = vector.magnitude;
+
+                    if (distance > 0.3f)
+                        NextDirection = vector / distance;
+                }
             }
             else
                 NextDirection = Vector3.zero;
@@ -4750,7 +4766,8 @@ namespace CoverShooter
         private bool findEdge(out Vector3 position, float threshold)
         {
             var bottom = transform.TransformPoint(_capsule.center - new Vector3(0, _capsule.height * 0.5f + _capsule.radius, 0));
-            var count = GetPhysicsScene().OverlapSphere(bottom, _capsule.radius + threshold, Util.Colliders, Layers.Geometry, QueryTriggerInteraction.UseGlobal);
+            var count = GetPhysicsScene().OverlapSphere(bottom, _capsule.radius + threshold, Util.Colliders, 
+                Layers.Geometry, QueryTriggerInteraction.UseGlobal);
 
             for (int i = 0; i < count; i++)
                 if (Util.Colliders[i].gameObject != gameObject)

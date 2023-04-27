@@ -69,6 +69,11 @@ namespace TPSBR
             aiPlayer.UpdateStatistics(statistics);
             aiPlayer.SetActiveAgent(enemy.GetComponent<AIAgent>());
 
+            var fighter = aiAgent.GetComponent<FighterBrain>();
+            fighter.Start.Mode = AIStartMode.investigate;
+            fighter.Start.Position = _currentGameMode.FindAgentNearestPoint(fighter.transform.position, aiAgent).transform.position;
+            fighter.StartingLocation = _currentGameMode.FindAgentNearestPoint(fighter.transform.position, aiAgent).transform.position;
+
 
             AllEnemies.Add(enemy);
 
@@ -77,7 +82,7 @@ namespace TPSBR
         private void SpawnEnemies(NetworkBehaviour template)
         {
             // var spawnPoint = _currentGameMode.GetRandomSpawnPoint(1f);
-            var spawnPoint = _currentGameMode.GetAgents()[0].transform;
+            var spawnPoint = _currentGameMode.GetRandomSpawnPoint(1f);
 
             var deltaPosition = UnityEngine.Random.insideUnitSphere * 5f;
             deltaPosition.y = 0;
@@ -110,6 +115,12 @@ namespace TPSBR
 
             _currentGameMode.TryAdd(aiPlayer, aiAgent);
             statistics.AgentIndex = aiAgent.AgentIndex;
+
+            var fighter = aiAgent.GetComponent<FighterBrain>();
+
+            fighter.Start.Mode = AIStartMode.investigate;
+            fighter.Start.Position = _currentGameMode.FindAgentNearestPoint(fighter.transform.position, aiAgent).transform.position;
+            fighter.StartingLocation = _currentGameMode.FindAgentNearestPoint(fighter.transform.position, aiAgent).transform.position;
 
             aiPlayer.UpdateStatistics(statistics);
             aiPlayer.SetActiveAgent(enemy.GetComponent<AIAgent>());

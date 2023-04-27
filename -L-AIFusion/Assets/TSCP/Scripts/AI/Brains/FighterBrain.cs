@@ -238,10 +238,10 @@ namespace CoverShooter
         {
             get
             {
-                if (_futureSetState != FighterState.none)
-                    return _futureSetState;
+                if (futureSetState != FighterState.none)
+                    return futureSetState;
                 else
-                    return _state;
+                    return state;
             }
         }
 
@@ -400,7 +400,8 @@ namespace CoverShooter
         private HashSet<Actor> _visibleCivilians = new HashSet<Actor>();
 
         private FighterState _previousState;
-        private FighterState _state;
+        protected FighterState _state;
+        private FighterState state { get => _state; set { Debug.LogError(value); _state = value; } }
         private float _stateTime;
 
         private Vector3 _maintainPosition;
@@ -423,7 +424,8 @@ namespace CoverShooter
         private bool _hasThrowFirstGrenade;
         private Vector3[] _grenadePath = new Vector3[128];
 
-        private FighterState _futureSetState;
+        [SerializeField] private FighterState _futureSetState;
+        public FighterState futureSetState { get => _futureSetState; private set { Debug.LogError("Future  " + value); _futureSetState = value; } }
         private bool _hasFailedToFindCover;
         private bool _hasSucceededToFindCover;
         private bool _isLookingForCover;
@@ -682,7 +684,7 @@ namespace CoverShooter
         public override void ToForget()
         {
             base.ToForget();
-            setState(FighterState.patrol);
+            setState(FighterState.search);
         }
 
         /// <summary>
@@ -989,9 +991,9 @@ namespace CoverShooter
             {
                 if ((Actor.Cover == null && canLeavePosition) || Threat == null || !Threat.IsAlive)
                     setState(FighterState.retreatToCover);
-                else if (_state == FighterState.hideInCover && _stateTime > 0.5f)
+                else if (state == FighterState.hideInCover && _stateTime > 0.5f)
                     setState(FighterState.fightInCover);
-                else if (_state == FighterState.fightInCover && _stateTime > 0.5f)
+                else if (state == FighterState.fightInCover && _stateTime > 0.5f)
                     setState(FighterState.hideInCover);
             }
 
@@ -1245,6 +1247,8 @@ namespace CoverShooter
         /// </summary>
         public void OnUnseeActor(Actor actor)
         {
+            Debug.LogError(actor.transform.name);
+
             _visibleActors.Remove(actor);
 
             if (actor.Side == Actor.Side)
@@ -1258,7 +1262,9 @@ namespace CoverShooter
             {
                 UnseeThreat();
 
-                if (State == FighterState.standAndFight && canLeavePosition)
+                if (
+                    // State == FighterState.standAndFight && 
+                    canLeavePosition)
                 {
                     if (ThreatCover == null && tryInvestigate())
                         setState(FighterState.investigate);
@@ -1359,7 +1365,7 @@ namespace CoverShooter
 
         #region Behaviour
 
-        protected override void Awake()
+        public override void Spawned()
         {
             base.Awake();
             
@@ -1376,24 +1382,24 @@ namespace CoverShooter
             switch (Start.Mode)
             {
                 case AIStartMode.idle:
-                    _futureSetState = FighterState.idle;
+                    futureSetState = FighterState.idle;
                     break;
 
                 case AIStartMode.alerted:
-                    _futureSetState = FighterState.idleButAlerted;
+                    futureSetState = FighterState.idleButAlerted;
                     break;
 
                 case AIStartMode.patrol:
-                    _futureSetState = FighterState.patrol;
+                    futureSetState = FighterState.patrol;
                     break;
 
                 case AIStartMode.searchAround:
                 case AIStartMode.searchPosition:
-                    _futureSetState = FighterState.search;
+                    futureSetState = FighterState.search;
                     break;
 
                 case AIStartMode.investigate:
-                    _futureSetState = FighterState.investigate;
+                    futureSetState = FighterState.investigate;
                     break;
             }
         }
@@ -1405,10 +1411,10 @@ namespace CoverShooter
 
             _stateTime += GetDeltaTime();
 
-            if (_futureSetState != FighterState.none)
+            if (futureSetState != FighterState.none)
             {
-                var state = _futureSetState;
-                _futureSetState = FighterState.none;
+                var state = futureSetState;
+                futureSetState = FighterState.none;
                 setStateImmediately(state);
             }
 
@@ -1444,7 +1450,7 @@ namespace CoverShooter
             if (canLeavePosition)
                 findGrenades();
 
-            switch (_state)
+            switch (state)
             {
                 case FighterState.none:
                     setState(FighterState.patrol);
@@ -1711,7 +1717,7 @@ namespace CoverShooter
 
         private void setState(FighterState state, bool forceRestart = false, bool allowCancelProcess = false)
         {
-            if (_state == FighterState.process && !allowCancelProcess)
+            if (this.state == FighterState.process && !allowCancelProcess)
                 return;
 
             if (state == FighterState.search)
@@ -1721,26 +1727,26 @@ namespace CoverShooter
             {
             }
 
-            if (_futureSetState != FighterState.none ||
-                _state != state ||
+            if (futureSetState != FighterState.none ||
+                this.state != state ||
                 forceRestart)
             {
-                _futureSetState = state;
+                futureSetState = state;
             }
         }
 
         private void setStateImmediately(FighterState state)
         {
-            if (_state != state)
-                _previousState = _state;
+            if (this.state != state)
+                _previousState = this.state;
 
             _failedToAvoidInThisState = false;
             _hasOpenFire = false;
 
-            closeState(_state, state);
+            closeState(this.state, state);
             _stateTime = 0;
-            _state = state;
-            openState(_state, _previousState);
+            this.state = state;
+            openState(this.state, _previousState);
 
             if (IsAlerted)
             {
@@ -1765,11 +1771,19 @@ namespace CoverShooter
 
                     if (Start.ReturnOnIdle && Vector3.Distance(transform.position, StartingLocation) > 0.25f)
                     {
+                        Debug.LogError("ToWalkTo");
                         Message("ToWalkTo", StartingLocation);
                         Message("ToFaceWalkDirection");
                     }
                     else
-                        Message("ToStopMoving");
+                    {
+                        Debug.LogError("ToStopMoving");
+                        var position = Context.GameplayMode.FindAgentNearestPoint(this.transform.position, this.Actor.GetAgent()).transform.position;
+                        Message("ToWalkTo", position);
+                        Message("ToFaceWalkDirection");
+
+                        // Message("ToStopMoving");
+                    }
 
                     break;
 

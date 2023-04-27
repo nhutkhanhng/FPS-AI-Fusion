@@ -56,7 +56,6 @@ namespace TPSBR
 			_observedPlayer = Object.InputAuthority;
             var n = Statistics;
             n.AgentIndex = agent.AgentIndex;
-            Debug.LogError((agent is AIAgent).ToString() + "===" + agent.AgentIndex);
             UpdateStatistics(n);
 		}
 
@@ -75,7 +74,6 @@ namespace TPSBR
 		public void UpdateStatistics(PlayerStatistics statistics)
 		{
 			Statistics = statistics;
-            Debug.LogError(statistics.AgentIndex);
 		}
 
 		public void SetObservedPlayer(PlayerRef playerRef)

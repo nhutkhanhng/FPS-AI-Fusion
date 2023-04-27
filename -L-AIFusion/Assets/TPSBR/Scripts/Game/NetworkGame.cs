@@ -73,11 +73,15 @@ namespace TPSBR
 		// PUBLIC METHODS
         public PlayerRef? GetPlayerRef(Player playerInfo)
         {
+            if (playerInfo == null)
+                Debug.LogError("???????");
+
             foreach(var p in _pendingPlayers)
             {
-                if (p.Value.Statistics.AgentIndex == playerInfo.Statistics.AgentIndex)
+                if (p.Value)
                 {
-                    return p.Key;
+                    if (p.Value.Statistics.AgentIndex == playerInfo.Statistics.AgentIndex)
+                        return p.Key;
                 }
             }
 
@@ -364,7 +368,8 @@ namespace TPSBR
 			if (_isActive == false || _levelGenerator == null || _levelGenerated == true || seed == 0)
 				return;
 
-			_levelGenerated = true;
+            _levelGenerator.IsSerSide = Runner.IsServer;
+            _levelGenerated = true;
 
 			_levelGenerator.Generate(seed, _levelSize, _areaCount);
 

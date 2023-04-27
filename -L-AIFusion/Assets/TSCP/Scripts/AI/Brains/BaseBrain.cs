@@ -101,6 +101,7 @@ namespace CoverShooter
         public Vector3 StartingLocation
         {
             get { return _startingPosition; }
+            set { _startingPosition = value; }
         }
 
         /// <summary>

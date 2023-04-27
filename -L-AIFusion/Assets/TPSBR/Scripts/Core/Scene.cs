@@ -13,7 +13,7 @@ namespace TPSBR
             var victimPlayer = Context.NetworkGame.GetPlayer(agentIndex);
 
             var VictimRef = Context.NetworkGame.GetPlayerRef(victimPlayer);
-            bool isLocalVictim = VictimRef == null ? false : (VictimRef != PlayerRef.None && VictimRef == Context.LocalPlayerRef);
+            bool isLocalVictim = VictimRef == null ? false : (VictimRef.Value != PlayerRef.None && VictimRef.Value == Context.LocalPlayerRef);
 
             return isLocalVictim;
         }
@@ -27,7 +27,8 @@ namespace TPSBR
         public static bool CheckLocal(this SceneContext Context, in PlayerStatistics statics)
         {
             var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(statics.AgentIndex);
-            return Context.NetworkGame.GetPlayerRef(player) == Context.LocalPlayerRef;
+            var f = Context.NetworkGame.GetPlayerRef(player);
+            return f!= null && f.Value == Context.LocalPlayerRef;
         }
         public static bool CheckLocalAndRunnerForward(in this HitData hitData, SceneContext Context, NetworkRunner Runner)
         {
@@ -40,7 +41,9 @@ namespace TPSBR
             // hit.InstigatorRef != Context.LocalPlayerRef
 
             var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
-            return Context.NetworkGame.GetPlayerRef(player) == Context.LocalPlayerRef;
+
+            var f = Context.NetworkGame.GetPlayerRef(player);
+            return f != null && f.Value == Context.LocalPlayerRef;
         }
 
         public static bool CheckObservedPlayerRef(in this HitData hitData, SceneContext Context)
@@ -48,7 +51,9 @@ namespace TPSBR
             // hit.InstigatorRef == Context.ObservedPlayerRef
 
             var player = Context.GameplayMode.GetPlayerReplyOnAgentIndex(hitData.InstigatorIndex);
-            return Context.NetworkGame.GetPlayerRef(player) == Context.ObservedPlayerRef;
+
+            var f = Context.NetworkGame.GetPlayerRef(player);
+            return f != null && f.Value == Context.ObservedPlayerRef;
         }
 
     }

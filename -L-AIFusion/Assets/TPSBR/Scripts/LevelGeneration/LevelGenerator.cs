@@ -42,8 +42,8 @@ namespace TPSBR
 
 	public class LevelGenerator : CoreBehaviour
 	{
-		// PUBLIC MEMBERS
-
+        // PUBLIC MEMBERS
+        public bool IsSerSide = false;
 		public AreaSetup[]     Areas => _areas;
 
 		public List<SpawnData> ObjectsToSpawn  => _objectsToSpawn;
@@ -139,12 +139,6 @@ namespace TPSBR
 		{
 			var block = GenerateBlock(blockSpawn.GetBlockPrefab(), position);
             var sf = block.GetComponent<NavMeshSurface>();
-
-            if (sf == null)
-                sf = block.gameObject.AddComponent<NavMeshSurface>();
-
-            allSf.Add(sf);
-            sf.BuildNavMesh();
             return block;
 		}
 
@@ -157,13 +151,17 @@ namespace TPSBR
 			{
 				block.transform.localScale = new Vector3(-1f, 1f, 1f);
 			}
-            var sf = block.GetComponent<NavMeshSurface>();
 
-            if (sf == null)
-                sf = block.gameObject.AddComponent<NavMeshSurface>();
+            if (IsSerSide)
+            {
+                var sf = block.GetComponent<NavMeshSurface>();
 
-            allSf.Add(sf);
-            sf.BuildNavMesh();
+                if (sf == null)
+                    sf = block.gameObject.AddComponent<NavMeshSurface>();
+
+                allSf.Add(sf);
+                sf.BuildNavMesh();
+            }
             return block;
 		}
 

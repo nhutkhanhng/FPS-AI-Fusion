@@ -24,15 +24,6 @@ namespace TPSBR
 		[SerializeField]
 		private MeshRenderer[] _renderers;
 
-        // PUBLIC METHODS
-        private void Awake()
-        {
-            var sf = GetComponent<NavMeshSurface>();
-
-            if (sf == null)
-                sf = gameObject.AddComponent<NavMeshSurface>();
-            sf.BuildNavMesh();
-        }
         public void SetMaterial(int areaID, Material material)
 		{
 			if (material == null)

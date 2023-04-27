@@ -218,7 +218,7 @@ namespace CoverShooter
 
         #region Behaviour
 
-        private void Awake()
+        public override void Spawned()
         {
             _block = new SearchBlock(_points);
             _blockCache = new SearchBlockCache(_points);
@@ -313,7 +313,7 @@ namespace CoverShooter
             if (_wasRunning && !shouldRunTo(_point.Position))
                 walk();
 
-            _checkWait -= kINetworkTimer.deltaTime;
+            _checkWait -= GetDeltaTime();
 
             if (_checkWait <= float.Epsilon)
             {

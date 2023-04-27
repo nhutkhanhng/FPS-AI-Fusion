@@ -222,6 +222,8 @@ namespace CoverShooter
         [SerializeField] protected Rigidbody _body;
         [SerializeField] protected BaseBrain _brain;
         [SerializeField] protected Agent _agent;
+
+        public Agent GetAgent() => _agent;
         protected KCC kcc;
         protected Actor _possibleThreat;
 
